@@ -4,29 +4,62 @@ An Axum + Tokio API for simulating slow HTTP responses. Choose how long a reques
 waits, how it waits, and which HTTP status comes back. Use it to exercise loading
 states, client timeouts, retries, and mock email or SMS integrations.
 
+Each request waits inside SleepAPI, then receives a JSON result and the chosen
+HTTP status. Email and SMS are labels on this delay engine; no provider is
+contacted and no background delivery job is created. The waiting implementations
+are real, while the provider outcomes are simulated.
+
+**v0.1.0** is distributed as source code and a Dockerfile.
+See the [changelog](CHANGELOG.md) and [release checklist](docs/RELEASING.md) for
+its scope and publication status.
+
 ## Run with Docker
 
-The image runs Linux on `amd64` and `arm64`. Use Docker Engine on Linux or Docker
+The container targets are Linux `amd64` and `arm64`. Use Docker Engine on Linux or Docker
 Desktop in Linux-container mode on macOS and Windows; Rust is not needed on the
-host. Build locally for your machine's architecture:
+host. Docker runs the API locally; it does not connect to a hosted SleepAPI service.
+
+CI covers both Linux architectures. Docker Desktop was also checked locally on
+macOS; Windows host integration and native Windows builds have not been tested.
+
+### Build the current source
+
+Build locally for your machine's architecture:
 
 ```sh
 git clone https://github.com/givtaj/sleepapi.git
 cd sleepapi
-docker build -t sleepapi:0.1.0 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.0
+docker build -t sleepapi:dev .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:dev
 ```
 
 The container runs as a non-root user and listens on `0.0.0.0:3000` internally.
 The command above exposes it only on your host's loopback address. Docker selects
 the matching architecture when building; the same Dockerfile serves both Intel/AMD
-and ARM64 hosts. This repository currently provides a buildable image definition,
-not a published registry image.
+and ARM64 hosts. The `dev` tag describes your local checkout, which may differ
+from a released version. Building requires network access to download base images
+and Rust dependencies. The Rust compiler stays in the build stage, outside the
+runtime image.
+
+No registry image is part of v0.1.0: users build their own image from the source.
+To build the versioned release, use the `v0.1.0` Git tag instead of cloning the
+moving default branch:
+
+```sh
+git clone --branch v0.1.0 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.0
+cd sleepapi-v0.1.0
+docker build -t sleepapi:0.1.0 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.0
+```
+
+Both examples build an image on your machine; neither pulls a prebuilt SleepAPI image.
+
+### Configure and stop the container
 
 Configure the container with environment variables, for example:
 
 ```sh
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 -e SLEEPAPI_CORS_ORIGINS=http://localhost:5173 sleepapi:0.1.0
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 -e SLEEPAPI_CORS_ORIGINS=http://localhost:5173 sleepapi:dev
 ```
 
 Stop it from another terminal with `docker stop --time 7 sleepapi`. The default
@@ -39,12 +72,19 @@ to the binary running as PID 1.
 Install Rust 1.94 or newer, then from this directory:
 
 ```sh
-cargo run
+cargo run --locked
 ```
 
-The server listens at `http://127.0.0.1:3000`. In another terminal:
+The server listens at `http://127.0.0.1:3000` by default.
+
+## Try the API
+
+After starting with Docker or Rust, use another terminal. The `sh` examples in
+this document use POSIX shell syntax (macOS/Linux, WSL, or Git Bash):
 
 ```sh
+curl -sS http://127.0.0.1:3000/health
+
 # Wait 400 ms without blocking a runtime worker.
 curl -sS http://127.0.0.1:3000/sleep/tokio \
   -H 'Content-Type: application/json' \
@@ -59,6 +99,14 @@ curl -sS http://127.0.0.1:3000/simulate/email \
 curl -i http://127.0.0.1:3000/simulate/sms \
   -H 'Content-Type: application/json' \
   -d '{"scenario":"delayed_failure","method":"thread_park"}'
+```
+
+For Windows PowerShell, these are the equivalents of the request examples.
+They are provided for convenience and have not been executed on Windows in this release:
+
+```powershell
+Invoke-RestMethod -Uri http://127.0.0.1:3000/health
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:3000/sleep/tokio -ContentType 'application/json' -Body '{"duration_ms":400}'
 ```
 
 Example result (elapsed time varies):
@@ -201,7 +249,9 @@ rejected with `422`, as are bodyless statuses `204`, `205`, and `304`. Other cus
 statuses simulate the status and JSON result, not a complete provider protocol;
 for example, a `302` response does not configure a redirect destination.
 
-Actual API rejections are immediate and use `simulated: false`. For example,
+Validation, routing, and capacity rejections skip the configured simulation delay
+and use `simulated: false`; body parsing can still take time. An internal waiting-task
+failure also uses `simulated: false`, but may occur after waiting has started. For example,
 exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 
 ```json
@@ -253,8 +303,8 @@ Malformed JSON returns `400`; invalid fields, excessive duration, or disallowed
 status codes return `422`; missing JSON content type returns `415`; oversized
 bodies return `413`; unknown operations return `404`. These errors have the shape
 shown for actual API rejections above. Unsupported HTTP methods return `405` in
-the same format. Requests arriving when all simulation slots are occupied get
-an immediate `429`, without entering a waiting queue. Simulated failures have
+the same format. Valid requests finding all simulation slots occupied at admission
+get `429` without waiting for a slot. Simulated failures have
 the normal result shape with `simulated: true` plus the structured `error` object.
 
 `elapsed_ms` measures server time from admission to wait completion, including
@@ -335,14 +385,17 @@ See [Tokio's blocking-task lifecycle](https://docs.rs/tokio/latest/tokio/task/fn
 
 ```sh
 cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo test
+cargo clippy --locked --all-targets -- -D warnings
+cargo test --locked
 ```
 
 GitHub Actions runs only on Linux. It checks formatting, Clippy, tests, release
 builds, and source packaging on stable Rust, and tests the supported minimum Rust
 1.94.0. Separate native Linux `amd64` and `arm64` jobs build the Docker image and
-verify container HTTP behavior, CORS, and shutdown. No images are pushed by CI.
+verify container HTTP behavior, CORS, and shutdown. CI builds images only for
+testing; it does not push them to a registry. See [Releasing](docs/RELEASING.md)
+for the source-release checklist. A configured workflow is not evidence that a
+release candidate has passed: check the run for the exact release commit.
 Process tests cover graceful drain, stalled request bodies, repeated signals,
 and blocking work at shutdown.
 
@@ -357,3 +410,7 @@ The code is split into the HTTP contract (`src/lib.rs`), the four waiting
 implementations (`src/wait.rs`), environment configuration (`src/config.rs`),
 scenario presets (`src/scenario.rs`), error responses (`src/error.rs`),
 and server startup/shutdown (`src/main.rs`).
+
+## License
+
+MIT; see [LICENSE](LICENSE).
