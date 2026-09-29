@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!Cargo.toml
+!Cargo.lock
+!README.md
+!LICENSE
+!src/
+!src/**
