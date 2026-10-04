@@ -1,6 +1,6 @@
 # Interpretation criteria for the follow-up
 
-These criteria were reviewed against SleepAPI source before interpreting live results.
+These criteria accompany the historical results reported in the [bundle summary](README.md). Raw benchmark inputs and the original verifier are not included, so the public bundle supports inspection of the reported values rather than reproduction of the original audit.
 
 - At a 400 ms delay, the closed-loop delay-only throughput ceilings for concurrency 1, 4, 16 and 64 are approximately 2.5, 10, 40 and 160 responses/s. Near-ceiling results establish that these workloads complete efficiently; they do not measure maximum throughput or capacity above 64.
 - `/health` bypasses simulation admission. On the isolated capacity-one server, a confirmed `429` with `simulated:false` and `error.code:capacity_exceeded`, followed by a valid zero-delay simulation response, establishes slot recovery. Probe timing gives a recovery interval rather than an exact instant.
@@ -12,4 +12,4 @@ These criteria were reviewed against SleepAPI source before interpreting live re
 
 Source references: [admission](../../../src/lib.rs), [waiting and permit ownership](../../../src/wait.rs), [documented cancellation behavior](../../../README.md), and [resource sampler](../../../scripts/benchmark-resources.py).
 
-Independent source review found no inaccurate cancellation/admission documentation and no server defect requiring an application change before these measurements.
+The historical report identified no server defect requiring an application change. The retained summary alone does not establish that result for a new workload or a changed implementation.

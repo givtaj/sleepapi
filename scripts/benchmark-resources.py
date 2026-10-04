@@ -26,7 +26,6 @@ import re
 import signal
 import subprocess
 import sys
-import threading
 import time
 
 
@@ -99,13 +98,13 @@ def process_sample(pid, clock_ticks, page_size, expected_start_ticks=None):
 
 
 def run(args, output):
-    stop = threading.Event()
     requested_signal = None
 
     def handle_signal(signum, _frame):
         nonlocal requested_signal
-        requested_signal = signal.Signals(signum).name
-        stop.set()
+        # Signal handlers can interrupt a wait while its internal lock is held.
+        # Record only the signal here; leave shutdown and formatting to the loop.
+        requested_signal = signum
 
     original_handlers = {
         signum: signal.signal(signum, handle_signal)
@@ -174,8 +173,8 @@ def run(args, output):
             })
             count += 1
             previous = sample
-            if stop.is_set():
-                reason = requested_signal or "requested_stop"
+            if requested_signal is not None:
+                reason = signal.Signals(requested_signal).name
                 break
             if args.stop_file and args.stop_file.exists():
                 reason = "stop_file"
@@ -186,9 +185,16 @@ def run(args, output):
                 break
             # Skip missed slots instead of emitting a burst of delayed samples.
             next_sample_ns = max(next_sample_ns + interval_ns, now_ns)
-            stop.wait(max(0, min(next_sample_ns, deadline_ns) - now_ns) / 1_000_000_000)
-            if stop.is_set():
-                reason = requested_signal or "requested_stop"
+            wake_ns = min(next_sample_ns, deadline_ns)
+            # Python resumes sleep after a handled signal. Bound each sleep so
+            # shutdown stays prompt even with the maximum 10-second interval.
+            while requested_signal is None:
+                remaining_ns = wake_ns - time.monotonic_ns()
+                if remaining_ns <= 0:
+                    break
+                time.sleep(min(remaining_ns / 1_000_000_000, 0.1))
+            if requested_signal is not None:
+                reason = signal.Signals(requested_signal).name
                 break
             if args.stop_file and args.stop_file.exists():
                 reason = "stop_file"

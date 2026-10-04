@@ -1,7 +1,14 @@
 {
+  "publication": {
+    "evidence_status": "historical_record_with_public_redactions",
+    "redactions": [
+      "Removed local run/session suffixes from descriptive identifiers and commands."
+    ],
+    "note": "These are edited historical records, not original raw receipts or a new verification run. Recorded measurements and outcomes are unchanged. Commands containing redacted identifiers are illustrative, not exact original invocations."
+  },
   "recorded_at": "2026-09-30T01:52:24.999358+02:00",
   "container_id": "775721c893aa348ec53da581ee84b458261500e0fdd50c956e059bce5041a1cd",
-  "container_name": "sleepapi-benchmark-01a0ef83",
+  "container_name": "sleepapi-benchmark",
   "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
   "state": {
     "Status": "exited",
@@ -16,7 +23,7 @@
     "StartedAt": "2026-09-29T23:42:15.272109465Z",
     "FinishedAt": "2026-09-29T23:52:24.729738862Z"
   },
-  "action": "docker stop --time 7 sleepapi-benchmark-01a0ef83",
+  "action": "docker stop --time 7 sleepapi-benchmark",
   "retained_for_rerun": true,
-  "restart_command": "docker start sleepapi-benchmark-01a0ef83"
+  "restart_command": "docker start sleepapi-benchmark"
 }

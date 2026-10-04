@@ -1,5 +1,14 @@
 {
-  "operation": "sleepapi-followup-2026-10-04-01a0ef83",
+  "publication": {
+    "evidence_status": "historical_audit_summary_only",
+    "redactions": [
+      "Removed local run/session suffixes from descriptive identifiers and commands."
+    ],
+    "note": "The passed flag, counts, checks, and rows below report the historical audit only. Its raw runner artifacts, resource samples, and verifier are not included, so that audit cannot be reproduced from this repository. The measurements have not been rerun or independently reverified for this public bundle.",
+    "raw_inputs_included": false,
+    "original_verifier_included": false
+  },
+  "operation": "sleepapi-followup-2026-10-04",
   "verified_at_utc": "2026-10-04T13:27:20.293116+00:00",
   "passed": true,
   "verified_runs": 48,

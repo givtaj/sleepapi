@@ -1,5 +1,12 @@
 {
-  "operation": "sleepapi-local-2026-09-30-01a0ef83",
+  "publication": {
+    "evidence_status": "historical_record_with_public_redactions",
+    "redactions": [
+      "Removed local run/session suffixes from descriptive identifiers and commands."
+    ],
+    "note": "These are edited historical records, not original raw receipts or a new verification run. Recorded measurements and outcomes are unchanged. Commands containing redacted identifiers are illustrative, not exact original invocations."
+  },
+  "operation": "sleepapi-local-2026-09-30",
   "prepared_at": "2026-09-30T01:37:07.664207+02:00",
   "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
   "architecture": "x86_64",
