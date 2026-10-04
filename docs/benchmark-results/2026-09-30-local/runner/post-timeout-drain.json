@@ -1,0 +1,7 @@
+{
+  "started_at": "2026-09-30T01:49:58.444733+02:00",
+  "completed_at": "2026-09-30T01:50:01.644944+02:00",
+  "requested_seconds": 3.2,
+  "observed_seconds": 3.200153867714107,
+  "requests_sent_during_drain": 0
+}

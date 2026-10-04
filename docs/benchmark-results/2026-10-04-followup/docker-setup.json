@@ -1,0 +1,329 @@
+{
+  "operation": "sleepapi-followup-2026-10-04-01a0ef83",
+  "prepared_at": "2026-10-04T14:46:30.669507+02:00",
+  "source_commit": "d6e10c3012b042e825831606424c41437e20a06c",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "per_request_logging": "disabled (RUST_LOG=sleepapi=warn)",
+  "containers": [
+    {
+      "role": "tokio",
+      "container_name": "sleepapi-followup-01a0ef83-tokio",
+      "container_id": "e8eb8cca7d90330a18045b2a6997e5495d5d7b963cf4e6906dba5ec842858a84",
+      "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "pid": 3108127,
+      "base_url": "http://127.0.0.1:3110",
+      "max_in_flight": 64,
+      "executable_sha256": "aa947abe7e4f6f71d157896006224151d32b3d1dcc7a1a4feae5ae3cc225472e",
+      "run_argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "sleepapi-followup-01a0ef83-tokio",
+        "--label",
+        "codex.operation=sleepapi-followup-2026-10-04-01a0ef83",
+        "--publish",
+        "127.0.0.1:3110:3000",
+        "-e",
+        "SLEEPAPI_MAX_IN_FLIGHT=64",
+        "-e",
+        "RUST_LOG=sleepapi=warn",
+        "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158"
+      ],
+      "started_at": "2026-10-04T12:46:26.923210182Z",
+      "health": {
+        "status": "ok"
+      },
+      "methods": {
+        "defaults": {
+          "duration_ms": 400,
+          "method": "tokio_sleep",
+          "status_code": 200
+        },
+        "limits": {
+          "max_duration_ms": 30000,
+          "max_in_flight": 64
+        },
+        "methods": [
+          {
+            "blocks_thread": false,
+            "description": "Await a Tokio timer in the request task; no thread is blocked.",
+            "method": "tokio_sleep"
+          },
+          {
+            "blocks_thread": false,
+            "description": "Spawn a Tokio task, await its timer, then join it; no thread is blocked.",
+            "method": "tokio_spawn"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Sleep an OS thread in Tokio's blocking pool.",
+            "method": "thread_sleep"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Park an OS thread in Tokio's blocking pool until the duration elapses.",
+            "method": "thread_park"
+          }
+        ]
+      },
+      "cgroup": "0::/system.slice/docker-e8eb8cca7d90330a18045b2a6997e5495d5d7b963cf4e6906dba5ec842858a84.scope\n"
+    },
+    {
+      "role": "tokio-spawn",
+      "container_name": "sleepapi-followup-01a0ef83-tokio-spawn",
+      "container_id": "c1f5cd0b5ec4fa7b89ea752fe0354ada004cb27831b6f563f23dfe020a0598a1",
+      "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "pid": 3108315,
+      "base_url": "http://127.0.0.1:3111",
+      "max_in_flight": 64,
+      "executable_sha256": "aa947abe7e4f6f71d157896006224151d32b3d1dcc7a1a4feae5ae3cc225472e",
+      "run_argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "sleepapi-followup-01a0ef83-tokio-spawn",
+        "--label",
+        "codex.operation=sleepapi-followup-2026-10-04-01a0ef83",
+        "--publish",
+        "127.0.0.1:3111:3000",
+        "-e",
+        "SLEEPAPI_MAX_IN_FLIGHT=64",
+        "-e",
+        "RUST_LOG=sleepapi=warn",
+        "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158"
+      ],
+      "started_at": "2026-10-04T12:46:27.731858916Z",
+      "health": {
+        "status": "ok"
+      },
+      "methods": {
+        "defaults": {
+          "duration_ms": 400,
+          "method": "tokio_sleep",
+          "status_code": 200
+        },
+        "limits": {
+          "max_duration_ms": 30000,
+          "max_in_flight": 64
+        },
+        "methods": [
+          {
+            "blocks_thread": false,
+            "description": "Await a Tokio timer in the request task; no thread is blocked.",
+            "method": "tokio_sleep"
+          },
+          {
+            "blocks_thread": false,
+            "description": "Spawn a Tokio task, await its timer, then join it; no thread is blocked.",
+            "method": "tokio_spawn"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Sleep an OS thread in Tokio's blocking pool.",
+            "method": "thread_sleep"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Park an OS thread in Tokio's blocking pool until the duration elapses.",
+            "method": "thread_park"
+          }
+        ]
+      },
+      "cgroup": "0::/system.slice/docker-c1f5cd0b5ec4fa7b89ea752fe0354ada004cb27831b6f563f23dfe020a0598a1.scope\n"
+    },
+    {
+      "role": "thread",
+      "container_name": "sleepapi-followup-01a0ef83-thread",
+      "container_id": "91a491ff05c44fb531dc5c699a3daccbdcf01841ede44a8f996d47b483b842d0",
+      "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "pid": 3108479,
+      "base_url": "http://127.0.0.1:3112",
+      "max_in_flight": 64,
+      "executable_sha256": "aa947abe7e4f6f71d157896006224151d32b3d1dcc7a1a4feae5ae3cc225472e",
+      "run_argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "sleepapi-followup-01a0ef83-thread",
+        "--label",
+        "codex.operation=sleepapi-followup-2026-10-04-01a0ef83",
+        "--publish",
+        "127.0.0.1:3112:3000",
+        "-e",
+        "SLEEPAPI_MAX_IN_FLIGHT=64",
+        "-e",
+        "RUST_LOG=sleepapi=warn",
+        "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158"
+      ],
+      "started_at": "2026-10-04T12:46:28.384733577Z",
+      "health": {
+        "status": "ok"
+      },
+      "methods": {
+        "defaults": {
+          "duration_ms": 400,
+          "method": "tokio_sleep",
+          "status_code": 200
+        },
+        "limits": {
+          "max_duration_ms": 30000,
+          "max_in_flight": 64
+        },
+        "methods": [
+          {
+            "blocks_thread": false,
+            "description": "Await a Tokio timer in the request task; no thread is blocked.",
+            "method": "tokio_sleep"
+          },
+          {
+            "blocks_thread": false,
+            "description": "Spawn a Tokio task, await its timer, then join it; no thread is blocked.",
+            "method": "tokio_spawn"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Sleep an OS thread in Tokio's blocking pool.",
+            "method": "thread_sleep"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Park an OS thread in Tokio's blocking pool until the duration elapses.",
+            "method": "thread_park"
+          }
+        ]
+      },
+      "cgroup": "0::/system.slice/docker-91a491ff05c44fb531dc5c699a3daccbdcf01841ede44a8f996d47b483b842d0.scope\n"
+    },
+    {
+      "role": "park",
+      "container_name": "sleepapi-followup-01a0ef83-park",
+      "container_id": "68abd35166892a6e8e0bea4ca6b796439ca73313420cbdf244194762501830f9",
+      "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "pid": 3108596,
+      "base_url": "http://127.0.0.1:3113",
+      "max_in_flight": 64,
+      "executable_sha256": "aa947abe7e4f6f71d157896006224151d32b3d1dcc7a1a4feae5ae3cc225472e",
+      "run_argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "sleepapi-followup-01a0ef83-park",
+        "--label",
+        "codex.operation=sleepapi-followup-2026-10-04-01a0ef83",
+        "--publish",
+        "127.0.0.1:3113:3000",
+        "-e",
+        "SLEEPAPI_MAX_IN_FLIGHT=64",
+        "-e",
+        "RUST_LOG=sleepapi=warn",
+        "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158"
+      ],
+      "started_at": "2026-10-04T12:46:29.131521936Z",
+      "health": {
+        "status": "ok"
+      },
+      "methods": {
+        "defaults": {
+          "duration_ms": 400,
+          "method": "tokio_sleep",
+          "status_code": 200
+        },
+        "limits": {
+          "max_duration_ms": 30000,
+          "max_in_flight": 64
+        },
+        "methods": [
+          {
+            "blocks_thread": false,
+            "description": "Await a Tokio timer in the request task; no thread is blocked.",
+            "method": "tokio_sleep"
+          },
+          {
+            "blocks_thread": false,
+            "description": "Spawn a Tokio task, await its timer, then join it; no thread is blocked.",
+            "method": "tokio_spawn"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Sleep an OS thread in Tokio's blocking pool.",
+            "method": "thread_sleep"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Park an OS thread in Tokio's blocking pool until the duration elapses.",
+            "method": "thread_park"
+          }
+        ]
+      },
+      "cgroup": "0::/system.slice/docker-68abd35166892a6e8e0bea4ca6b796439ca73313420cbdf244194762501830f9.scope\n"
+    },
+    {
+      "role": "recovery",
+      "container_name": "sleepapi-followup-01a0ef83-recovery",
+      "container_id": "020ab4a0d2b2c961f58ff879ca042d97f5e651578d5ffb70dbfe6c415c092522",
+      "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "pid": 3108757,
+      "base_url": "http://127.0.0.1:3114",
+      "max_in_flight": 1,
+      "executable_sha256": "aa947abe7e4f6f71d157896006224151d32b3d1dcc7a1a4feae5ae3cc225472e",
+      "run_argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "sleepapi-followup-01a0ef83-recovery",
+        "--label",
+        "codex.operation=sleepapi-followup-2026-10-04-01a0ef83",
+        "--publish",
+        "127.0.0.1:3114:3000",
+        "-e",
+        "SLEEPAPI_MAX_IN_FLIGHT=1",
+        "-e",
+        "RUST_LOG=sleepapi=warn",
+        "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158"
+      ],
+      "started_at": "2026-10-04T12:46:30.009580548Z",
+      "health": {
+        "status": "ok"
+      },
+      "methods": {
+        "defaults": {
+          "duration_ms": 400,
+          "method": "tokio_sleep",
+          "status_code": 200
+        },
+        "limits": {
+          "max_duration_ms": 30000,
+          "max_in_flight": 1
+        },
+        "methods": [
+          {
+            "blocks_thread": false,
+            "description": "Await a Tokio timer in the request task; no thread is blocked.",
+            "method": "tokio_sleep"
+          },
+          {
+            "blocks_thread": false,
+            "description": "Spawn a Tokio task, await its timer, then join it; no thread is blocked.",
+            "method": "tokio_spawn"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Sleep an OS thread in Tokio's blocking pool.",
+            "method": "thread_sleep"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Park an OS thread in Tokio's blocking pool until the duration elapses.",
+            "method": "thread_park"
+          }
+        ]
+      },
+      "cgroup": "0::/system.slice/docker-020ab4a0d2b2c961f58ff879ca042d97f5e651578d5ffb70dbfe6c415c092522.scope\n"
+    }
+  ]
+}

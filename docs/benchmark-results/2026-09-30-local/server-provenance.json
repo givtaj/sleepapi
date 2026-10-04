@@ -1,0 +1,37 @@
+{
+  "operation": "sleepapi-local-2026-09-30-01a0ef83",
+  "prepared_at": "2026-09-30T01:37:07.664207+02:00",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "architecture": "x86_64",
+  "cpu_count": 4,
+  "cpu_model": "DO-Regular",
+  "server_commit": "d6e10c3012b042e825831606424c41437e20a06c",
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+  "server_configuration": {
+    "SLEEPAPI_ADDR": "127.0.0.1:3000",
+    "SLEEPAPI_MAX_DURATION_MS": "30000",
+    "SLEEPAPI_MAX_IN_FLIGHT": "64",
+    "SLEEPAPI_SHUTDOWN_GRACE_MS": "5000",
+    "SLEEPAPI_CORS_ORIGINS": "",
+    "RUST_LOG": "sleepapi=info"
+  },
+  "build_command": "cargo build --release --locked",
+  "source_sha256": {
+    "Cargo.toml": "52db2f4b259bb746d69183d390ef0d06d63636d2c64002ce7d6c4c8736c311d2",
+    "Cargo.lock": "d6fd6a1490c59e7bebfc75be7d935277c85bdf0ae7e18ccd750f6aa204e8e8fe",
+    "src/config.rs": "ab214d915e765f20dc706912794928672b56c619ce749bea25ff5022669c42a5",
+    "src/error.rs": "a5d20c3940a32ecc34407823f3332a89ee9e4c3f46066185291ee8c1bdfef9b6",
+    "src/lib.rs": "733da9e9fab999a94b0f7638aa2183a27697748606bd175e2acbc0d73a7086e3",
+    "src/main.rs": "249430f26fa7598defdbd82a3bae6c7d95f26c2f0ffe659695c58d240d6b68d2",
+    "src/scenario.rs": "a980e51e6584c2e130fdb5f02c7bc205da95d1b0fdd51779ae741fb2dfb7efe6",
+    "src/wait.rs": "cb69b25ad7837a2ff9b9877969563f80f2567ca815880643c31ae05bf608c27b"
+  },
+  "notes": [
+    "Both applications execute on the same shared Linux host.",
+    "Host is not dedicated or CPU-isolated; these are initial functional benchmark measurements."
+  ],
+  "executable_sha256": "fd03e1bdf43bce517331383c6a6fc769c08dbdcc147214f16607943033f1a871",
+  "started_at": "2026-09-30T01:37:33.616625+02:00",
+  "pid": 2688182
+}
