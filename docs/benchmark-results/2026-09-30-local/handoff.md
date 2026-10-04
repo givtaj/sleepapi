@@ -1,0 +1,24 @@
+# Local SleepAPI benchmark coordination
+
+- Operation: `sleepapi-local-2026-09-30-01a0ef83`.
+- Date: 2026-09-30 (Europe/Madrid).
+- Outcome: execute the prepared rusta-pitest profile against all four live SleepAPI waiting endpoints and retain measured results.
+- Coordinator: chat `01a0ef83-b8a2-75e1-b397-3687c2367b21`, `/home/dev/workspace/projects/sleepapi`.
+- Runner: existing chat `01a0eef9-25d4-75c2-9ea9-34b778a72b1e`, `/home/dev/workspace/projects/rusta-pitest`.
+- Host for both: `remote-ssh-discovered:codex-crisp-vale-4a0c-dev` (Linux workspace; not the user's Mac).
+- Server source: clean release revision `d6e10c3012b042e825831606424c41437e20a06c` before adding benchmark evidence.
+- Runner source: existing working tree, including its uncommitted SleepAPI profile. Runner owns recording the complete source fingerprint and executable hash.
+- Authorization: user requested coordination with the runner chat to run the benchmark locally. Build and loopback traffic are in scope. Preserve existing work; no deployment, commits, or pushes.
+- Transfer: shared filesystem confirmed by chat metadata and direct repository inspection. No cross-machine artifact transfer required.
+- Execution ownership: coordinator builds/starts/stops SleepAPI; runner chat builds/verifies rusta-pitest and owns all measured benchmark traffic.
+- Required topology: host rusta-pitest -> loopback port -> Docker SleepAPI; user explicitly corrected this before the final run. Native preparation is superseded.
+- Workload: sequential endpoints, 100 requests each, concurrency 4, 400 ms delay, 5000 ms timeout. Additional bounded scenario checks may follow.
+- Verification: server health and contract probes; live runner exit statuses, request/status/error counts, latency percentiles, successful throughput, exact commands, and source/executable provenance.
+- Transfer state: verified shared workspace.
+- Execution state: completed by the existing rusta-pitest project agent against Docker at `http://127.0.0.1:3100`; 400 baseline requests, 16 expected-error requests, four intentional client timeouts and final health.
+- Verification state: verified. Seven Docker readiness probes passed. Runner reports and output hashes passed independent review; Docker logs independently confirm 100 baseline completions per method. Source and executable identity remained stable.
+- Final server lifecycle: coordinator stopped the owned Docker container after completion at 2026-09-30 01:52:24 Europe/Madrid; exit 0, retained for reruns. See `docker-lifecycle.json`.
+- Docker evidence: `docker-build.log`, `docker-image.id`, `docker-provenance.json`, `docker-contract-probes.json`, `docker-log-verification.json`, and `docker-server.log` beside this record.
+- Runner evidence: exact reports and receipts copied with matching SHA-256 hashes into `runner/`; `runner-copy-manifest.json` points to the authoritative project agent output directory.
+- Native preparation: superseded; no native benchmark traffic. The unprefixed server/probe files only describe preliminary setup.
+- Continuation: none required for this operation. Completion and clean shutdown receipt sent to the runner chat. Do not replay the benchmark automatically. See `README.md` for final results and rerun instructions.

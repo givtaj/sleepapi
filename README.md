@@ -399,6 +399,22 @@ release candidate has passed: check the run for the exact release commit.
 Process tests cover graceful drain, stalled request bodies, repeated signals,
 and blocking work at shutdown.
 
+For benchmarks on a Linux Docker host, sample a running SleepAPI container's
+process resources alongside the HTTP client:
+
+```sh
+python3 scripts/benchmark-resources.py --container sleepapi \
+  --output /tmp/sleepapi-resources.jsonl --max-duration-secs 60
+```
+
+The sampler sends no HTTP requests and does not start or stop containers. It
+records CPU time, resident process memory, and live OS thread counts every
+100 ms. CPU usage of 100% means one logical CPU; resident memory is not total
+container memory. Run it on the Docker daemon's Linux host with its host `/proc`
+view. Output files must be new. Use `--stop-file PATH` or SIGINT/SIGTERM to end
+sampling early. Align samples with the client's measured interval and keep
+warmup separate; brief peaks can fall between samples.
+
 Run the container checks locally with Docker and Python 3:
 
 ```sh

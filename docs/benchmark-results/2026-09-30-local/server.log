@@ -1,0 +1,6 @@
+2026-09-29T23:37:33.621106Z  INFO sleepapi: sleepapi listening address=127.0.0.1:3000 max_duration_ms=30000 max_in_flight=64 shutdown_grace_ms=5000
+2026-09-29T23:37:54.447977Z  INFO sleepapi: simulation complete operation="sleep" method=TokioSleep duration_ms=10 elapsed_ms=11.657907 status_code=200
+2026-09-29T23:37:54.463444Z  INFO sleepapi: simulation complete operation="sleep" method=TokioSpawn duration_ms=10 elapsed_ms=11.271313 status_code=200
+2026-09-29T23:37:54.476038Z  INFO sleepapi: simulation complete operation="sleep" method=ThreadSleep duration_ms=10 elapsed_ms=10.823048 status_code=200
+2026-09-29T23:37:54.487929Z  INFO sleepapi: simulation complete operation="sleep" method=ThreadPark duration_ms=10 elapsed_ms=10.506262000000001 status_code=200
+2026-09-29T23:40:29.732144Z  INFO sleepapi: shutdown requested; draining in-flight work grace_ms=5000

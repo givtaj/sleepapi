@@ -1,0 +1,43 @@
+{
+  "operation_key": "sleepapi-local-2026-09-30-01a0ef83",
+  "status": "all_runs_completed_expected_exits_and_final_health_ok",
+  "started_at": "2026-09-30T01:49:03.655148+02:00",
+  "completed_at": "2026-09-30T01:50:02.090808+02:00",
+  "suite_wall_seconds_including_drain_and_health": 58.43571086321026,
+  "sum_measured_command_wall_seconds": 54.66351828398183,
+  "requests_planned_and_executed": 421,
+  "runner_source_after": {
+    "worktree_manifest_sha256": "646846969a2daccd2990a76fd70ba643a6aa123fc5351c7ef9eec728c17b7790",
+    "executable_sha256": "2ff4318e0365a0c7bd15fd514573dd4dc12ea74a45122bbc37b68337189a09c5",
+    "existing_source_unchanged": true
+  },
+  "docker_container_left_running": "775721c893aa348ec53da581ee84b458261500e0fdd50c956e059bce5041a1cd",
+  "target_url": "http://127.0.0.1:3100",
+  "container_after": {
+    "container_id": "775721c893aa348ec53da581ee84b458261500e0fdd50c956e059bce5041a1cd",
+    "running": true,
+    "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+    "user": "65532:65532",
+    "port_bindings": {
+      "3000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "3100"
+        }
+      ]
+    },
+    "started_at": "2026-09-29T23:42:15.272109465Z",
+    "executable_sha256": "aa947abe7e4f6f71d157896006224151d32b3d1dcc7a1a4feae5ae3cc225472e"
+  },
+  "server_commit": "d6e10c3012b042e825831606424c41437e20a06c",
+  "native_artifacts": "superseded/nonfinal; zero native benchmark traffic",
+  "server_lifecycle_actions": [],
+  "source_implementation_edits": false,
+  "builds_observed": [],
+  "intentional_failure_run": "client-timeout: expected exit1; validate four failed endpoints/four timeouts in raw reports",
+  "metrics_validated": true,
+  "total_runner_http_requests": 421,
+  "baseline_unexpected_failures": 0,
+  "intentional_client_timeouts": 4,
+  "final_health_status": 200
+}

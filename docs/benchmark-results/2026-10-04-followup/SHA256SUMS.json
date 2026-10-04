@@ -1,0 +1,11 @@
+{
+  "README.md": "89209f3d8e6b5239f836d9938383ab6daf2689e0b762b9790033091d1a805c67",
+  "docker-cleanup.json": "5cca2a77730a1bfb72f064fa99f2d32a943f9b2e2949492530df543c2fd1e08c",
+  "docker-setup.json": "e037ef5a546a9b70246501f80be44b7ea1e613bb11e202d77cbcc8b590aafb18",
+  "handoff.md": "a3a7464553b3fbb4b25d8f77650c61c71de3f72945c5c1b3fa603b90403725a7",
+  "independent-verification.json": "2f873a4f76677c460ef3e6ba3b29e8ef7b282cb8ff64e9df78811693f7151502",
+  "interpretation.md": "36c83ae87eae90a2eb0578079f722dc0f72613c5e8a02fb041319e9fd43ec737",
+  "sampler-idle-validation.jsonl": "f8ad12320d1eec89e1f2e11e883f1767ce5f4b811172510af5db548bdf05fd52",
+  "sampler-validation.json": "3dc8e1aad4d738d8e342ba82d380f800912aa712bf9733940679a5e79b91685d",
+  "verify-evidence.py": "fa40e59bd0cc6495296081bf88e3ef21cafb79a0f2ea75889396f923d0aa9b8c"
+}

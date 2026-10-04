@@ -1,0 +1,118 @@
+{
+  "operation": "sleepapi-followup-2026-10-04-01a0ef83",
+  "started_at_utc": "2026-10-04T13:32:26.883942+00:00",
+  "finished_at_utc": "2026-10-04T13:32:28.434827+00:00",
+  "runner_completion_receipt": "/home/dev/workspace/projects/rusta-pitest/docs/benchmark-results/sleepapi-followup-2026-10-04-01a0ef83/execution-complete.json",
+  "runner_completion_sha256": "542860c532fcda4d8d08b9e2a23a9789bba2af2f3085c4b2a57d65ac7f0d572c",
+  "command": [
+    "docker",
+    "stop",
+    "--timeout",
+    "7",
+    "e8eb8cca7d90330a18045b2a6997e5495d5d7b963cf4e6906dba5ec842858a84",
+    "c1f5cd0b5ec4fa7b89ea752fe0354ada004cb27831b6f563f23dfe020a0598a1",
+    "91a491ff05c44fb531dc5c699a3daccbdcf01841ede44a8f996d47b483b842d0",
+    "68abd35166892a6e8e0bea4ca6b796439ca73313420cbdf244194762501830f9",
+    "020ab4a0d2b2c961f58ff879ca042d97f5e651578d5ffb70dbfe6c415c092522"
+  ],
+  "exit_code": 0,
+  "retained_stopped_containers": true,
+  "unrelated_containers_modified": false,
+  "containers": [
+    {
+      "id": "e8eb8cca7d90330a18045b2a6997e5495d5d7b963cf4e6906dba5ec842858a84",
+      "name": "sleepapi-followup-01a0ef83-tokio",
+      "image": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-04T12:46:26.923210182Z",
+        "FinishedAt": "2026-10-04T13:32:27.068008692Z"
+      },
+      "restart_count": 0
+    },
+    {
+      "id": "c1f5cd0b5ec4fa7b89ea752fe0354ada004cb27831b6f563f23dfe020a0598a1",
+      "name": "sleepapi-followup-01a0ef83-tokio-spawn",
+      "image": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-04T12:46:27.731858916Z",
+        "FinishedAt": "2026-10-04T13:32:27.054401976Z"
+      },
+      "restart_count": 0
+    },
+    {
+      "id": "91a491ff05c44fb531dc5c699a3daccbdcf01841ede44a8f996d47b483b842d0",
+      "name": "sleepapi-followup-01a0ef83-thread",
+      "image": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-04T12:46:28.384733577Z",
+        "FinishedAt": "2026-10-04T13:32:27.070846796Z"
+      },
+      "restart_count": 0
+    },
+    {
+      "id": "68abd35166892a6e8e0bea4ca6b796439ca73313420cbdf244194762501830f9",
+      "name": "sleepapi-followup-01a0ef83-park",
+      "image": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-04T12:46:29.131521936Z",
+        "FinishedAt": "2026-10-04T13:32:27.057250477Z"
+      },
+      "restart_count": 0
+    },
+    {
+      "id": "020ab4a0d2b2c961f58ff879ca042d97f5e651578d5ffb70dbfe6c415c092522",
+      "name": "sleepapi-followup-01a0ef83-recovery",
+      "image": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-04T12:46:30.009580548Z",
+        "FinishedAt": "2026-10-04T13:32:27.053818069Z"
+      },
+      "restart_count": 0
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 655B done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/rust:1.94.0-slim-bookworm
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#2 [internal] load metadata for docker.io/library/rust:1.94.0-slim-bookworm
+#2 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 113B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [runtime 1/2] FROM docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
+#6 resolve docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251 0.1s done
+#6 DONE 0.1s
+
+#7 [build 1/5] FROM docker.io/library/rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62
+#7 resolve docker.io/library/rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62
+#7 ...
+
+#6 [runtime 1/2] FROM docker.io/library/debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251
+#6 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 69.77kB 0.0s done
+#5 DONE 0.1s
+
+#7 [build 1/5] FROM docker.io/library/rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62
+#7 resolve docker.io/library/rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62 0.1s done
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 5.24MB / 283.79MB 0.2s
+#7 sha256:6db0909c4473287ed4d1f950d26b8bc5b7b4206d365a0e7740cb89e46979153e 5.24MB / 28.24MB 0.2s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 25.17MB / 283.79MB 0.5s
+#7 sha256:6db0909c4473287ed4d1f950d26b8bc5b7b4206d365a0e7740cb89e46979153e 15.73MB / 28.24MB 0.3s
+#7 sha256:6db0909c4473287ed4d1f950d26b8bc5b7b4206d365a0e7740cb89e46979153e 28.24MB / 28.24MB 0.5s done
+#7 extracting sha256:6db0909c4473287ed4d1f950d26b8bc5b7b4206d365a0e7740cb89e46979153e
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 49.28MB / 283.79MB 0.8s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 71.30MB / 283.79MB 1.1s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 94.37MB / 283.79MB 1.4s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 119.54MB / 283.79MB 1.7s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 134.22MB / 283.79MB 1.8s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 160.43MB / 283.79MB 2.1s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 184.55MB / 283.79MB 2.4s
+#7 extracting sha256:6db0909c4473287ed4d1f950d26b8bc5b7b4206d365a0e7740cb89e46979153e 2.1s done
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 219.15MB / 283.79MB 2.9s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 247.46MB / 283.79MB 3.2s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 262.14MB / 283.79MB 3.3s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 283.79MB / 283.79MB 3.6s
+#7 sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 283.79MB / 283.79MB 3.7s done
+#7 extracting sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8
+#7 extracting sha256:9ebf5b92148cf32b7186f028986ce4cbe93a965022500948f637404980f535e8 9.6s done
+#7 DONE 13.6s
+
+#8 [build 2/5] WORKDIR /build
+#8 DONE 0.5s
+
+#9 [build 3/5] COPY Cargo.toml Cargo.lock README.md LICENSE ./
+#9 DONE 0.1s
+
+#10 [build 4/5] COPY src ./src
+#10 DONE 0.1s
+
+#11 [build 5/5] RUN cargo build --release --locked --bin sleepapi
+#11 0.592     Updating crates.io index
+#11 0.971  Downloading crates ...
+#11 1.022   Downloaded bytes v1.12.1
+#11 1.035   Downloaded httpdate v1.0.3
+#11 1.040   Downloaded serde_urlencoded v0.7.1
+#11 1.045   Downloaded tower-service v0.3.3
+#11 1.050   Downloaded zmij v1.0.23
+#11 1.055   Downloaded sync_wrapper v1.0.2
+#11 1.060   Downloaded unicode-ident v1.0.26
+#11 1.071   Downloaded tracing-core v0.1.36
+#11 1.080   Downloaded serde_derive v1.0.229
+#11 1.089   Downloaded mio v1.2.3
+#11 1.104   Downloaded tower v0.5.3
+#11 1.129   Downloaded hyper v1.11.1
+#11 1.147   Downloaded axum v0.8.9
+#11 1.167   Downloaded serde_json v1.0.151
+#11 1.185   Downloaded tracing-subscriber v0.3.23
+#11 1.207   Downloaded tower-http v0.7.1
+#11 1.233   Downloaded futures-util v0.3.34
+#11 1.266   Downloaded aho-corasick v1.1.5
+#11 1.280   Downloaded hyper-util v0.1.21
+#11 1.296   Downloaded memchr v2.8.3
+#11 1.308   Downloaded serde v1.0.229
+#11 1.317   Downloaded syn v3.0.6
+#11 1.341   Downloaded syn v2.0.119
+#11 1.366   Downloaded socket2 v0.6.5
+#11 1.371   Downloaded regex-syntax v0.8.11
+#11 1.389   Downloaded sharded-slab v0.1.7
+#11 1.399   Downloaded serde_core v1.0.229
+#11 1.406   Downloaded ryu v1.0.23
+#11 1.415   Downloaded proc-macro2 v1.0.107
+#11 1.423   Downloaded tracing v0.1.44
+#11 1.460   Downloaded once_cell v1.21.4
+#11 1.466   Downloaded tracing-attributes v0.1.31
+#11 1.473   Downloaded log v0.4.34
+#11 1.479   Downloaded regex-automata v0.4.18
+#11 1.515   Downloaded httparse v1.10.1
+#11 1.527   Downloaded smallvec v1.16.2
+#11 1.532   Downloaded signal-hook-registry v1.4.8
+#11 1.535   Downloaded quote v1.0.47
+#11 1.542   Downloaded pin-project-lite v0.2.17
+#11 1.554   Downloaded matchit v0.8.4
+#11 1.560   Downloaded futures-channel v0.3.34
+#11 1.564   Downloaded tracing-log v0.2.0
+#11 1.567   Downloaded tokio-macros v2.7.2
+#11 1.571   Downloaded slab v0.4.12
+#11 1.573   Downloaded serde_path_to_error v0.1.20
+#11 1.576   Downloaded nu-ansi-term v0.50.3
+#11 1.582   Downloaded bitflags v2.13.2
+#11 1.591   Downloaded axum-core v0.5.6
+#11 1.596   Downloaded tower-layer v0.3.3
+#11 1.598   Downloaded thread_local v1.1.10
+#11 1.601   Downloaded libc v0.2.189
+#11 1.699   Downloaded percent-encoding v2.3.2
+#11 1.700   Downloaded lazy_static v1.5.0
+#11 1.704   Downloaded futures-task v0.3.34
+#11 1.707   Downloaded mime v0.3.17
+#11 1.711   Downloaded matchers v0.2.0
+#11 1.714   Downloaded tokio v1.53.1
+#11 1.822   Downloaded itoa v1.0.18
+#11 1.825   Downloaded http-body-util v0.1.5
+#11 1.830   Downloaded http-body v1.1.0
+#11 1.833   Downloaded http v1.5.0
+#11 1.841   Downloaded futures-core v0.3.34
+#11 1.844   Downloaded errno v0.3.14
+#11 1.847   Downloaded cfg-if v1.0.5
+#11 1.850   Downloaded form_urlencoded v1.2.2
+#11 1.852   Downloaded atomic-waker v1.1.2
+#11 1.927    Compiling proc-macro2 v1.0.107
+#11 1.927    Compiling unicode-ident v1.0.26
+#11 1.928    Compiling quote v1.0.47
+#11 1.928    Compiling itoa v1.0.18
+#11 2.075    Compiling pin-project-lite v0.2.17
+#11 2.168    Compiling libc v0.2.189
+#11 2.227    Compiling bytes v1.12.1
+#11 2.331    Compiling futures-core v0.3.34
+#11 2.496    Compiling once_cell v1.21.4
+#11 2.799    Compiling serde_core v1.0.229
+#11 3.145    Compiling tracing-core v0.1.36
+#11 3.976    Compiling syn v3.0.6
+#11 4.099    Compiling http v1.5.0
+#11 4.580    Compiling errno v0.3.14
+#11 4.819    Compiling syn v2.0.119
+#11 5.112    Compiling log v0.4.34
+#11 5.427    Compiling signal-hook-registry v1.4.8
+#11 6.238    Compiling http-body v1.1.0
+#11 6.413    Compiling socket2 v0.6.5
+#11 7.560    Compiling mio v1.2.3
+#11 8.719    Compiling tower-service v0.3.3
+#11 8.792    Compiling httparse v1.10.1
+#11 9.211    Compiling smallvec v1.16.2
+#11 9.552    Compiling serde v1.0.229
+#11 9.980    Compiling tower-layer v0.3.3
+#11 10.38    Compiling percent-encoding v2.3.2
+#11 10.79    Compiling zmij v1.0.23
+#11 10.86    Compiling tokio-macros v2.7.2
+#11 11.10    Compiling serde_derive v1.0.229
+#11 11.97    Compiling tokio v1.53.1
+#11 14.03    Compiling tracing-attributes v0.1.31
+#11 14.19    Compiling futures-channel v0.3.34
+#11 14.55    Compiling atomic-waker v1.1.2
+#11 14.67    Compiling regex-syntax v0.8.11
+#11 16.29    Compiling tracing v0.1.44
+#11 17.09    Compiling serde_json v1.0.151
+#11 17.21    Compiling sync_wrapper v1.0.2
+#11 17.29    Compiling slab v0.4.12
+#11 17.30    Compiling futures-task v0.3.34
+#11 17.52    Compiling httpdate v1.0.3
+#11 17.56    Compiling futures-util v0.3.34
+#11 18.17    Compiling regex-automata v0.4.18
+#11 21.43    Compiling hyper v1.11.1
+#11 28.67    Compiling form_urlencoded v1.2.2
+#11 28.94    Compiling http-body-util v0.1.5
+#11 29.04    Compiling lazy_static v1.5.0
+#11 29.13    Compiling ryu v1.0.23
+#11 29.42    Compiling mime v0.3.17
+#11 29.57    Compiling memchr v2.8.3
+#11 30.21    Compiling cfg-if v1.0.5
+#11 30.26    Compiling thread_local v1.1.10
+#11 30.80    Compiling axum-core v0.5.6
+#11 31.69    Compiling serde_urlencoded v0.7.1
+#11 32.14    Compiling sharded-slab v0.1.7
+#11 33.31    Compiling hyper-util v0.1.21
+#11 33.99    Compiling matchers v0.2.0
+#11 34.20    Compiling tower v0.5.3
+#11 35.02    Compiling serde_path_to_error v0.1.20
+#11 35.76    Compiling tracing-log v0.2.0
+#11 35.96    Compiling matchit v0.8.4
+#11 36.40    Compiling bitflags v2.13.2
+#11 36.47    Compiling nu-ansi-term v0.50.3
+#11 36.61    Compiling axum v0.8.9
+#11 36.99    Compiling tracing-subscriber v0.3.23
+#11 37.24    Compiling tower-http v0.7.1
+#11 44.96    Compiling sleepapi v0.1.0 (/build)
+#11 55.95     Finished `release` profile [optimized] target(s) in 55.42s
+#11 DONE 56.3s
+
+#12 [runtime 2/2] COPY --from=build /build/target/release/sleepapi /usr/local/bin/sleepapi
+#12 DONE 0.1s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 0.6s done
+#13 exporting manifest sha256:f8197a452562cb7051ee644ce37c953fdffd37e3b6ef5d4b6e6204e967f87b37 0.0s done
+#13 exporting config sha256:b34ce3ab65ac1bc15dafafadf22469a7c7e4d866a75c9aef5a381ed46093ee7d 0.0s done
+#13 exporting attestation manifest sha256:5eba7b9363bc4579cfbc7912343b637973d3fe167868be532d33bb7469db3562
+#13 exporting attestation manifest sha256:5eba7b9363bc4579cfbc7912343b637973d3fe167868be532d33bb7469db3562 0.1s done
+#13 exporting manifest list sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158 0.1s done
+#13 naming to docker.io/library/sleepapi:benchmark-20260930-01a0ef83
+#13 naming to docker.io/library/sleepapi:benchmark-20260930-01a0ef83 done
+#13 unpacking to docker.io/library/sleepapi:benchmark-20260930-01a0ef83 0.1s done
+#13 DONE 1.0s

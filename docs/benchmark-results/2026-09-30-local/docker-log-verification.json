@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-09-30T01:51:33.754362+02:00",
+  "source": "Docker container stdout, matched simulation complete + duration_ms=400 + status_code=200",
+  "container_id": "775721c893aa348ec53da581ee84b458261500e0fdd50c956e059bce5041a1cd",
+  "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+  "container_running": true,
+  "baseline_completions_by_method": {
+    "TokioSleep": 100,
+    "TokioSpawn": 100,
+    "ThreadSleep": 100,
+    "ThreadPark": 100
+  },
+  "baseline_completions_total": 400,
+  "matches_runner_baseline": true,
+  "notes": [
+    "Read-only log verification generated no traffic.",
+    "No assertion is made that timed-out requests log completion."
+  ]
+}

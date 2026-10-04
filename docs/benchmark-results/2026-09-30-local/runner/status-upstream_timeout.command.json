@@ -1,0 +1,32 @@
+{
+  "label": "status-upstream_timeout",
+  "argv": [
+    "/home/dev/workspace/projects/rusta-pitest/target/release/rusta-pitest",
+    "profile",
+    "sleepapi",
+    "--base-url",
+    "http://127.0.0.1:3100",
+    "--requests",
+    "1",
+    "--concurrency",
+    "1",
+    "--scenario",
+    "upstream_timeout",
+    "--timeout-ms",
+    "5000"
+  ],
+  "shell_command": "/home/dev/workspace/projects/rusta-pitest/target/release/rusta-pitest profile sleepapi --base-url http://127.0.0.1:3100 --requests 1 --concurrency 1 --scenario upstream_timeout --timeout-ms 5000",
+  "cwd": "/home/dev/workspace/projects/rusta-pitest",
+  "started_at": "2026-09-30T01:49:48.240972+02:00",
+  "pid": 2694184,
+  "status": "completed",
+  "expected_exit_code": 0,
+  "completed_at": "2026-09-30T01:49:56.355403+02:00",
+  "exit_code": 0,
+  "expected_exit_matched": true,
+  "process_wall_seconds": 8.101836488116533,
+  "build_monitor_samples": 15,
+  "builds_observed": [],
+  "stdout_sha256": "ba58eeb66ceff3c82ba75bbd44ceefed48b58801a2d0726960598e6ddd3574af",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

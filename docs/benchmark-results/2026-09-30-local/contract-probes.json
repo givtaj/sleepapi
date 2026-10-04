@@ -1,0 +1,157 @@
+{
+  "verified_at": "2026-09-30T01:37:54.489196+02:00",
+  "base_url": "http://127.0.0.1:3000",
+  "requests": [
+    {
+      "path": "/health",
+      "status": 200,
+      "body": {
+        "status": "ok"
+      }
+    },
+    {
+      "path": "/methods",
+      "status": 200,
+      "body": {
+        "defaults": {
+          "duration_ms": 400,
+          "method": "tokio_sleep",
+          "status_code": 200
+        },
+        "limits": {
+          "max_duration_ms": 30000,
+          "max_in_flight": 64
+        },
+        "methods": [
+          {
+            "blocks_thread": false,
+            "description": "Await a Tokio timer in the request task; no thread is blocked.",
+            "method": "tokio_sleep"
+          },
+          {
+            "blocks_thread": false,
+            "description": "Spawn a Tokio task, await its timer, then join it; no thread is blocked.",
+            "method": "tokio_spawn"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Sleep an OS thread in Tokio's blocking pool.",
+            "method": "thread_sleep"
+          },
+          {
+            "blocks_thread": true,
+            "description": "Park an OS thread in Tokio's blocking pool until the duration elapses.",
+            "method": "thread_park"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/scenarios",
+      "status": 200,
+      "body": {
+        "scenarios": [
+          {
+            "description": "A provider responds successfully with little delay.",
+            "duration_ms": 50,
+            "scenario": "fast_success",
+            "status_code": 200
+          },
+          {
+            "description": "A slow provider eventually responds successfully.",
+            "duration_ms": 2000,
+            "scenario": "slow_provider",
+            "status_code": 200
+          },
+          {
+            "description": "A provider is temporarily unavailable; exercise client retries.",
+            "duration_ms": 800,
+            "scenario": "delayed_failure",
+            "status_code": 503
+          },
+          {
+            "description": "Returns 200 after 3 seconds; set a shorter timeout in your client.",
+            "duration_ms": 3000,
+            "scenario": "client_timeout",
+            "status_code": 200
+          },
+          {
+            "description": "A provider rejects excess traffic and asks the client to retry later.",
+            "duration_ms": 100,
+            "scenario": "rate_limited",
+            "status_code": 429
+          },
+          {
+            "description": "A provider rejects invalid input; retrying unchanged will not help.",
+            "duration_ms": 50,
+            "scenario": "invalid_request",
+            "status_code": 400
+          },
+          {
+            "description": "A gateway reports that its upstream provider timed out.",
+            "duration_ms": 2000,
+            "scenario": "upstream_timeout",
+            "status_code": 504
+          }
+        ]
+      }
+    },
+    {
+      "path": "/sleep/tokio",
+      "status": 200,
+      "client_elapsed_ms": 13.12855863943696,
+      "body": {
+        "blocks_thread": false,
+        "elapsed_ms": 11.657907,
+        "method": "tokio_sleep",
+        "operation": "sleep",
+        "requested_duration_ms": 10,
+        "simulated": true,
+        "status_code": 200
+      }
+    },
+    {
+      "path": "/sleep/tokio-spawn",
+      "status": 200,
+      "client_elapsed_ms": 15.067207161337137,
+      "body": {
+        "blocks_thread": false,
+        "elapsed_ms": 11.271313,
+        "method": "tokio_spawn",
+        "operation": "sleep",
+        "requested_duration_ms": 10,
+        "simulated": true,
+        "status_code": 200
+      }
+    },
+    {
+      "path": "/sleep/thread",
+      "status": 200,
+      "client_elapsed_ms": 12.069941964000463,
+      "body": {
+        "blocks_thread": true,
+        "elapsed_ms": 10.823048,
+        "method": "thread_sleep",
+        "operation": "sleep",
+        "requested_duration_ms": 10,
+        "simulated": true,
+        "status_code": 200
+      }
+    },
+    {
+      "path": "/sleep/park",
+      "status": 200,
+      "client_elapsed_ms": 11.691795662045479,
+      "body": {
+        "blocks_thread": true,
+        "elapsed_ms": 10.506262000000001,
+        "method": "thread_park",
+        "operation": "sleep",
+        "requested_duration_ms": 10,
+        "simulated": true,
+        "status_code": 200
+      }
+    }
+  ],
+  "result": "passed"
+}
