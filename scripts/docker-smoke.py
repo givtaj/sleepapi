@@ -11,6 +11,7 @@ import uuid
 
 
 ORIGIN = "http://localhost:5173"
+SHUTDOWN_GRACE_MS = 500
 
 
 def docker(*args, timeout=20, check=True):
@@ -49,7 +50,7 @@ def start(image, containers):
         "run", "--detach", "--pull=never", "--name", name,
         "--publish", "127.0.0.1::3000",
         "--env", "SLEEPAPI_CORS_ORIGINS=" + ORIGIN,
-        "--env", "SLEEPAPI_SHUTDOWN_GRACE_MS=500", image,
+        "--env", f"SLEEPAPI_SHUTDOWN_GRACE_MS={SHUTDOWN_GRACE_MS}", image,
     )
     containers[name] = container
     details = inspect(container)
@@ -132,8 +133,12 @@ def check_incomplete_body(container, port):
             require(len(reply) <= 8192, "unexpectedly large interim response")
         require(reply.split(b"\r\n", 1)[0] == b"HTTP/1.1 100 Continue", "expected an active request via 100 Continue")
         connection.sendall(b'{"duration_ms":')
+        started = time.monotonic()
         stop(container, 2)  # Keep the partial request open until the container exits.
-    require("shutdown grace expired" in docker("logs", container), "exit must come from the grace deadline")
+        elapsed = time.monotonic() - started
+    # Only one SIGTERM is sent, and exit 2 rules out Docker's later SIGKILL.
+    # Forced exits must not depend on delivering a final log record.
+    require(elapsed >= SHUTDOWN_GRACE_MS / 1000, "process exited before its grace period")
     print("PASS: incomplete request exits 2 after its grace period, without Docker SIGKILL")
 
 

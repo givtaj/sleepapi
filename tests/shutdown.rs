@@ -1,8 +1,9 @@
 #![cfg(unix)]
 
 use std::{
-    io::{BufRead, BufReader, Read, Write},
+    io::{self, BufRead, BufReader, Read, Write},
     net::{SocketAddr, TcpListener, TcpStream},
+    os::fd::AsRawFd,
     process::{Child, Command, ExitStatus, Stdio},
     sync::mpsc::{self, Receiver},
     thread,
@@ -13,6 +14,8 @@ struct Server {
     child: Child,
     logs: Receiver<String>,
     address: SocketAddr,
+    // Keep the read end open without consuming data in backpressure tests.
+    _blocked_stdout: Option<io::PipeReader>,
 }
 
 impl Server {
@@ -42,16 +45,8 @@ impl Server {
     }
 
     fn spawn(address: &str, grace_ms: u64) -> Self {
-        let mut child = Command::new(env!("CARGO_BIN_EXE_sleepapi"))
-            .env("SLEEPAPI_ADDR", address)
-            .env("SLEEPAPI_MAX_DURATION_MS", "10000")
-            .env("SLEEPAPI_MAX_IN_FLIGHT", "1")
-            .env("SLEEPAPI_SHUTDOWN_GRACE_MS", grace_ms.to_string())
-            .env("SLEEPAPI_CORS_ORIGINS", "")
-            .env("TOKIO_WORKER_THREADS", "2")
-            .env("RUST_LOG", "sleepapi=info")
+        let mut child = Self::command(address, grace_ms)
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
             .spawn()
             .expect("start sleepapi process");
         let stdout = child.stdout.take().unwrap();
@@ -68,7 +63,88 @@ impl Server {
             child,
             logs,
             address: "127.0.0.1:0".parse().unwrap(),
+            _blocked_stdout: None,
         }
+    }
+
+    fn command(address: &str, grace_ms: u64) -> Command {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_sleepapi"));
+        command
+            .env("SLEEPAPI_ADDR", address)
+            .env("SLEEPAPI_MAX_DURATION_MS", "10000")
+            .env("SLEEPAPI_MAX_IN_FLIGHT", "1")
+            .env("SLEEPAPI_SHUTDOWN_GRACE_MS", grace_ms.to_string())
+            .env("SLEEPAPI_CORS_ORIGINS", "")
+            .env("TOKIO_WORKER_THREADS", "2")
+            .env("RUST_LOG", "sleepapi=info")
+            .stderr(Stdio::inherit());
+        command
+    }
+
+    fn start_with_blocked_stdout(grace_ms: u64) -> Self {
+        let (mut stdout, mut filler) = io::pipe().unwrap();
+        set_nonblocking(&stdout, true);
+        let child = Self::command("127.0.0.1:0", grace_ms)
+            .stdout(filler.try_clone().unwrap())
+            .spawn()
+            .expect("start sleepapi with controlled stdout");
+        let (_, logs) = mpsc::channel();
+        // Construct the cleanup guard before doing anything that may fail.
+        let mut server = Self {
+            child,
+            logs,
+            address: "127.0.0.1:0".parse().unwrap(),
+            _blocked_stdout: None,
+        };
+        let deadline = Instant::now() + Duration::from_secs(5);
+        let mut startup = Vec::new();
+        while !startup.contains(&b'\n') {
+            assert!(Instant::now() < deadline, "startup log timed out");
+            let mut bytes = [0; 4096];
+            match stdout.read(&mut bytes) {
+                Ok(0) => panic!("server exited before announcing its address"),
+                Ok(count) => startup.extend_from_slice(&bytes[..count]),
+                Err(error) if error.kind() == io::ErrorKind::WouldBlock => {
+                    thread::sleep(Duration::from_millis(5));
+                }
+                Err(error) if error.kind() == io::ErrorKind::Interrupted => {}
+                Err(error) => panic!("read startup log: {error}"),
+            }
+        }
+        let startup = String::from_utf8(startup).unwrap();
+        let port = startup
+            .split_once("127.0.0.1:")
+            .expect("startup log should contain the loopback address")
+            .1
+            .chars()
+            .take_while(char::is_ascii_digit)
+            .collect::<String>()
+            .parse()
+            .unwrap();
+        server.address.set_port(port);
+
+        // Saturate the actual pipe, independent of platform capacity or log
+        // formatting. No requests are running while O_NONBLOCK is temporarily
+        // set on the writer shared with the child. Restore blocking mode before
+        // exercising requests or shutdown, and never read stdout again.
+        set_nonblocking(&filler, true);
+        let mut filled = 0;
+        for bytes in [&[b'x'; 4096][..], &b"x"[..]] {
+            loop {
+                match filler.write(bytes) {
+                    Ok(0) => panic!("stdout pipe stopped accepting data"),
+                    Ok(count) => filled += count,
+                    Err(error) if error.kind() == io::ErrorKind::WouldBlock => break,
+                    Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
+                    Err(error) => panic!("fill stdout pipe: {error}"),
+                }
+                assert!(filled < 16 * 1024 * 1024, "stdout pipe did not fill");
+            }
+        }
+        assert!(filled > 0);
+        set_nonblocking(&filler, false);
+        server._blocked_stdout = Some(stdout);
+        server
     }
 
     fn connect(&self) -> TcpStream {
@@ -196,6 +272,20 @@ impl Server {
     }
 }
 
+fn set_nonblocking(fd: &impl AsRawFd, enabled: bool) {
+    // SAFETY: fd remains owned and open for both fcntl calls; these commands
+    // only read or update its file status flags and do not access memory.
+    let flags = unsafe { libc::fcntl(fd.as_raw_fd(), libc::F_GETFL) };
+    assert!(flags >= 0, "get pipe flags: {}", io::Error::last_os_error());
+    let flags = if enabled {
+        flags | libc::O_NONBLOCK
+    } else {
+        flags & !libc::O_NONBLOCK
+    };
+    let result = unsafe { libc::fcntl(fd.as_raw_fd(), libc::F_SETFL, flags) };
+    assert_eq!(result, 0, "set pipe flags: {}", io::Error::last_os_error());
+}
+
 impl Drop for Server {
     fn drop(&mut self) {
         if self.child.try_wait().ok().flatten().is_none() {
@@ -260,4 +350,39 @@ fn a_bind_error_exits_without_leaving_the_supervisor_waiting() {
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let mut server = Server::spawn(&listener.local_addr().unwrap().to_string(), 1_000);
     assert_eq!(server.wait(Duration::from_secs(3)).code(), Some(1));
+}
+
+#[test]
+fn blocked_stdout_does_not_stall_requests_or_shutdown() {
+    let mut server = Server::start_with_blocked_stdout(150);
+    // Exercise overflow as well as the first blocked write. This exceeds the
+    // documented 1024-record logging queue while the OS pipe stays full.
+    for _ in 0..2048 {
+        assert!(response(server.request("tokio", 0)).starts_with("HTTP/1.1 200"));
+    }
+    server.signal("TERM");
+    // Queued logs cannot flush, so the supervisor must bound logger teardown
+    // with the same deadline even though all HTTP requests finished.
+    assert_eq!(server.wait(Duration::from_secs(1)).code(), Some(2));
+}
+
+#[test]
+fn blocked_stdout_cannot_extend_the_shutdown_deadline() {
+    let mut server = Server::start_with_blocked_stdout(150);
+    let _incomplete = server.incomplete_request();
+    server.signal("TERM");
+    assert_eq!(server.wait(Duration::from_secs(1)).code(), Some(2));
+}
+
+#[test]
+fn a_second_signal_exits_with_blocked_stdout() {
+    let mut server = Server::start_with_blocked_stdout(10_000);
+    let _incomplete = server.incomplete_request();
+    server.signal("INT");
+    // Closing the listener confirms that the first signal reached the service;
+    // waiting for a log line would drain the condition under test.
+    server.assert_port_closed();
+    assert!(server.child.try_wait().unwrap().is_none());
+    server.signal("TERM");
+    assert_eq!(server.wait(Duration::from_secs(1)).code(), Some(2));
 }
