@@ -24,3 +24,8 @@ target
 # Added by cargo
 
 /target
+
+# Local desktop metadata and Python bytecode
+.DS_Store
+__pycache__/
+*.pyc
