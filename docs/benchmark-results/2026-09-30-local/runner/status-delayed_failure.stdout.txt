@@ -1,0 +1,92 @@
+SleepAPI benchmark profile
+Base URL: http://127.0.0.1:3100/
+Four endpoints run sequentially with the same workload.
+Scenario: delayed_failure — Delayed service unavailable response
+Server delay: 800 ms; configured response status: 503
+JSON: {"scenario":"delayed_failure"}
+Requests per endpoint: 1
+Total planned requests: 4
+Concurrency per endpoint: 1
+Timeout per request: 5000 ms
+Expected status: 503
+Timeouts count as failures; use --timeout-ms below the server delay to test them.
+No retries; response bodies and Retry-After headers are not asserted.
+
+POST http://127.0.0.1:3100/sleep/tokio
+Mode: HTTP/1.1, fixed request count, closed loop
+Warmup: none (connection setup is included)
+Concurrency: 1
+Requests: 1
+Succeeded: 1
+Unexpected status: 0
+Timeouts: 0
+Transport errors: 0
+Elapsed: 0.803 s
+Throughput: 1.24 complete responses/s
+Successful throughput: 1.24 responses/s
+HTTP statuses (complete responses): 503=1
+Latency samples: 1
+Latency: all attempts, through full body or failure
+  p50: 803.327 ms | p95: 803.327 ms | p99: 803.327 ms
+Note: fewer than 100 samples; tail percentiles are not stable.
+
+POST http://127.0.0.1:3100/sleep/tokio-spawn
+Mode: HTTP/1.1, fixed request count, closed loop
+Warmup: none (connection setup is included)
+Concurrency: 1
+Requests: 1
+Succeeded: 1
+Unexpected status: 0
+Timeouts: 0
+Transport errors: 0
+Elapsed: 0.803 s
+Throughput: 1.24 complete responses/s
+Successful throughput: 1.24 responses/s
+HTTP statuses (complete responses): 503=1
+Latency samples: 1
+Latency: all attempts, through full body or failure
+  p50: 803.327 ms | p95: 803.327 ms | p99: 803.327 ms
+Note: fewer than 100 samples; tail percentiles are not stable.
+
+POST http://127.0.0.1:3100/sleep/thread
+Mode: HTTP/1.1, fixed request count, closed loop
+Warmup: none (connection setup is included)
+Concurrency: 1
+Requests: 1
+Succeeded: 1
+Unexpected status: 0
+Timeouts: 0
+Transport errors: 0
+Elapsed: 0.802 s
+Throughput: 1.25 complete responses/s
+Successful throughput: 1.25 responses/s
+HTTP statuses (complete responses): 503=1
+Latency samples: 1
+Latency: all attempts, through full body or failure
+  p50: 802.303 ms | p95: 802.303 ms | p99: 802.303 ms
+Note: fewer than 100 samples; tail percentiles are not stable.
+
+POST http://127.0.0.1:3100/sleep/park
+Mode: HTTP/1.1, fixed request count, closed loop
+Warmup: none (connection setup is included)
+Concurrency: 1
+Requests: 1
+Succeeded: 1
+Unexpected status: 0
+Timeouts: 0
+Transport errors: 0
+Elapsed: 0.804 s
+Throughput: 1.24 complete responses/s
+Successful throughput: 1.24 responses/s
+HTTP statuses (complete responses): 503=1
+Latency samples: 1
+Latency: all attempts, through full body or failure
+  p50: 803.839 ms | p95: 803.839 ms | p99: 803.839 ms
+Note: fewer than 100 samples; tail percentiles are not stable.
+
+SleepAPI profile summary:
+  PASS /sleep/tokio
+  PASS /sleep/tokio-spawn
+  PASS /sleep/thread
+  PASS /sleep/park
+Endpoints passed: 4/4

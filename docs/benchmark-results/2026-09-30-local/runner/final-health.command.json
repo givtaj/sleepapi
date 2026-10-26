@@ -1,0 +1,29 @@
+{
+  "label": "final-health",
+  "argv": [
+    "curl",
+    "--silent",
+    "--show-error",
+    "--noproxy",
+    "*",
+    "--max-time",
+    "5",
+    "--dump-header",
+    "/home/dev/workspace/projects/rusta-pitest/docs/benchmark-results/sleepapi-local-2026-09-30-01a0ef83/final-health.headers.txt",
+    "http://127.0.0.1:3100/health"
+  ],
+  "shell_command": "curl --silent --show-error --noproxy '*' --max-time 5 --dump-header /home/dev/workspace/projects/rusta-pitest/docs/benchmark-results/sleepapi-local-2026-09-30-01a0ef83/final-health.headers.txt http://127.0.0.1:3100/health",
+  "cwd": "/home/dev/workspace/projects/rusta-pitest",
+  "started_at": "2026-09-30T01:50:01.657242+02:00",
+  "pid": 2694273,
+  "status": "completed",
+  "expected_exit_code": 0,
+  "completed_at": "2026-09-30T01:50:01.716706+02:00",
+  "exit_code": 0,
+  "expected_exit_matched": true,
+  "process_wall_seconds": 0.04152854159474373,
+  "build_monitor_samples": 0,
+  "builds_observed": [],
+  "stdout_sha256": "a29ee2b15c494311c52521766e44af56a3ad2248e7a8ab465e5206463c13d288",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

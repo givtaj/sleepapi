@@ -9,9 +9,13 @@ HTTP status. Email and SMS are labels on this delay engine; no provider is
 contacted and no background delivery job is created. The waiting implementations
 are real, while the provider outcomes are simulated.
 
-**v0.1.0** is distributed as source code and a Dockerfile.
-See the [changelog](CHANGELOG.md) and [release checklist](docs/RELEASING.md) for
-its scope and publication status.
+**v0.1.1-alpha.1** is an alpha source distribution with a Dockerfile.
+Publication status and verification are recorded in the
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1).
+See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
+[release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
+The earlier [v0.1.0 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0)
+remains available.
 
 ## Run with Docker
 
@@ -41,15 +45,15 @@ from a released version. Building requires network access to download base image
 and Rust dependencies. The Rust compiler stays in the build stage, outside the
 runtime image.
 
-No registry image is part of v0.1.0: users build their own image from the source.
-To build the versioned release, use the `v0.1.0` Git tag instead of cloning the
+No registry image is provided: users build their own image from the source.
+To build this alpha, use the `v0.1.1-alpha.1` Git tag instead of cloning the
 moving default branch:
 
 ```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.0
-cd sleepapi-v0.1.0
-docker build -t sleepapi:0.1.0 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.0
+git clone --branch v0.1.1-alpha.1 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.1
+cd sleepapi-v0.1.1-alpha.1
+docker build -t sleepapi:0.1.1-alpha.1 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.1
 ```
 
 Both examples build an image on your machine; neither pulls a prebuilt SleepAPI image.
@@ -374,12 +378,19 @@ and keeps its capacity slot until it finishes during normal operation.
 
 Ctrl-C or SIGTERM stops accepting connections and starts the configured shutdown
 grace period. The server exits with code `0` when requests and started blocking
-work finish. A second signal or the grace deadline forces process exit with code
-`2`, including when a client never finishes its request body or blocking work is
-still running. Choose a longer grace period if your test needs pending requests
+work finish and the best-effort log flush returns. A second signal or the grace
+deadline forces process exit with code `2`, including when a client never
+finishes its request body, blocking work is still running, or log output is
+stuck. Choose a longer grace period if your test needs pending requests
 to complete. The deadline terminates the process; it does not make OS-thread
 sleep or parking individually cancellable.
 See [Tokio's blocking-task lifecycle](https://docs.rs/tokio/latest/tokio/task/fn.spawn_blocking.html).
+
+Logs are written to stdout by a dedicated worker through a bounded queue of
+1024 records. When the queue fills, new records are dropped so slow or stopped
+log readers cannot block HTTP requests. Logging teardown shares the original
+shutdown grace period; forced exits do not wait for log output. Queued records
+and final shutdown messages are best effort and may be lost.
 
 ## Develop
 
@@ -387,7 +398,15 @@ See [Tokio's blocking-task lifecycle](https://docs.rs/tokio/latest/tokio/task/fn
 cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked
+python3 -B -m unittest discover -s scripts -p 'test_*.py' -v
+cargo build --release --locked
+python3 scripts/alpha-smoke.py --binary target/release/sleepapi
 ```
+
+The alpha smoke command launches and cleans up its own loopback processes. It
+checks response correctness, health responsiveness, and capacity recovery and
+prints a JSON receipt. The fixed workload and limits are local regression gates;
+they do not establish maximum throughput or production capacity.
 
 GitHub Actions runs only on Linux. It checks formatting, Clippy, tests, release
 builds, and source packaging on stable Rust, and tests the supported minimum Rust

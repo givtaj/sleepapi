@@ -1,0 +1,26 @@
+{
+  "binary": "/home/dev/workspace/projects/rusta-pitest/target/release/rusta-pitest",
+  "binary_sha256_before_build": "2ff4318e0365a0c7bd15fd514573dd4dc12ea74a45122bbc37b68337189a09c5",
+  "binary_sha256": "2ff4318e0365a0c7bd15fd514573dd4dc12ea74a45122bbc37b68337189a09c5",
+  "binary_size_bytes": 7989744,
+  "cargo_reported_fresh": true,
+  "release_profile": {
+    "opt_level": "3",
+    "debuginfo": 0,
+    "debug_assertions": false,
+    "overflow_checks": false,
+    "test": false
+  },
+  "all_checks_passed": true,
+  "tests_compiled_only": true,
+  "servers_started": false,
+  "benchmark_traffic_sent": false,
+  "platform": {
+    "system": "Linux",
+    "kernel_release": "6.8.0-138-generic",
+    "machine": "x86_64",
+    "logical_cpus": 4,
+    "cpu_affinity_count": 4
+  },
+  "build_env": {}
+}

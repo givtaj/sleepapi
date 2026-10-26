@@ -1,12 +1,5 @@
 {
-  "publication": {
-    "evidence_status": "historical_record_with_public_redactions",
-    "redactions": [
-      "Removed local run/session suffixes from descriptive identifiers and commands."
-    ],
-    "note": "These are edited historical records, not original raw receipts or a new verification run. Recorded measurements and outcomes are unchanged. Commands containing redacted identifiers are illustrative, not exact original invocations."
-  },
-  "operation_key": "sleepapi-local-2026-09-30",
+  "operation_key": "sleepapi-local-2026-09-30-01a0ef83",
   "status": "all_runs_completed_expected_exits_and_final_health_ok",
   "started_at": "2026-09-30T01:49:03.655148+02:00",
   "completed_at": "2026-09-30T01:50:02.090808+02:00",

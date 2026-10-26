@@ -102,8 +102,8 @@ def run(args, output):
 
     def handle_signal(signum, _frame):
         nonlocal requested_signal
-        # Signal handlers can interrupt a wait while its internal lock is held.
-        # Record only the signal here; leave shutdown and formatting to the loop.
+        # A signal can interrupt a wait while its internal lock is held. Keep
+        # the handler lock-free; Event.set() here can deadlock Event.wait().
         requested_signal = signum
 
     original_handlers = {
@@ -186,13 +186,15 @@ def run(args, output):
             # Skip missed slots instead of emitting a burst of delayed samples.
             next_sample_ns = max(next_sample_ns + interval_ns, now_ns)
             wake_ns = min(next_sample_ns, deadline_ns)
-            # Python resumes sleep after a handled signal. Bound each sleep so
-            # shutdown stays prompt even with the maximum 10-second interval.
+            # Poll stop requests at most 100 ms apart even with a long sample
+            # interval. Polling must not create additional resource samples.
             while requested_signal is None:
-                remaining_ns = wake_ns - time.monotonic_ns()
-                if remaining_ns <= 0:
+                if args.stop_file and args.stop_file.exists():
                     break
-                time.sleep(min(remaining_ns / 1_000_000_000, 0.1))
+                remaining_secs = (wake_ns - time.monotonic_ns()) / 1_000_000_000
+                if remaining_secs <= 0:
+                    break
+                time.sleep(min(0.1, remaining_secs))
             if requested_signal is not None:
                 reason = signal.Signals(requested_signal).name
                 break
@@ -207,12 +209,14 @@ def run(args, output):
         print(f"Resource sampling failed: {message}", file=sys.stderr)
         exit_code = 1
     finally:
-        emit({
-            "type": "summary", "finished_at_utc": utc_now(), "reason": reason,
-            "sample_count": count, "elapsed_seconds": (time.monotonic_ns() - started_ns) / 1_000_000_000,
-        })
-        for signum, handler in original_handlers.items():
-            signal.signal(signum, handler)
+        try:
+            emit({
+                "type": "summary", "finished_at_utc": utc_now(), "reason": reason,
+                "sample_count": count, "elapsed_seconds": (time.monotonic_ns() - started_ns) / 1_000_000_000,
+            })
+        finally:
+            for signum, handler in original_handlers.items():
+                signal.signal(signum, handler)
     return exit_code
 
 

@@ -1,0 +1,122 @@
+{
+  "validated_at_utc": "2026-10-04T12:49:21.085967+00:00",
+  "script": "/home/dev/workspace/projects/sleepapi/scripts/benchmark-resources.py",
+  "script_sha256": "afbe46bd7d74a8f1a19ca3ff13cbc1a22de47ba28844aedc93aa9d34d1876af3",
+  "python_version": "3.12.3",
+  "read_only_container": "sleepapi-followup-01a0ef83-tokio",
+  "real_sample_evidence_path": "/tmp/sleepapi-sampler-real-01a0ef83.jsonl",
+  "real_sample_evidence_sha256": "f8ad12320d1eec89e1f2e11e883f1767ce5f4b811172510af5db548bdf05fd52",
+  "real_sampling_metadata": {
+    "cgroup": [
+      "0::/system.slice/docker-e8eb8cca7d90330a18045b2a6997e5495d5d7b963cf4e6906dba5ec842858a84.scope"
+    ],
+    "clock_ticks_per_second": 100,
+    "configured_container_limits": {
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpusetCpus": "",
+      "Memory": 0,
+      "NanoCpus": 0
+    },
+    "container_id": "e8eb8cca7d90330a18045b2a6997e5495d5d7b963cf4e6906dba5ec842858a84",
+    "container_name": "sleepapi-followup-01a0ef83-tokio",
+    "container_reference": "sleepapi-followup-01a0ef83-tokio",
+    "cpu_percent_convention": "100% = one logical CPU; may exceed 100%",
+    "host_logical_cpus": 4,
+    "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
+    "interval_ms": 100,
+    "max_duration_secs": 0.5,
+    "page_size_bytes": 4096,
+    "pid": 3108127,
+    "process_start_ticks": 361874411,
+    "rss_convention": "resident process pages; not container cgroup memory",
+    "schema_version": 1,
+    "scope": "container_init_process",
+    "started_at_utc": "2026-10-04T12:47:47.792522+00:00",
+    "stop_file": null,
+    "type": "metadata"
+  },
+  "real_sampling_summary": {
+    "elapsed_seconds": 0.500891441,
+    "finished_at_utc": "2026-10-04T12:47:48.293241+00:00",
+    "reason": "max_duration",
+    "sample_count": 6,
+    "type": "summary"
+  },
+  "tests": [
+    {
+      "name": "syntax_compile",
+      "outcome": "passed"
+    },
+    {
+      "name": "real_container_sampling",
+      "outcome": "passed",
+      "checks": [
+        "full container ID/cgroup and PID verification",
+        "initial CPU percent null",
+        "positive RSS and live threads",
+        "strictly increasing monotonic timestamps",
+        "at least five samples within the bounded 0.5-second run",
+        "max_duration summary"
+      ]
+    },
+    {
+      "name": "proc_stat_fixtures",
+      "outcome": "passed",
+      "checks": [
+        "spaces and parentheses in process command",
+        "user/system ticks parsed correctly",
+        "RSS page conversion",
+        "live thread count",
+        "PID reuse rejected",
+        "Docker inspect resolution",
+        "cgroup identity mismatch rejected"
+      ]
+    },
+    {
+      "name": "cpu_delta_math",
+      "outcome": "passed",
+      "checks": [
+        "0.1 CPU seconds over 0.1 wall seconds yields 100%"
+      ]
+    },
+    {
+      "name": "existing_output",
+      "outcome": "passed",
+      "checks": [
+        "exit 1 and original bytes preserved"
+      ]
+    },
+    {
+      "name": "graceful_signals",
+      "outcome": "passed",
+      "checks": [
+        "SIGINT and SIGTERM each return 0 and flush a summary recording the signal"
+      ]
+    },
+    {
+      "name": "stop_file",
+      "outcome": "passed",
+      "checks": [
+        "stops with stop_file summary",
+        "does not modify stop file"
+      ]
+    },
+    {
+      "name": "invalid_bounds",
+      "outcome": "passed",
+      "checks": [
+        "NaN interval and duration above 900 seconds rejected with exit 2"
+      ]
+    }
+  ],
+  "fixture_evidence": "Temporary fixture directories removed after assertions; real sampling JSONL retained at evidence path.",
+  "limitations": [
+    "Samples only container init process, including its live threads, not child processes.",
+    "RSS is process resident memory, not cgroup memory usage.",
+    "100% CPU denotes one logical CPU; percentages may exceed 100%.",
+    "Short-lived peaks between samples can be missed.",
+    "Requires Docker daemon and sampler to share local Linux host PID/cgroup view."
+  ],
+  "real_sample_evidence_copy": "sampler-idle-validation.jsonl"
+}

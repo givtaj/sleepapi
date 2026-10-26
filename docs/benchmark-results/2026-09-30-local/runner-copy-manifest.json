@@ -1,0 +1,30 @@
+{
+  "source_directory": "/home/dev/workspace/projects/rusta-pitest/docs/benchmark-results/sleepapi-local-2026-09-30-01a0ef83",
+  "files_sha256": {
+    "execution-summary.json": "a404d7898b1f85033e055a87edbc047f9ae35277fa3baad1cef2e2e40e3193a3",
+    "benchmark-commands.json": "92dac49ca714048098295f295a8518c211995eadf4a3d388285eb24e0f8599a2",
+    "runner-build.json": "b3f8645bda24a9e95382158f68ed7dc3abefd5d9f7083c8240a4dc45a9641c2d",
+    "source-provenance.json": "01122c2ceb420bf01280d77530ae57bf3133649a68a315cb8ff5d1e430bc1159",
+    "post-timeout-drain.json": "05b1cb600c9e7ae38bd2d83219bf471cbb944587defed5b444c0fabd30148687",
+    "final-health.stdout.txt": "a29ee2b15c494311c52521766e44af56a3ad2248e7a8ab465e5206463c13d288",
+    "final-health.command.json": "74b7e8e4c779e1edf5c3f3343d4c25707700e6d2ee3bbbb2e217aef050138de5",
+    "baseline.stdout.txt": "47ddbaf60ac013f827493f87d7bbde079955649868d2c5d9ca6a6177b75dc5b0",
+    "baseline.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline.command.json": "b21e81d61ddb226eca7db2fac77fd36c6a4ba6ca26d73d5c5abf2edbec21aeb6",
+    "status-delayed_failure.stdout.txt": "406292afe5221c4a6c9d30d4dd0c1f97a396b661de3f87bb52e446c8410cd4c9",
+    "status-delayed_failure.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status-delayed_failure.command.json": "d1450d7746bbd87be1bd7a5d92ed441d856cd672c31e4b2cf567dd71288431f8",
+    "status-rate_limited.stdout.txt": "320fa44d3022f690130c59044b9d3541d0664944c6ff7113bfb407bc61000c63",
+    "status-rate_limited.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status-rate_limited.command.json": "54cc28b287e94aa9735cb067cba62b02363a0a790aa7f2bb1fb8e343b8817f0f",
+    "status-invalid_request.stdout.txt": "12d2e4413899e060a5299b42518df1258186fd043581f432b56edc17528e4569",
+    "status-invalid_request.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status-invalid_request.command.json": "4a01354101428929bfb1a9c31eff81e9f7e94bb03fb65e1a484d3411fc6c2531",
+    "status-upstream_timeout.stdout.txt": "ba58eeb66ceff3c82ba75bbd44ceefed48b58801a2d0726960598e6ddd3574af",
+    "status-upstream_timeout.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status-upstream_timeout.command.json": "a4faf74b3e03dfedbe9cd3d2c1542f8928b72d2ce6101dbc40aae11868bf7c18",
+    "client-timeout.stdout.txt": "d279568a16552d2d292cf96d1c0e6bf3d056832d737d42290ebe01f5643e3af6",
+    "client-timeout.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client-timeout.command.json": "4ed54a6941a2cf345f4d9fcaf89f449e6ee5630fd655fe2a3f1d3fe45046f14e"
+  }
+}

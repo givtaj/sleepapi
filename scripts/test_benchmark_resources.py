@@ -1,12 +1,10 @@
-"""Sampler shutdown regressions; no Docker daemon or Linux /proc required.
+#!/usr/bin/env python3
+"""Sampler regressions using a fake /proc tree; no Docker daemon is required."""
 
-Run with: python3 -B -m unittest discover -s scripts -p 'test_*.py'
-"""
-
-from contextlib import contextmanager
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import signal
 import subprocess
@@ -16,166 +14,185 @@ import threading
 import time
 from types import SimpleNamespace
 import unittest
-from unittest import mock
 
 
-SAMPLER_PATH = Path(__file__).with_name("benchmark-resources.py")
+SCRIPT = Path(__file__).with_name("benchmark-resources.py")
 
 
-@contextmanager
-def sampler_fixture(interval_ms=100, max_duration_secs=0.25):
-    spec = importlib.util.spec_from_file_location("benchmark_resources", SAMPLER_PATH)
+def fixture_worker(mode):
+    spec = importlib.util.spec_from_file_location("benchmark_resources", SCRIPT)
     sampler = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(sampler)
-    with tempfile.TemporaryDirectory() as temporary:
-        root = Path(temporary)
+    with tempfile.TemporaryDirectory(prefix="sleepapi-sampler-test-") as directory:
+        root = Path(directory)
         pid = 123
         container_id = "a" * 64
-        cgroup = "0::/docker/" + container_id + "\n"
-        (root / str(pid)).mkdir()
-        (root / str(pid) / "cgroup").write_text(cgroup)
-        details = {"Id": container_id, "State": {"Pid": pid}, "Name": "/fixture"}
+        proc = root / str(pid)
+        proc.mkdir()
+        cgroup = f"0::/docker/{container_id}\n"
+        (proc / "cgroup").write_text(cgroup)
+        fields = ["0"] * 22
+        fields[0], fields[11], fields[12] = "S", "100", "20"
+        fields[17], fields[19], fields[21] = "6", "12345", "1024"
+        (proc / "stat").write_text(f"{pid} (sleep api) worker) " + " ".join(fields))
+        sampler.PROC_ROOT = root
+        sampler.inspect_container = lambda _reference: (
+            {"Id": container_id, "State": {"Pid": pid}}, cgroup,
+        )
+        stop_file = root / "stop"
         args = SimpleNamespace(
-            container="fixture", interval_ms=interval_ms,
-            max_duration_secs=max_duration_secs, stop_file=root / "stop",
+            container="fixture", interval_ms=10000, max_duration_secs=30,
+            stop_file=stop_file if mode == "stop_file" else None,
         )
+        handlers = {}
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            signal.signal(signum, signal.SIG_IGN)
+            handlers[signum] = signal.getsignal(signum)
 
-        def sample(*_args):
-            return {
-                "monotonic_ns": sampler.time.monotonic_ns(),
-                "process_start_ticks": 1, "user_cpu_ticks": 0,
-                "system_cpu_ticks": 0, "cpu_seconds": 0,
-                "rss_bytes": 4096, "live_threads": 1,
-            }
+        if mode in ("SIGINT", "SIGTERM", "stop_file"):
+            injected = False
+            real_sleep = time.sleep
+            real_wait = threading.Condition.wait
 
-        with mock.patch.object(sampler, "PROC_ROOT", root), \
-                mock.patch.object(sampler, "inspect_container", return_value=(details, cgroup)), \
-                mock.patch.object(sampler, "process_sample", side_effect=sample):
-            yield sampler, args, io.StringIO()
+            def inject():
+                nonlocal injected
+                if not injected:
+                    injected = True
+                    if mode == "stop_file":
+                        stop_file.write_text("stop\n")
+                    else:
+                        os.kill(os.getpid(), getattr(signal, mode))
+
+            def sleep(seconds):
+                inject()
+                real_sleep(seconds)
+
+            def condition_wait(condition, timeout=None):
+                # Event.wait holds this non-reentrant lock at entry. The old
+                # signal handler deadlocks here when it calls Event.set().
+                inject()
+                return real_wait(condition, timeout)
+
+            sampler.time.sleep = sleep
+            threading.Condition.wait = condition_wait
+        elif mode == "max_duration":
+            args.max_duration_secs = 0.15
+        elif mode == "interval":
+            args.interval_ms = 250
+            args.max_duration_secs = 0.55
+            clock = 1_000_000_000
+
+            def advance(seconds):
+                nonlocal clock
+                clock += round(seconds * 1_000_000_000)
+
+            sampler.time.monotonic_ns = lambda: clock
+            sampler.time.sleep = advance
+        elif mode == "inspect_error":
+            def fail_inspect(_reference):
+                raise ValueError("fixture inspection failure")
+
+            sampler.inspect_container = fail_inspect
+        elif mode == "output_error":
+            args.max_duration_secs = 0.1
+
+        class Output(io.StringIO):
+            def write(self, text):
+                if mode == "output_error" and json.loads(text)["type"] == "summary":
+                    raise OSError("fixture output failure")
+                return super().write(text)
+
+        output = Output()
+        error = None
+        try:
+            code = sampler.run(args, output)
+        except OSError as failure:
+            code = 1
+            error = str(failure)
+        print(json.dumps({
+            "code": code,
+            "error": error,
+            "records": [json.loads(line) for line in output.getvalue().splitlines()],
+            "handlers_restored": all(
+                signal.getsignal(signum) == handler for signum, handler in handlers.items()
+            ),
+            "stop_file": stop_file.read_text() if stop_file.exists() else None,
+        }))
 
 
-def run_sampler(sampler, args, output):
-    originals = {signum: signal.getsignal(signum) for signum in (signal.SIGINT, signal.SIGTERM)}
-    exit_code = sampler.run(args, output)
-    return {
-        "exit_code": exit_code,
-        "records": [json.loads(line) for line in output.getvalue().splitlines()],
-        "handlers_restored": all(signal.getsignal(signum) == handler for signum, handler in originals.items()),
-    }
-
-
-def signal_worker(signal_name):
-    signum = getattr(signal, signal_name)
-    original_sleep = time.sleep
-    original_wait = threading.Condition.wait
-    boundary = None
-
-    def deliver_signal(location):
-        nonlocal boundary
-        if boundary is None:
-            boundary = location
-            signal.raise_signal(signum)
-
-    def condition_wait(condition, timeout=None):
-        # Event.wait calls this with its Condition lock held. On the original
-        # implementation the handler's Event.set deadlocks on that exact lock.
-        deliver_signal("condition_wait")
-        return original_wait(condition, timeout)
-
-    def sleep(seconds):
-        # Also inject at the replacement timer's entry. Sleeping for the full
-        # sample interval after the signal would fail the subprocess timeout.
-        deliver_signal("sleep")
-        original_sleep(seconds)
-
-    with sampler_fixture(interval_ms=10000, max_duration_secs=20) as (sampler, args, output):
-        with mock.patch.object(threading.Condition, "wait", condition_wait), \
-                mock.patch.object(sampler.time, "sleep", sleep):
-            result = run_sampler(sampler, args, output)
-    result["signal_boundary"] = boundary
-    return result
-
-
-class FakeClock:
-    def __init__(self, on_sleep=None):
-        self.now_ns = 1_000_000_000
-        self.on_sleep = on_sleep
-
-    def monotonic_ns(self):
-        return self.now_ns
-
-    def sleep(self, seconds):
-        self.now_ns += round(seconds * 1_000_000_000)
-        if self.on_sleep:
-            self.on_sleep()
-
-
-class SamplerShutdownTests(unittest.TestCase):
-    def assert_shutdown(self, result, reason):
-        self.assertEqual(result["exit_code"], 0)
+class ResourceSamplerTests(unittest.TestCase):
+    def run_fixture(self, mode):
+        try:
+            completed = subprocess.run(
+                [sys.executable, str(Path(__file__).resolve()), "--fixture", mode],
+                capture_output=True, text=True, timeout=3, check=True,
+            )
+        except subprocess.TimeoutExpired:
+            self.fail(f"{mode}: sampler hung or failed to stop within three seconds")
+        result = json.loads(completed.stdout)
         self.assertTrue(result["handlers_restored"])
+        return result
+
+    def assert_summary(self, result, reason):
         records = result["records"]
-        self.assertEqual(records[0]["type"], "metadata")
-        summaries = [record for record in records if record["type"] == "summary"]
+        summaries = [row for row in records if row["type"] == "summary"]
         self.assertEqual(len(summaries), 1)
-        self.assertIs(summaries[0], records[-1])
+        self.assertEqual(records[-1], summaries[0])
         self.assertEqual(summaries[0]["reason"], reason)
-        samples = [record for record in records if record["type"] == "sample"]
+        samples = [row for row in records if row["type"] == "sample"]
         self.assertEqual(summaries[0]["sample_count"], len(samples))
-        return samples
+        return summaries[0], samples
 
-    def check_signal(self, signal_name):
-        # An actual deadlock must fail this test without hanging the test runner.
-        child = subprocess.run(
-            [sys.executable, "-B", str(Path(__file__).resolve()), "--signal-worker", signal_name],
-            capture_output=True, text=True, timeout=3, check=True,
-        )
-        result = json.loads(child.stdout)
-        self.assertIn(result["signal_boundary"], ("condition_wait", "sleep"))
-        samples = self.assert_shutdown(result, signal_name)
+    def test_signals_at_wait_boundary_do_not_deadlock(self):
+        for signum in ("SIGINT", "SIGTERM"):
+            with self.subTest(signal=signum):
+                result = self.run_fixture(signum)
+                self.assertEqual(result["code"], 0)
+                summary, samples = self.assert_summary(result, signum)
+                self.assertEqual(len(samples), 1)
+                self.assertLess(summary["elapsed_seconds"], 1)
+
+    def test_stop_file_interrupts_long_sample_interval(self):
+        result = self.run_fixture("stop_file")
+        self.assertEqual(result["code"], 0)
+        summary, samples = self.assert_summary(result, "stop_file")
         self.assertEqual(len(samples), 1)
+        self.assertLess(summary["elapsed_seconds"], 1)
+        self.assertEqual(result["stop_file"], "stop\n")
 
-    def test_sigint_at_wait_boundary(self):
-        self.check_signal("SIGINT")
+    def test_max_duration_bounds_long_sample_interval(self):
+        result = self.run_fixture("max_duration")
+        self.assertEqual(result["code"], 0)
+        summary, _samples = self.assert_summary(result, "max_duration")
+        self.assertGreaterEqual(summary["elapsed_seconds"], 0.15)
+        self.assertLess(summary["elapsed_seconds"], 1)
 
-    def test_sigterm_at_wait_boundary(self):
-        self.check_signal("SIGTERM")
+    def test_polling_preserves_sample_interval_and_cpu_metadata(self):
+        result = self.run_fixture("interval")
+        self.assertEqual(result["code"], 0)
+        summary, samples = self.assert_summary(result, "max_duration")
+        self.assertEqual([row["elapsed_seconds"] for row in samples], [0, 0.25, 0.5, 0.55])
+        self.assertEqual(summary["elapsed_seconds"], 0.55)
+        self.assertIsNone(samples[0]["cpu_percent"])
+        self.assertTrue(all(row["cpu_percent"] == 0 for row in samples[1:]))
+        self.assertEqual([row["sample_index"] for row in samples], [0, 1, 2, 3])
+        self.assertTrue(all(row["live_threads"] == 6 for row in samples))
 
-    def test_duration_deadline_caps_long_sample_interval(self):
-        with sampler_fixture(interval_ms=10000, max_duration_secs=0.25) as (sampler, args, output):
-            clock = FakeClock()
-            with mock.patch.object(sampler, "time", clock):
-                result = run_sampler(sampler, args, output)
-        samples = self.assert_shutdown(result, "max_duration")
-        self.assertEqual([sample["elapsed_seconds"] for sample in samples], [0, 0.25])
-        self.assertEqual(result["records"][-1]["elapsed_seconds"], 0.25)
+    def test_error_flushes_summary_and_restores_handlers(self):
+        result = self.run_fixture("inspect_error")
+        self.assertEqual(result["code"], 1)
+        _summary, samples = self.assert_summary(result, "error")
+        self.assertEqual(samples, [])
+        self.assertEqual(result["records"][0]["message"], "fixture inspection failure")
 
-    def test_polling_preserves_sample_intervals(self):
-        with sampler_fixture(interval_ms=200, max_duration_secs=0.5) as (sampler, args, output):
-            with mock.patch.object(sampler, "time", FakeClock()):
-                result = run_sampler(sampler, args, output)
-        samples = self.assert_shutdown(result, "max_duration")
-        self.assertEqual([sample["elapsed_seconds"] for sample in samples], [0, 0.2, 0.4, 0.5])
-
-    def test_existing_stop_file_finishes_after_first_sample(self):
-        with sampler_fixture() as (sampler, args, output):
-            args.stop_file.touch()
-            result = run_sampler(sampler, args, output)
-            self.assertTrue(args.stop_file.exists())
-        samples = self.assert_shutdown(result, "stop_file")
-        self.assertEqual(len(samples), 1)
-
-    def test_stop_file_created_during_wait(self):
-        with sampler_fixture() as (sampler, args, output):
-            with mock.patch.object(sampler, "time", FakeClock(on_sleep=args.stop_file.touch)):
-                result = run_sampler(sampler, args, output)
-            self.assertTrue(args.stop_file.exists())
-        samples = self.assert_shutdown(result, "stop_file")
-        self.assertEqual(len(samples), 1)
+    def test_output_error_still_restores_handlers(self):
+        result = self.run_fixture("output_error")
+        self.assertEqual(result["code"], 1)
+        self.assertEqual(result["error"], "fixture output failure")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3 and sys.argv[1] == "--signal-worker":
-        print(json.dumps(signal_worker(sys.argv[2])))
+    if len(sys.argv) == 3 and sys.argv[1] == "--fixture":
+        fixture_worker(sys.argv[2])
     else:
         unittest.main()

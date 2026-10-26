@@ -1,16 +1,8 @@
 {
-  "publication": {
-    "evidence_status": "historical_record_with_public_redactions",
-    "redactions": [
-      "Removed local run/session suffixes from descriptive identifiers and commands.",
-      "Replaced the unrelated runner project name with a generic HTTP client label."
-    ],
-    "note": "These are edited historical records, not original raw receipts or a new verification run. Recorded measurements and outcomes are unchanged. Commands containing redacted identifiers are illustrative, not exact original invocations."
-  },
   "verified_at": "2026-09-30T01:43:11.121909+02:00",
-  "topology": "Linux host HTTP client -> 127.0.0.1:3100 -> Docker SleepAPI :3000",
-  "build_command": "docker build --progress=plain --iidfile docs/benchmark-results/2026-09-30-local/docker-image.id -t sleepapi:benchmark-20260930 .",
-  "run_command": "docker run -d --name sleepapi-benchmark --label codex.operation=sleepapi-local-2026-09-30 --publish 127.0.0.1:3100:3000 sleepapi:benchmark-20260930",
+  "topology": "Linux host rusta-pitest -> 127.0.0.1:3100 -> Docker SleepAPI :3000",
+  "build_command": "docker build --progress=plain --iidfile docs/benchmark-results/2026-09-30-local/docker-image.id -t sleepapi:benchmark-20260930-01a0ef83 .",
+  "run_command": "docker run -d --name sleepapi-benchmark-01a0ef83 --label codex.operation=sleepapi-local-2026-09-30-01a0ef83 --publish 127.0.0.1:3100:3000 sleepapi:benchmark-20260930-01a0ef83",
   "docker_version": {
     "Client": {
       "Platform": {
@@ -84,7 +76,7 @@
   "container_id": "775721c893aa348ec53da581ee84b458261500e0fdd50c956e059bce5041a1cd",
   "image_id": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
   "container_image_reference": "sha256:b27f3931364b2527b7e731efcf0cf2ae808da841af4a80d5b5b6027de48f9158",
-  "image_tag": "sleepapi:benchmark-20260930",
+  "image_tag": "sleepapi:benchmark-20260930-01a0ef83",
   "platform": "linux/amd64",
   "user": "65532:65532",
   "environment": [
