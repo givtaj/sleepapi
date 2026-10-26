@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1-alpha.1 — Unreleased
+## 0.1.1-alpha.1 — 2026-10-26
 
 ### Fixed
 
@@ -14,9 +14,10 @@
 - An alpha readiness record and version-independent release procedure that
   preserve the already-published v0.1.0 release.
 
-The API and source-plus-Dockerfile distribution remain the same. This candidate
+The API and source-plus-Dockerfile distribution remain the same. This alpha
 does not add registry images, native downloads, hosted service, or Windows
-verification. Publication is pending the [release gates](docs/ALPHA_READINESS.md).
+verification. See the [release verification record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
+and [acceptance gates](docs/ALPHA_READINESS.md).
 
 ## 0.1.0 — 2026-09-30
 

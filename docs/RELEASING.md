@@ -14,8 +14,10 @@ Ordinary Linux CI builds and tests containers without publishing them.
 ## Release evidence
 
 `v0.1.0` was published on 2026-09-30 (Europe/Madrid). Never recreate or move that
-tag. The next prepared version is `0.1.1-alpha.1`; publish it as a GitHub
-**prerelease** only after the [alpha gates](ALPHA_READINESS.md) pass.
+tag. The alpha version is `0.1.1-alpha.1`; publish it as a GitHub
+**prerelease** only after the [alpha gates](ALPHA_READINESS.md) pass. Its
+[GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
+are the live publication and verification record.
 
 The historical verification record is in the [v0.1.0 GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0):
 each new release must likewise record the full released commit SHA, a successful
@@ -102,10 +104,11 @@ Use this checklist for each release and include the final results in its notes:
    no prebuilt binary or container asset is promised. Verify the release and
    source links in a signed-out view.
 
-6. **Record completion.** Update the readiness record with the released commit,
-   successful CI run, release URL, and fresh-install result. Keep verification
-   notes distinct from feature changes. Creating a release is a publication
-   step; updating these documents alone does not perform it.
+6. **Record completion.** Put the released commit, successful CI run, release URL,
+   and fresh-install result in the GitHub prerelease notes linked from the
+   readiness record. This avoids changing the immutable release commit merely
+   to insert its own SHA. Creating a release is a publication step; updating
+   these documents alone does not perform it.
 
 ## Local checks when implementation changes
 
@@ -130,7 +133,8 @@ on Rust 1.94.0 and builds/tests the Dockerfile on both native Linux architecture
 
 ## Publication record
 
-Copy this into the new release notes and fill every field from actual results:
+This is a checklist template, not current publication status. Copy it into the
+GitHub prerelease notes and fill every field from actual results:
 
 - Candidate/tag: `v0.1.1-alpha.1`; full commit SHA: pending.
 - Exact-commit `main` CI URL and all four required job results: pending.

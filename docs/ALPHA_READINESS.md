@@ -1,7 +1,9 @@
 # SleepAPI alpha readiness
 
-Assessment date: 2026-10-26 (Europe/Madrid). Prepared version:
-**`0.1.1-alpha.1`**. Publication status: **not released**.
+Assessment date: 2026-10-26 (Europe/Madrid). Alpha version:
+**`0.1.1-alpha.1`**. The [GitHub prerelease record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
+is the authoritative publication status and completion evidence, including the
+released commit, final CI, and fresh tagged-source installation.
 
 ## Where the project stands
 
@@ -64,7 +66,8 @@ hardware-independent resource thresholds from one old run.
 ## Candidate evidence
 
 Local verification below was recorded before committing the preparation branch.
-The preparation PR records its exact commit and current CI results. The final release
+The [preparation PR](https://github.com/givtaj/sleepapi/pull/2) records its exact
+commit and CI results. The final release
 must link a successful `main` CI run on its actual tag target.
 
 | Check | Current result |
@@ -75,10 +78,10 @@ must link a successful `main` CI run on its actual tag target.
 | Source package | Passed local `cargo package --locked --allow-dirty` snapshot verification; CI requires clean packaging |
 | Python sampler regressions | 6 passed; original code reproduces signal deadlocks and slow stop-file handling |
 | Alpha HTTP receipt | [Passed on macOS ARM64](release-evidence/2026-10-26/alpha-smoke-macos-arm64.json): 256/256 valid; worst p95 overhead 24.699 ms, health 15.747 ms, recovery 307.761 ms |
-| Final candidate CI, both Docker architectures | Check the preparation PR’s checks and description for current results; local Docker daemon was stopped during this audit |
-| Tag, fresh public tagged installation, prerelease | Pending publication |
+| Final candidate CI, both Docker architectures | The preparation PR records review checks; the prerelease notes record all four `main` CI jobs on the actual tag target |
+| Tag, fresh public tagged installation, prerelease | Completion evidence is maintained in the linked GitHub prerelease record |
 
-## Remaining release sequence
+## Release completion sequence
 
 1. Review and merge the prepared candidate after its PR checks pass. Set the
    actual changelog release date and update candidate/publication wording before
@@ -90,5 +93,7 @@ must link a successful `main` CI run on its actual tag target.
    receipt, installation result, and platform limitations. Verify signed-out
    access before announcing it.
 
-Preparation does not create a tag, publish a release, or validate a hosted
-deployment. The existing `v0.1.0` remains available throughout this process.
+The linked GitHub prerelease record captures the completed sequence without
+changing the immutable release commit to insert its own SHA. A source document
+alone does not prove publication or installation. The existing `v0.1.0` remains
+available; this release has no hosted deployment.

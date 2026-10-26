@@ -9,13 +9,13 @@ HTTP status. Email and SMS are labels on this delay engine; no provider is
 contacted and no background delivery job is created. The waiting implementations
 are real, while the provider outcomes are simulated.
 
-**v0.1.0** is distributed as source code and a Dockerfile.
-See the [changelog](CHANGELOG.md) and [release checklist](docs/RELEASING.md) for
-its scope and publication status.
-
-The next candidate is **v0.1.1-alpha.1** (not yet published). Its
-[alpha gates and readiness record](docs/ALPHA_READINESS.md) define the required
-checks, measurable thresholds, and remaining publication steps.
+**v0.1.1-alpha.1** is an alpha source distribution with a Dockerfile.
+Publication status and verification are recorded in the
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1).
+See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
+[release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
+The earlier [v0.1.0 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0)
+remains available.
 
 ## Run with Docker
 
@@ -45,15 +45,15 @@ from a released version. Building requires network access to download base image
 and Rust dependencies. The Rust compiler stays in the build stage, outside the
 runtime image.
 
-No registry image is part of v0.1.0: users build their own image from the source.
-To build the versioned release, use the `v0.1.0` Git tag instead of cloning the
+No registry image is provided: users build their own image from the source.
+To build this alpha, use the `v0.1.1-alpha.1` Git tag instead of cloning the
 moving default branch:
 
 ```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.0
-cd sleepapi-v0.1.0
-docker build -t sleepapi:0.1.0 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.0
+git clone --branch v0.1.1-alpha.1 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.1
+cd sleepapi-v0.1.1-alpha.1
+docker build -t sleepapi:0.1.1-alpha.1 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.1
 ```
 
 Both examples build an image on your machine; neither pulls a prebuilt SleepAPI image.
