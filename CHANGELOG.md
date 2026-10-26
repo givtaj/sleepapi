@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.1-alpha.1 — Unreleased
+
+### Fixed
+
+- Prevent a resource-sampler shutdown deadlock when SIGINT or SIGTERM arrives
+  during a timed wait; check stop-file requests promptly at long sample intervals.
+
+### Added
+
+- Sampler shutdown regressions and a repeatable real-HTTP alpha acceptance gate
+  with response, latency, health, and capacity-recovery thresholds in CI.
+- An alpha readiness record and version-independent release procedure that
+  preserve the already-published v0.1.0 release.
+
+The API and source-plus-Dockerfile distribution remain the same. This candidate
+does not add registry images, native downloads, hosted service, or Windows
+verification. Publication is pending the [release gates](docs/ALPHA_READINESS.md).
+
 ## 0.1.0 — 2026-09-30
 
 Initial developer-tool release for simulating HTTP latency and provider failures.

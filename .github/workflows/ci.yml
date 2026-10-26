@@ -36,8 +36,14 @@ jobs:
         run: cargo +${{ matrix.toolchain }} clippy --locked --all-targets -- -D warnings
       - name: Test
         run: cargo +${{ matrix.toolchain }} test --locked
+      - name: Test resource sampler shutdown
+        if: matrix.toolchain == 'stable'
+        run: python3 -B -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Build release
         run: cargo +${{ matrix.toolchain }} build --release --locked
+      - name: Verify alpha acceptance thresholds
+        if: matrix.toolchain == 'stable'
+        run: python3 scripts/alpha-smoke.py --binary target/release/sleepapi
       - name: Verify source package
         if: matrix.toolchain == 'stable'
         run: cargo +${{ matrix.toolchain }} package --locked

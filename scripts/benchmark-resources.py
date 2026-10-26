@@ -26,7 +26,6 @@ import re
 import signal
 import subprocess
 import sys
-import threading
 import time
 
 
@@ -99,13 +98,13 @@ def process_sample(pid, clock_ticks, page_size, expected_start_ticks=None):
 
 
 def run(args, output):
-    stop = threading.Event()
     requested_signal = None
 
     def handle_signal(signum, _frame):
         nonlocal requested_signal
-        requested_signal = signal.Signals(signum).name
-        stop.set()
+        # A signal can interrupt a wait while its internal lock is held. Keep
+        # the handler lock-free; Event.set() here can deadlock Event.wait().
+        requested_signal = signum
 
     original_handlers = {
         signum: signal.signal(signum, handle_signal)
@@ -174,8 +173,8 @@ def run(args, output):
             })
             count += 1
             previous = sample
-            if stop.is_set():
-                reason = requested_signal or "requested_stop"
+            if requested_signal is not None:
+                reason = signal.Signals(requested_signal).name
                 break
             if args.stop_file and args.stop_file.exists():
                 reason = "stop_file"
@@ -186,9 +185,18 @@ def run(args, output):
                 break
             # Skip missed slots instead of emitting a burst of delayed samples.
             next_sample_ns = max(next_sample_ns + interval_ns, now_ns)
-            stop.wait(max(0, min(next_sample_ns, deadline_ns) - now_ns) / 1_000_000_000)
-            if stop.is_set():
-                reason = requested_signal or "requested_stop"
+            wake_ns = min(next_sample_ns, deadline_ns)
+            # Poll stop requests at most 100 ms apart even with a long sample
+            # interval. Polling must not create additional resource samples.
+            while requested_signal is None:
+                if args.stop_file and args.stop_file.exists():
+                    break
+                remaining_secs = (wake_ns - time.monotonic_ns()) / 1_000_000_000
+                if remaining_secs <= 0:
+                    break
+                time.sleep(min(0.1, remaining_secs))
+            if requested_signal is not None:
+                reason = signal.Signals(requested_signal).name
                 break
             if args.stop_file and args.stop_file.exists():
                 reason = "stop_file"
@@ -201,12 +209,14 @@ def run(args, output):
         print(f"Resource sampling failed: {message}", file=sys.stderr)
         exit_code = 1
     finally:
-        emit({
-            "type": "summary", "finished_at_utc": utc_now(), "reason": reason,
-            "sample_count": count, "elapsed_seconds": (time.monotonic_ns() - started_ns) / 1_000_000_000,
-        })
-        for signum, handler in original_handlers.items():
-            signal.signal(signum, handler)
+        try:
+            emit({
+                "type": "summary", "finished_at_utc": utc_now(), "reason": reason,
+                "sample_count": count, "elapsed_seconds": (time.monotonic_ns() - started_ns) / 1_000_000_000,
+            })
+        finally:
+            for signum, handler in original_handlers.items():
+                signal.signal(signum, handler)
     return exit_code
 
 

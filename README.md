@@ -13,6 +13,10 @@ are real, while the provider outcomes are simulated.
 See the [changelog](CHANGELOG.md) and [release checklist](docs/RELEASING.md) for
 its scope and publication status.
 
+The next candidate is **v0.1.1-alpha.1** (not yet published). Its
+[alpha gates and readiness record](docs/ALPHA_READINESS.md) define the required
+checks, measurable thresholds, and remaining publication steps.
+
 ## Run with Docker
 
 The container targets are Linux `amd64` and `arm64`. Use Docker Engine on Linux or Docker
@@ -387,7 +391,15 @@ See [Tokio's blocking-task lifecycle](https://docs.rs/tokio/latest/tokio/task/fn
 cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked
+python3 -B -m unittest discover -s scripts -p 'test_*.py' -v
+cargo build --release --locked
+python3 scripts/alpha-smoke.py --binary target/release/sleepapi
 ```
+
+The alpha smoke command launches and cleans up its own loopback processes. It
+checks response correctness, health responsiveness, and capacity recovery and
+prints a JSON receipt. The fixed workload and limits are local regression gates;
+they do not establish maximum throughput or production capacity.
 
 GitHub Actions runs only on Linux. It checks formatting, Clippy, tests, release
 builds, and source packaging on stable Rust, and tests the supported minimum Rust
