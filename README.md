@@ -378,12 +378,19 @@ and keeps its capacity slot until it finishes during normal operation.
 
 Ctrl-C or SIGTERM stops accepting connections and starts the configured shutdown
 grace period. The server exits with code `0` when requests and started blocking
-work finish. A second signal or the grace deadline forces process exit with code
-`2`, including when a client never finishes its request body or blocking work is
-still running. Choose a longer grace period if your test needs pending requests
+work finish and the best-effort log flush returns. A second signal or the grace
+deadline forces process exit with code `2`, including when a client never
+finishes its request body, blocking work is still running, or log output is
+stuck. Choose a longer grace period if your test needs pending requests
 to complete. The deadline terminates the process; it does not make OS-thread
 sleep or parking individually cancellable.
 See [Tokio's blocking-task lifecycle](https://docs.rs/tokio/latest/tokio/task/fn.spawn_blocking.html).
+
+Logs are written to stdout by a dedicated worker through a bounded queue of
+1024 records. When the queue fills, new records are dropped so slow or stopped
+log readers cannot block HTTP requests. Logging teardown shares the original
+shutdown grace period; forced exits do not wait for log output. Queued records
+and final shutdown messages are best effort and may be lost.
 
 ## Develop
 

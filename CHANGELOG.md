@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Keep HTTP requests and bounded shutdown responsive when stdout stops being
+  drained. Use a bounded, lossy logging queue and keep logger teardown under
+  the supervisor's grace deadline and second-signal escape.
+- Add subprocess regressions with a deliberately saturated stdout pipe for
+  request progress, logging teardown, grace expiry, and repeated signals.
+
 ## 0.1.1-alpha.1 — 2026-10-26
 
 ### Fixed
