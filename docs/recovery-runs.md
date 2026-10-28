@@ -1,7 +1,8 @@
 # Deterministic recovery runs
 
-This feature is available in the current source and is **unreleased**.
-The published `v0.1.1-alpha.2` release does not include recovery runs.
+Recovery runs are included from **`v0.1.1-alpha.3`**. Publication and verification
+are recorded in the [prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3).
+Earlier releases do not include this API.
 
 A recovery run gives one synthetic client test its own finite response sequence,
 such as HTTP `503`, `503`, then `200`. Each admitted attempt receives a sequence
