@@ -14,9 +14,9 @@ Ordinary Linux CI builds and tests containers without publishing them.
 ## Release evidence
 
 `v0.1.0` was published on 2026-09-30 (Europe/Madrid). Never recreate or move that
-tag. The alpha version is `0.1.1-alpha.1`; publish it as a GitHub
+tag. The alpha version is `0.1.1-alpha.2`; publish it as a GitHub
 **prerelease** only after the [alpha gates](ALPHA_READINESS.md) pass. Its
-[GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
+[GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.2)
 are the live publication and verification record.
 
 The historical verification record is in the [v0.1.0 GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0):
@@ -24,12 +24,12 @@ each new release must likewise record the full released commit SHA, a successful
 CI run on that SHA, fresh tagged-source build results, and platform limitations.
 The release tag and CI run must refer to the same commit. A local check or a workflow file alone is not release evidence.
 
-The local implementation baseline, `25daf094fdfbc28d0695d95ac494b612d18e8f4a`,
-passed 39 tests on Rust stable and 1.94.0, formatting, stable Clippy, source
-packaging, and container smoke checks. The ARM64 container ran natively on the
-local Mac; AMD64 used emulation. The GitHub jobs provide native Linux verification
-for both container architectures. Windows host integration and native Windows
-builds have not been tested.
+The [alpha.1 release record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
+contains the previous release's 39-test and installation evidence. Alpha.2 adds
+three blocked-stdout regressions, bringing the Rust suite to 42 tests. Each new
+candidate still requires fresh CI and tagged-source installation checks; older
+results do not validate it. Windows host integration and native Windows builds
+have not been tested.
 
 The container smoke script checks health, scenario discovery returning seven
 entries, timed failures on all four waiting routes, CORS, protocol headers,
@@ -54,8 +54,8 @@ Use this checklist for each release and include the final results in its notes:
 ## Release sequence
 
 1. **Prepare one release candidate.** Match `Cargo.toml` and the root package in
-   `Cargo.lock` to `0.1.1-alpha.1`, and change the changelog's Unreleased heading
-   to `0.1.1-alpha.1 — YYYY-MM-DD` using the actual release date. Update the README
+   `Cargo.lock` to `0.1.1-alpha.2`, and change the changelog's Unreleased heading
+   to `0.1.1-alpha.2 — YYYY-MM-DD` using the actual release date. Update the README
    candidate wording and readiness status for publication; review features and limits. Check all README examples and commit the final files. A local
    Docker tag such as `sleepapi:dev` does not create a Git tag or publish an image.
 
@@ -75,21 +75,21 @@ Use this checklist for each release and include the final results in its notes:
    badge or on local test results. This workflow runs for `main` pushes and pull
    requests, not tag pushes.
 
-3. **Tag the exact green commit as `v0.1.1-alpha.1`.** Create an annotated Git tag and
+3. **Tag the exact green commit as `v0.1.1-alpha.2`.** Create an annotated Git tag and
    push that tag without moving it to a different commit later. Verify that
-   `git rev-parse 'v0.1.1-alpha.1^{commit}'` equals the SHA recorded in step 2. If a
-   published version needs a fix, prepare a new patch release instead of
+   `git rev-parse 'v0.1.1-alpha.2^{commit}'` equals the SHA recorded in step 2. If a
+   published version needs a fix, prepare a new version instead of
    replacing the old tag.
 
 4. **Verify the published source path before announcing the release.** In a
    fresh directory, use the README's version-pinned clone and Docker commands,
-   substituting `v0.1.1-alpha.1` and image tag `sleepapi:0.1.1-alpha.1`.
+   substituting `v0.1.1-alpha.2` and image tag `sleepapi:0.1.1-alpha.2`.
    Confirm `GET /health` returns `{"status":"ok"}` and a POST simulation waits
    and returns its documented JSON. Run the existing container checks against
    that locally built image:
 
    ```sh
-   python3 scripts/docker-smoke.py sleepapi:0.1.1-alpha.1
+   python3 scripts/docker-smoke.py sleepapi:0.1.1-alpha.2
    ```
 
    This needs Docker and Python 3. The test creates and cleans up only its own
@@ -97,7 +97,7 @@ Use this checklist for each release and include the final results in its notes:
    Dockerfile, `Cargo.lock`, `src/`, and `LICENSE`; the build must not depend on
    an existing `target/` directory or local secrets.
 
-5. **Publish a GitHub prerelease using the tested tag.** Use `v0.1.1-alpha.1` as
+5. **Publish a GitHub prerelease using the tested tag.** Use `v0.1.1-alpha.2` as
    the title, enable the prerelease flag, summarize the changes and limits, and link the
    README's Docker instructions. Describe the deliverable as source plus a
    Dockerfile. [GitHub provides source archives](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases);
@@ -136,7 +136,7 @@ on Rust 1.94.0 and builds/tests the Dockerfile on both native Linux architecture
 This is a checklist template, not current publication status. Copy it into the
 GitHub prerelease notes and fill every field from actual results:
 
-- Candidate/tag: `v0.1.1-alpha.1`; full commit SHA: pending.
+- Candidate/tag: `v0.1.1-alpha.2`; full commit SHA: pending.
 - Exact-commit `main` CI URL and all four required job results: pending.
 - Alpha smoke JSON receipt in the stable CI log: pending.
 - Annotated tag target equals the tested SHA: pending.
