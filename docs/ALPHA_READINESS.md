@@ -5,6 +5,10 @@ Assessment date: 2026-10-28 (Europe/Madrid). Alpha version:
 is the authoritative publication status and completion evidence, including the
 released commit, final CI, and fresh tagged-source installation.
 
+This record describes alpha.2. Current source additionally implements
+[recovery runs](recovery-runs.md), which are unreleased and require their own
+release verification before publication.
+
 ## Where the project stands
 
 The previous [v0.1.1-alpha.1 source release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
@@ -22,11 +26,11 @@ exit `2` even when HTTP work has drained.
 
 The [historical benchmark documentation](https://github.com/givtaj/sleepapi/pull/1)
 has also been reconciled and merged. It describes the retained evidence and rerun
-limits; it does not certify this candidate's throughput. Optional recovery
-sequences, response fixtures, and transport faults remain future work in issues
-[#4](https://github.com/givtaj/sleepapi/issues/4),
-[#5](https://github.com/givtaj/sleepapi/issues/5), and
-[#6](https://github.com/givtaj/sleepapi/issues/6).
+limits; it does not certify this candidate's throughput. Recovery sequences
+([#4](https://github.com/givtaj/sleepapi/issues/4)) are implemented in source after
+alpha.2. Exact response fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5))
+and transport faults ([#6](https://github.com/givtaj/sleepapi/issues/6)) remain
+future work.
 
 ## Alpha scope
 
@@ -51,7 +55,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Gate | Required threshold | Evidence |
 | --- | --- | --- |
 | Defects | Zero unresolved critical/high-severity defects in supported behavior: crashes, hangs, incorrect HTTP contracts, or isolation failures | Review of final diff and failure triage; this is not a claim of a security audit |
-| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current suite has 42 tests |
+| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; alpha.2 has 42 tests, with additional recovery-run coverage in subsequent source |
 | Wait and lifecycle correctness | No early response; capacity returns structured `429` when full and recovers; dropped async work releases capacity; started blocking work retains it; graceful exit `0`, deadline/second-signal exit `2` | Rust API/wait/process tests and Docker smoke; existing process tests use a 3-second observation timeout |
 | Blocked stdout | 2,048 requests progress with stdout saturated; logger teardown and incomplete-body shutdown terminate within 1 second with 150-ms grace; second signal terminates within 1 second during a 10-second grace | Three deterministic subprocess regressions; observation limits are test guards, not general latency promises |
 | Sampler shutdown | Both SIGINT and SIGTERM and a stop file finish within 1 second in the long-interval fixture; preserve samples and restore handlers on errors | Six Python regression tests; polling interval is at most 100 ms, excluding setup/I/O |

@@ -17,6 +17,10 @@ See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
 The earlier [v0.1.0 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0)
 remains available.
 
+Current source also includes **unreleased recovery runs** for isolated, resettable
+response sequences such as `503, 503, 200`. See [recovery runs](docs/recovery-runs.md)
+for the API and limits. The published `v0.1.1-alpha.2` tag does not include them.
+
 ## Run with Docker
 
 The container targets are Linux `amd64` and `arm64`. Use Docker Engine on Linux or Docker
@@ -198,8 +202,10 @@ omitted or set to `null`; a provided `method` must be a valid method name.
 
 `client_timeout` does not manufacture a server error: your client's deadline
 causes the timeout. `upstream_timeout` produces an actual HTTP `504` response.
-Presets are stateless, so repeated failure requests keep failing; there is no
-"fail twice, then succeed" counter or automatic server-side retry.
+Presets are stateless, so repeated failure requests keep failing. For a finite
+"fail twice, then succeed" sequence, use the separate
+[recovery run API](docs/recovery-runs.md) in current source. Clients still initiate
+each attempt; the server does not retry requests automatically.
 
 Concurrent bursts, overload, and cancellation are client-driven experiments:
 send parallel requests to a named route, lower `SLEEPAPI_MAX_IN_FLIGHT` to reach
@@ -284,13 +290,21 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | `POST /sleep` | Select a waiting method in the JSON body |
 | `POST /simulate/email` | Same wait, labeled as a simulated email operation |
 | `POST /simulate/sms` | Same wait, labeled as a simulated SMS operation |
+| `GET /runs`, `POST /runs` | Inspect recovery limits or create an isolated run (unreleased) |
+| `GET /runs/{run_id}` | Inspect the run's sequence, generation, budget and expiry |
+| `POST /runs/{run_id}/attempts` | Consume the next sequence step using the current generation |
+| `GET /runs/{run_id}/receipts` | Inspect the newest bounded attempt receipts |
+| `POST /runs/{run_id}/reset` | Advance generation, restart the sequence and clear receipts |
+| `DELETE /runs/{run_id}` | Remove a run and its retained state |
 
-All POST endpoints accept `scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
+The stateless sleep and simulation POST endpoints accept `scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
 defaults. The four named `/sleep/...` endpoints fix the waiting method in the
 route and reject a `method` field in the body, even if it matches the route.
 
 The generic `/sleep`, `/simulate/email`, and `/simulate/sms` endpoints remain
 available and also accept `method` to choose how to wait.
+The `/runs` endpoints have their own [request contract](docs/recovery-runs.md);
+attempts and resets require a `generation` field.
 
 | Field | Default | Accepted values |
 | --- | --- | --- |

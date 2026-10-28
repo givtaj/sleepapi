@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Isolated in-memory recovery runs with finite response sequences, generation
+  guards, deterministic assignment at admission, explicit reset/deletion, and
+  automatic expiry. Runs share the existing simulation capacity and waiting methods.
+- Bounded run, step, lifetime-attempt and receipt storage, with diagnostics that
+  cannot be repopulated by late completions after reset, deletion or expiry.
+- Recovery-run contract tests and Docker HTTP coverage. See the
+  [run API](docs/recovery-runs.md) for limits and cancellation semantics.
+
 ## 0.1.1-alpha.2 — 2026-10-28
 
 ### Fixed
