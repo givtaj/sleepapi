@@ -1,9 +1,13 @@
 mod config;
 mod error;
+mod runs;
 mod scenario;
 mod wait;
 
-use std::{sync::Arc, time::Duration};
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 
 use axum::{
     Json, Router,
@@ -29,6 +33,7 @@ pub use wait::WaitMethod;
 struct AppState {
     config: Config,
     slots: Arc<Semaphore>,
+    runs: Arc<Mutex<runs::RunStore>>,
 }
 
 pub fn router(config: Config) -> std::io::Result<Router> {
@@ -36,6 +41,7 @@ pub fn router(config: Config) -> std::io::Result<Router> {
     let cors_origins = config.cors_origins()?;
     let state = AppState {
         slots: Arc::new(Semaphore::new(config.max_in_flight)),
+        runs: Arc::new(Mutex::new(runs::RunStore::default())),
         config,
     };
     let app = Router::new()
@@ -48,6 +54,7 @@ pub fn router(config: Config) -> std::io::Result<Router> {
         .route("/sleep/thread", sleep_route(WaitMethod::ThreadSleep))
         .route("/sleep/park", sleep_route(WaitMethod::ThreadPark))
         .route("/simulate/{operation}", post(simulate))
+        .merge(runs::routes())
         .fallback(|| async { ApiError::new(StatusCode::NOT_FOUND, "route not found") })
         .method_not_allowed_fallback(|| async {
             ApiError::new(
@@ -63,7 +70,7 @@ pub fn router(config: Config) -> std::io::Result<Router> {
     Ok(app.layer(
         CorsLayer::new()
             .allow_origin(cors_origins)
-            .allow_methods([Method::GET, Method::HEAD, Method::POST])
+            .allow_methods([Method::GET, Method::HEAD, Method::POST, Method::DELETE])
             .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
             .expose_headers([header::RETRY_AFTER, header::WWW_AUTHENTICATE, header::ALLOW]),
     ))

@@ -117,6 +117,41 @@ def stop(container, expected):
             f"expected exit {expected}, got {state['ExitCode']} (137 means Docker killed it)")
 
 
+def check_recovery_run(port):
+    status, _, body = request(port, "POST", "/runs", {
+        "sequence": [{"status_code": code, "duration_ms": 0} for code in (503, 503, 200)],
+    })
+    require(status == 201, "could not create a recovery run")
+    run = json.loads(body)
+    path = "/runs/" + run["run_id"]
+    generation = run["generation"]
+    for attempt, expected in enumerate((503, 503, 200), start=1):
+        status, _, body = request(port, "POST", path + "/attempts", {"generation": generation})
+        result = json.loads(body)
+        require(status == expected and result["attempt"] == attempt, "recovery sequence mismatch")
+        require(result["run_id"] == run["run_id"] and result["generation"] == generation,
+                "recovery response has wrong run/generation")
+    status, _, _ = request(port, "POST", path + "/attempts", {"generation": generation})
+    require(status == 409, "exhausted sequence must reject further attempts")
+    status, _, body = request(port, "GET", path + "/receipts")
+    receipts = json.loads(body)["receipts"]
+    require(status == 200 and len(receipts) == 3 and all(r["outcome"] == "completed" for r in receipts),
+            "recovery receipts missing completed attempts")
+    status, _, body = request(port, "POST", path + "/reset", {"generation": generation})
+    reset = json.loads(body)
+    require(status == 200 and reset["generation"] == generation + 1 and reset["retained_receipts"] == 0,
+            "recovery reset did not advance generation and clear receipts")
+    status, _, _ = request(port, "POST", path + "/attempts", {"generation": generation})
+    require(status == 409, "stale generation must not consume a reset sequence")
+    status, _, body = request(port, "POST", path + "/attempts", {"generation": reset["generation"]})
+    require(status == 503 and json.loads(body)["attempt"] == 1, "reset sequence did not restart")
+    status, _, body = request(port, "DELETE", path)
+    require(status == 204 and not body, "recovery run deletion failed")
+    status, _, _ = request(port, "GET", path)
+    require(status == 404, "deleted run remains accessible")
+    print("PASS: recovery sequence, receipts, exhaustion, guarded reset, and deletion")
+
+
 def check_incomplete_body(container, port):
     with socket.create_connection(("127.0.0.1", port), timeout=2) as connection:
         connection.sendall(
@@ -149,6 +184,7 @@ def main():
     try:
         container, port = start(sys.argv[1], containers)
         check_http(port)
+        check_recovery_run(port)
         stop(container, 0)
         print("PASS: normal Docker stop exits 0")
         container, port = start(sys.argv[1], containers)
