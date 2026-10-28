@@ -80,7 +80,49 @@ The [alpha.1 local receipt](release-evidence/2026-10-26/README.md) remains a
 historical record. Current release CI, alpha smoke, and fresh-install results
 belong in the linked alpha.2 prerelease notes, with their actual commit and date.
 
-## Release completion sequence
+## Recovery-run release review — 2026-10-28
+
+Reviewed the recovery-run change at
+[`d5c296fdf448631948c10f00d0dbea438fb26720`](https://github.com/givtaj/sleepapi/commit/d5c296fdf448631948c10f00d0dbea438fb26720)
+against published alpha.2. Independent lifecycle, HTTP-contract, and distribution
+reviews found no release-blocking runtime or packaging defect. Two README
+inaccuracies were corrected: DELETE is enabled by the configured CORS policy,
+and run management does not consume simulation-capacity slots.
+
+| Review area | Result and evidence |
+| --- | --- |
+| CI on the reviewed source | PASS: [main run 40706326174](https://github.com/givtaj/sleepapi/actions/runs/40706326174), stable Rust, Rust 1.94.0, native Linux AMD64 Docker and native Linux ARM64 Docker |
+| Rust and Python regressions | PASS in that CI: 58 Rust tests per toolchain (including 16 recovery-run tests), six Python tests, lint, builds, HTTP acceptance and source-package verification |
+| State lifecycle | PASS: bounded runs/steps/attempts/receipts, generation isolation, reservation ordering, cancellation, reset/delete/expiry and late-completion behavior reviewed |
+| Real HTTP disconnects | PASS locally: TCP FIN and reset probes across all four wait methods; cancellation receipts, async capacity recovery, continued blocking-work capacity, and subsequent attempt positions checked |
+| HTTP headers and browser access | PASS locally: simulated 401/405/429/503 headers, configured CORS, and actual routing 405 Allow headers |
+| Distribution inventory | PASS: 80-file source package includes recovery source, tests, API documentation and Docker smoke; compiled build artifacts and desktop metadata are excluded |
+
+The local disconnect probes used the existing Rust 1.94.0 release build from
+issue #4 verification; its source files match the reviewed tree. These probes
+supplement the automated tests, which cancel router futures directly; they are
+not yet retained as wire-level regression tests. A cancellation receipt is not
+proof that blocking work stopped, and completion is not proof of client delivery.
+Client acceptance remains separate from this review.
+
+The next recommended version is **`v0.1.1-alpha.3`**, as a source-plus-Dockerfile
+prerelease. It has **not** been prepared or published by this review. Remaining
+release gates are:
+
+1. Update the manifest, lockfile, changelog, README, recovery-run documentation,
+   readiness record and release checklist for alpha.3 and the actual release date.
+2. Commit and push or merge the final candidate to `main`, then require all four
+   CI jobs on that resulting SHA.
+   The reviewed-source CI above does not validate a future preparation commit.
+3. At publication, create a new annotated tag on that exact green commit; verify
+   a fresh public tagged checkout, Docker build and recovery-inclusive smoke,
+   source archive, and public prerelease access. Record those results in its notes.
+
+Do not reuse the published alpha.2 tag or follow the alpha.2 version examples
+below literally when preparing the next release. Source plus Dockerfile remains
+the distribution scope; Windows and production capacity remain unverified.
+
+## Alpha.2 release completion sequence
 
 1. Review and merge the prepared candidate after its PR checks pass. Set the
    actual changelog release date and update publication wording before the final
