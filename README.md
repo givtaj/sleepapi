@@ -354,7 +354,7 @@ Use a comma-separated list for multiple origins, such as
 `http://localhost:5173,http://127.0.0.1:5173`. Origins contain a scheme, host, and
 optional port, with no trailing slash or path. Wildcards and credential-bearing
 URLs are rejected. An unset or empty list leaves cross-origin access disabled.
-This permits GET, HEAD, and POST with `Content-Type` and `Authorization` headers,
+This permits GET, HEAD, POST, and DELETE with `Content-Type` and `Authorization` headers,
 and exposes `Retry-After`, `WWW-Authenticate`, and `Allow` to JavaScript. Cookie
 credentials are not enabled. CORS controls browser access; it is not authentication.
 
@@ -380,7 +380,9 @@ If the configured maximum is below the default 400 ms, provide `duration_ms`
 explicitly. Invalid configuration stops startup. The server defaults to loopback;
 it is a local development tool with no authentication.
 
-All POST routes share the same capacity pool. The limit counts waiting work,
+Stateless simulation requests and recovery-run attempts share the same capacity
+pool. Run creation, inspection, reset, and deletion do not consume simulation
+slots. The limit counts waiting work,
 including blocking work that outlives its request future. It does not cap all TCP
 connections or all HTTP requests. Tokio's blocking pool has its own thread limit;
 work can queue there if your configured admission limit is larger.
