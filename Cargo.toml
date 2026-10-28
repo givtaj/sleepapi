@@ -1,6 +1,6 @@
 [package]
 name = "sleepapi"
-version = "0.1.1-alpha.1"
+version = "0.1.1-alpha.2"
 edition = "2024"
 rust-version = "1.94"
 description = "An Axum devtool for simulating slow HTTP responses with different waiting strategies"

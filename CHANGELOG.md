@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1-alpha.2 — 2026-10-28
 
 ### Fixed
 
@@ -9,6 +9,16 @@
   the supervisor's grace deadline and second-signal escape.
 - Add subprocess regressions with a deliberately saturated stdout pipe for
   request progress, logging teardown, grace expiry, and repeated signals.
+
+### Documentation
+
+- Clarify the historical benchmark inventory, source limits, and requirements
+  for reproducing the recorded runs. No new throughput benchmark is claimed.
+
+HTTP behavior is unchanged. Logging uses a bounded, lossy queue; records may be
+dropped under pressure and final shutdown logs are best effort. Logger teardown
+shares the shutdown deadline, so blocked output can cause exit `2` even after
+HTTP work drains. See the [release verification record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.2).
 
 ## 0.1.1-alpha.1 — 2026-10-26
 
