@@ -9,17 +9,17 @@ HTTP status. Email and SMS are labels on this delay engine; no provider is
 contacted and no background delivery job is created. The waiting implementations
 are real, while the provider outcomes are simulated.
 
-**v0.1.1-alpha.2** is an alpha source distribution with a Dockerfile.
+**v0.1.1-alpha.3** is an alpha source distribution with a Dockerfile.
 Publication status and verification are recorded in the
-[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.2).
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3).
 See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
 [release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
 The earlier [v0.1.0 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0)
 remains available.
 
-Current source also includes **unreleased recovery runs** for isolated, resettable
-response sequences such as `503, 503, 200`. See [recovery runs](docs/recovery-runs.md)
-for the API and limits. The published `v0.1.1-alpha.2` tag does not include them.
+This alpha adds **recovery runs** for isolated, resettable response sequences
+such as `503, 503, 200`. See [recovery runs](docs/recovery-runs.md) for the API,
+bounded storage, generation guards, and cancellation semantics.
 
 ## Run with Docker
 
@@ -50,14 +50,14 @@ and Rust dependencies. The Rust compiler stays in the build stage, outside the
 runtime image.
 
 No registry image is provided: users build their own image from the source.
-To build this alpha, use the `v0.1.1-alpha.2` Git tag instead of cloning the
+To build this alpha, use the `v0.1.1-alpha.3` Git tag instead of cloning the
 moving default branch:
 
 ```sh
-git clone --branch v0.1.1-alpha.2 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.2
-cd sleepapi-v0.1.1-alpha.2
-docker build -t sleepapi:0.1.1-alpha.2 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.2
+git clone --branch v0.1.1-alpha.3 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.3
+cd sleepapi-v0.1.1-alpha.3
+docker build -t sleepapi:0.1.1-alpha.3 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.3
 ```
 
 Both examples build an image on your machine; neither pulls a prebuilt SleepAPI image.
@@ -204,7 +204,7 @@ omitted or set to `null`; a provided `method` must be a valid method name.
 causes the timeout. `upstream_timeout` produces an actual HTTP `504` response.
 Presets are stateless, so repeated failure requests keep failing. For a finite
 "fail twice, then succeed" sequence, use the separate
-[recovery run API](docs/recovery-runs.md) in current source. Clients still initiate
+[recovery run API](docs/recovery-runs.md). Clients still initiate
 each attempt; the server does not retry requests automatically.
 
 Concurrent bursts, overload, and cancellation are client-driven experiments:
@@ -290,7 +290,7 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | `POST /sleep` | Select a waiting method in the JSON body |
 | `POST /simulate/email` | Same wait, labeled as a simulated email operation |
 | `POST /simulate/sms` | Same wait, labeled as a simulated SMS operation |
-| `GET /runs`, `POST /runs` | Inspect recovery limits or create an isolated run (unreleased) |
+| `GET /runs`, `POST /runs` | Inspect recovery limits or create an isolated run |
 | `GET /runs/{run_id}` | Inspect the run's sequence, generation, budget and expiry |
 | `POST /runs/{run_id}/attempts` | Consume the next sequence step using the current generation |
 | `GET /runs/{run_id}/receipts` | Inspect the newest bounded attempt receipts |
