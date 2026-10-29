@@ -1,0 +1,35 @@
+{
+  "id": "ae667dc80ac9e1402a80a34e3b1de742c194fc15ef358880261acfbe503815e6",
+  "image": "sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea",
+  "name": "/sleepapi-bench-20261029-full-38-worker",
+  "pid": 0,
+  "started_at": "2026-10-29T18:57:58.248263422Z",
+  "user": "65532:65532",
+  "command": [
+    "python3",
+    "-B",
+    "/work/benchmark-worker.py",
+    "--mode",
+    "load",
+    "--method",
+    "tokio-spawn",
+    "--output-dir",
+    "/out/data",
+    "--window-secs",
+    "10",
+    "--concurrency",
+    "64",
+    "--duration-ms",
+    "100"
+  ],
+  "environment": [],
+  "limits": {
+    "CpusetCpus": "0,1",
+    "Memory": 536870912,
+    "MemorySwap": 536870912,
+    "PidsLimit": 256,
+    "ReadonlyRootfs": true
+  },
+  "pid_mode": "container:dce9e792e466064577742c17fc95b0b7e6ad86786392ec07cf77e80f631223e9",
+  "network_mode": "container:dce9e792e466064577742c17fc95b0b7e6ad86786392ec07cf77e80f631223e9"
+}

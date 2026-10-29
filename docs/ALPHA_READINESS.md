@@ -61,8 +61,12 @@ historical release evidence below covers its original 58-test source only.
 
 The 64-slot default is an admission limit, not a load-tested capacity guarantee.
 Larger configurable limits remain experimental. The
-[October 4 benchmarks](benchmark-results/2026-10-04-followup/README.md) are
-historical evidence on their recorded source and host, not candidate certification.
+[October 29 resource baseline](benchmark-results/2026-10-29-linux-arm64/README.md)
+measures all four methods at concurrency 1, 16, and 64 on source `f686bad` in a
+Linux ARM64 Docker Desktop VM, with separate overload/cancellation observations.
+Its fixed 100-ms delay limits throughput and does not establish maximum capacity.
+The [October 4 benchmarks](benchmark-results/2026-10-04-followup/README.md) remain
+historical evidence on their recorded source and host.
 
 ## Release thresholds
 
@@ -85,8 +89,9 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
-measurements. CPU/RSS/thread counts remain descriptive until a fresh, controlled
-benchmark establishes comparable budgets.
+measurements. The October 29 CPU/RSS/thread counts provide a reproducible,
+descriptive baseline for their recorded setup; they do not introduce release
+budgets or production SLOs.
 
 ## Development coverage after alpha.4
 

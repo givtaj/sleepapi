@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "mode": "load",
+  "method": "park",
+  "observed_at_utc": "2026-10-29T18:54:59.808318+00:00",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "python_version": "3.12.14",
+  "configuration": {
+    "mode": "load",
+    "method": "park",
+    "output_dir": "/out/data",
+    "window_secs": 10.0,
+    "concurrency": 1,
+    "duration_ms": 100
+  },
+  "cpu_convention": "100% = one logical CPU; process CPU only",
+  "rss_convention": "process resident pages; sampled peaks exclude other cgroup memory",
+  "sample_interval_ms": 100,
+  "request_timeout_seconds": 2.0,
+  "max_response_body_bytes": 65536,
+  "max_request_records": 100000,
+  "evidence_io": "64-KiB buffered JSONL streams; phase records flushed immediately, all streams on close",
+  "target_pid": 1,
+  "process_start_ticks": 172527,
+  "clock_ticks_per_second": 100,
+  "page_size_bytes": 4096,
+  "pid_namespace": "pid:[4026532559]",
+  "target_cgroup": [
+    "0::/../065e07a304dcc132955b150dab02d8555530aa920103461c338f762976df87c8"
+  ],
+  "target_comm": "sleepapi",
+  "target_cmdline": [
+    "/usr/local/bin/sleepapi",
+    ""
+  ],
+  "target_allowed_cpus": "2-3",
+  "client_pid": 10,
+  "client_allowed_cpus": [
+    0,
+    1
+  ],
+  "sampler_identity": "shared PID namespace PID 1 comm/start-ticks; no Docker host identity claim",
+  "results": {
+    "idle": {
+      "server": {
+        "sample_count": 10,
+        "cpu_counter_span_seconds": 0.901640917,
+        "cpu_ticks_delta": 0,
+        "cpu_seconds": 0.0,
+        "cpu_percent_one_core": 0.0,
+        "rss_peak_bytes": 3702784,
+        "rss_first_bytes": 3702784,
+        "rss_last_bytes": 3702784,
+        "threads_peak": 5,
+        "threads_first": 5,
+        "threads_last": 5,
+        "first_sample_ns": 1725717207744,
+        "last_sample_ns": 1726618848661,
+        "leading_unsampled_ms": 100.964042,
+        "trailing_unsampled_ms": 0.2735,
+        "max_sample_gap_ms": 103.670334
+      },
+      "client": {
+        "sample_count": 10,
+        "cpu_counter_span_seconds": 0.901709167,
+        "cpu_ticks_delta": 1,
+        "cpu_seconds": 0.01,
+        "cpu_percent_one_core": 1.109005028003669,
+        "rss_peak_bytes": 25526272,
+        "rss_first_bytes": 25526272,
+        "rss_last_bytes": 25526272,
+        "threads_peak": 2,
+        "threads_first": 2,
+        "threads_last": 2,
+        "first_sample_ns": 1725717232911,
+        "last_sample_ns": 1726618942078,
+        "leading_unsampled_ms": 100.989209,
+        "trailing_unsampled_ms": 0.180083,
+        "max_sample_gap_ms": 103.674917
+      }
+    },
+    "warmup": {
+      "start_ns": 1726620100536,
+      "scheduled_end_ns": 1728620100536,
+      "drain_end_ns": 1728713400454,
+      "last_response_ns": 1728712935037,
+      "launch_window_seconds": 2,
+      "response_span_seconds": 2.092834501,
+      "requests": 20,
+      "successful_responses": 20,
+      "unexpected_responses": 0,
+      "completions_in_window": 19,
+      "completed_in_window_per_second": 9.5,
+      "drained_responses_per_second": 9.556417380563815,
+      "latency_ms": {
+        "p50": 105.167625,
+        "p95": 106.185875,
+        "max": 106.2075
+      },
+      "resources": {
+        "server": {
+          "sample_count": 20,
+          "cpu_counter_span_seconds": 1.90006671,
+          "cpu_ticks_delta": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent_one_core": 0.0,
+          "rss_peak_bytes": 3702784,
+          "rss_first_bytes": 3702784,
+          "rss_last_bytes": 3702784,
+          "threads_peak": 6,
+          "threads_first": 6,
+          "threads_last": 6,
+          "first_sample_ns": 1726715344786,
+          "last_sample_ns": 1728615411496,
+          "leading_unsampled_ms": 95.24425,
+          "trailing_unsampled_ms": 97.523541,
+          "max_sample_gap_ms": 103.79075
+        },
+        "client": {
+          "sample_count": 20,
+          "cpu_counter_span_seconds": 1.900069876,
+          "cpu_ticks_delta": 2,
+          "cpu_seconds": 0.02,
+          "cpu_percent_one_core": 1.0525928679056642,
+          "rss_peak_bytes": 25657344,
+          "rss_first_bytes": 25657344,
+          "rss_last_bytes": 25657344,
+          "threads_peak": 3,
+          "threads_first": 3,
+          "threads_last": 3,
+          "first_sample_ns": 1726715439453,
+          "last_sample_ns": 1728615509329,
+          "leading_unsampled_ms": 95.338917,
+          "trailing_unsampled_ms": 97.425708,
+          "max_sample_gap_ms": 103.766208
+        }
+      }
+    },
+    "measured": {
+      "start_ns": 1728714706996,
+      "scheduled_end_ns": 1738714706996,
+      "drain_end_ns": 1738736631667,
+      "last_response_ns": 1738736280459,
+      "launch_window_seconds": 10.0,
+      "response_span_seconds": 10.021573463,
+      "requests": 96,
+      "successful_responses": 96,
+      "unexpected_responses": 0,
+      "completions_in_window": 95,
+      "completed_in_window_per_second": 9.5,
+      "drained_responses_per_second": 9.579334059111114,
+      "latency_ms": {
+        "p50": 104.645875,
+        "p95": 106.196625,
+        "max": 106.500209
+      },
+      "resources": {
+        "server": {
+          "sample_count": 100,
+          "cpu_counter_span_seconds": 9.897919879,
+          "cpu_ticks_delta": 4,
+          "cpu_seconds": 0.04,
+          "cpu_percent_one_core": 0.404125316116837,
+          "rss_peak_bytes": 3702784,
+          "rss_first_bytes": 3702784,
+          "rss_last_bytes": 3702784,
+          "threads_peak": 6,
+          "threads_first": 6,
+          "threads_last": 6,
+          "first_sample_ns": 1728818543121,
+          "last_sample_ns": 1738716463000,
+          "leading_unsampled_ms": 103.836125,
+          "trailing_unsampled_ms": 19.817459,
+          "max_sample_gap_ms": 104.872667
+        },
+        "client": {
+          "sample_count": 100,
+          "cpu_counter_span_seconds": 9.897880047,
+          "cpu_ticks_delta": 13,
+          "cpu_seconds": 0.13,
+          "cpu_percent_one_core": 1.313412562919495,
+          "rss_peak_bytes": 25657344,
+          "rss_first_bytes": 25657344,
+          "rss_last_bytes": 25657344,
+          "threads_peak": 3,
+          "threads_first": 3,
+          "threads_last": 3,
+          "first_sample_ns": 1728818636037,
+          "last_sample_ns": 1738716516084,
+          "leading_unsampled_ms": 103.929041,
+          "trailing_unsampled_ms": 19.764375,
+          "max_sample_gap_ms": 104.851875
+        }
+      }
+    },
+    "delay_only_ceiling_responses_per_second": 10.0,
+    "connection_policy": "one persistent HTTP/1.1 connection per worker; fresh clients after server warmup"
+  },
+  "request_records": 117,
+  "resource_samples": 132
+}

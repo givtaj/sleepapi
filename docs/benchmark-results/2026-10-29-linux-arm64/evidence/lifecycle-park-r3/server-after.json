@@ -1,0 +1,25 @@
+{
+  "id": "f7f9078a897a0c441a139d1d8531caed8af4ef01a59c8e4ed7007bd9532adc17",
+  "image": "sha256:5b0de913db7014106b8f1f32e049a5062f109b4ee9307d650454cf6c25e76f83",
+  "name": "/sleepapi-bench-20261029-full-48",
+  "pid": 16210,
+  "started_at": "2026-10-29T18:59:43.438538721Z",
+  "user": "65532:65532",
+  "command": null,
+  "environment": [
+    "RUST_LOG=sleepapi=warn",
+    "SLEEPAPI_ADDR=127.0.0.1:3000",
+    "TOKIO_WORKER_THREADS=2",
+    "SLEEPAPI_MAX_IN_FLIGHT=1",
+    "SLEEPAPI_SHUTDOWN_GRACE_MS=5000"
+  ],
+  "limits": {
+    "CpusetCpus": "2,3",
+    "Memory": 536870912,
+    "MemorySwap": 536870912,
+    "PidsLimit": 256,
+    "ReadonlyRootfs": true
+  },
+  "pid_mode": "",
+  "network_mode": "none"
+}

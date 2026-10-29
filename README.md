@@ -467,6 +467,14 @@ view. Output files must be new. Use `--stop-file PATH` or SIGINT/SIGTERM to end
 sampling early. Align samples with the client's measured interval and keep
 warmup separate; brief peaks can fall between samples.
 
+For a complete four-method experiment, use the
+[October 29 Linux ARM64 benchmark](docs/benchmark-results/2026-10-29-linux-arm64/README.md).
+It includes a reproducible Docker namespace runner, raw request/resource samples,
+an independent offline verifier, and load, overload, and cancellation results.
+This runner works inside a Linux Docker VM without mounting host namespaces or
+the Docker socket into a container. Its recorded numbers describe that setup
+and workload, not a maximum-capacity guarantee.
+
 Run the container checks locally with Docker and Python 3:
 
 ```sh
