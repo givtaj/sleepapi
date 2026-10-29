@@ -14,10 +14,11 @@ Ordinary Linux CI builds and tests containers without publishing them.
 ## Release evidence
 
 `v0.1.0` was published on 2026-09-30 (Europe/Madrid). Never recreate or move that
-tag. The alpha version is `0.1.1-alpha.3`; publish it as a GitHub
+tag. The current release candidate is `0.1.1-alpha.4`; publish it as a GitHub
 **prerelease** only after the [alpha gates](ALPHA_READINESS.md) pass. Its
-[GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3)
-are the live publication and verification record.
+[GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+will be the publication and verification record. Preparing this document does
+not establish publication or completion of the final candidate's checks.
 
 The historical verification record is in the [v0.1.0 GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0):
 each new release must likewise record the full released commit SHA, a successful
@@ -26,16 +27,21 @@ The release tag and CI run must refer to the same commit. A local check or a wor
 
 The [alpha.1 release record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
 contains its 39-test and installation evidence. Alpha.2 added three blocked-stdout
-regressions, bringing the Rust suite to 42 tests; alpha.3 adds 16 recovery-run
-tests for a total of 58. Each new
-candidate still requires fresh CI and tagged-source installation checks; older
-results do not validate it. Windows host integration and native Windows builds
+regressions, bringing the Rust suite to 42 tests; the
+[alpha.3 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3)
+added 16 recovery-run tests for a total of 58. The alpha.4 fixture and transport
+candidate has 86 Rust tests. Its merged implementation baseline
+`535301ac7c4d2adcc6a8d33a6f121c71d5247d96` passed all four jobs in
+[main CI run 40883400744](https://github.com/givtaj/sleepapi/actions/runs/40883400744).
+The final release candidate still requires its own CI and tagged-source
+installation checks; older results do not validate it. Windows host integration and native Windows builds
 have not been tested.
 
 The container smoke script checks health, scenario discovery returning seven
 entries, timed failures on all four waiting routes, CORS, protocol headers,
 recovery-run sequencing, receipts, generation guards, reset and deletion,
-normal exit `0`, and deadline exit `2` for an incomplete request. Rust tests
+exact fixtures, connection drops and truncated responses, normal exit `0`,
+and deadline exit `2` for an incomplete request. Rust tests
 also cover preset definitions, validation, concurrency, cancellation, and parking
 through early wakes. These checks are functional verification, not a throughput
 benchmark or proof of production-scale capacity.
@@ -56,8 +62,8 @@ Use this checklist for each release and include the final results in its notes:
 ## Release sequence
 
 1. **Prepare one release candidate.** Match `Cargo.toml` and the root package in
-   `Cargo.lock` to `0.1.1-alpha.3`, and change the changelog's Unreleased heading
-   to `0.1.1-alpha.3 — YYYY-MM-DD` using the actual release date. Update the README
+   `Cargo.lock` to `0.1.1-alpha.4`, and change the changelog's Unreleased heading
+   to `0.1.1-alpha.4 — YYYY-MM-DD` using the actual release date. Update the README
    candidate wording and readiness status for publication; review features and limits. Check all README examples and commit the final files. A local
    Docker tag such as `sleepapi:dev` does not create a Git tag or publish an image.
 
@@ -77,21 +83,21 @@ Use this checklist for each release and include the final results in its notes:
    badge or on local test results. This workflow runs for `main` pushes and pull
    requests, not tag pushes.
 
-3. **Tag the exact green commit as `v0.1.1-alpha.3`.** Create an annotated Git tag and
+3. **Tag the exact green commit as `v0.1.1-alpha.4`.** Create an annotated Git tag and
    push that tag without moving it to a different commit later. Verify that
-   `git rev-parse 'v0.1.1-alpha.3^{commit}'` equals the SHA recorded in step 2. If a
+   `git rev-parse 'v0.1.1-alpha.4^{commit}'` equals the SHA recorded in step 2. If a
    published version needs a fix, prepare a new version instead of
    replacing the old tag.
 
 4. **Verify the published source path before announcing the release.** In a
    fresh directory, use the README's version-pinned clone and Docker commands,
-   substituting `v0.1.1-alpha.3` and image tag `sleepapi:0.1.1-alpha.3`.
+   substituting `v0.1.1-alpha.4` and image tag `sleepapi:0.1.1-alpha.4`.
    Confirm `GET /health` returns `{"status":"ok"}` and a POST simulation waits
    and returns its documented JSON. Run the existing container checks against
    that locally built image:
 
    ```sh
-   python3 scripts/docker-smoke.py sleepapi:0.1.1-alpha.3
+   python3 scripts/docker-smoke.py sleepapi:0.1.1-alpha.4
    ```
 
    This needs Docker and Python 3. The test creates and cleans up only its own
@@ -99,7 +105,7 @@ Use this checklist for each release and include the final results in its notes:
    Dockerfile, `Cargo.lock`, `src/`, and `LICENSE`; the build must not depend on
    an existing `target/` directory or local secrets.
 
-5. **Publish a GitHub prerelease using the tested tag.** Use `v0.1.1-alpha.3` as
+5. **Publish a GitHub prerelease using the tested tag.** Use `v0.1.1-alpha.4` as
    the title, enable the prerelease flag, summarize the changes and limits, and link the
    README's Docker instructions. Describe the deliverable as source plus a
    Dockerfile. [GitHub provides source archives](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases);
@@ -138,7 +144,7 @@ on Rust 1.94.0 and builds/tests the Dockerfile on both native Linux architecture
 This is a checklist template, not current publication status. Copy it into the
 GitHub prerelease notes and fill every field from actual results:
 
-- Candidate/tag: `v0.1.1-alpha.3`; full commit SHA: pending.
+- Candidate/tag: `v0.1.1-alpha.4`; full commit SHA: pending.
 - Exact-commit `main` CI URL and all four required job results: pending.
 - Alpha smoke JSON receipt in the stable CI log: pending.
 - Annotated tag target equals the tested SHA: pending.
@@ -150,4 +156,4 @@ A green PR run makes the candidate reviewable. After merging, require a green
 `main` run for the resulting commit before tagging. Any subsequent source,
 version, workflow, or documentation edit creates a new candidate. A published
 release is immutable: corrections use a new version. If installation fails,
-stop publication and use the previous `v0.1.1-alpha.2` source tag while preparing a fix.
+stop publication and use the previous `v0.1.1-alpha.3` source tag while preparing a fix.

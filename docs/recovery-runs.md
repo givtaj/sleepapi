@@ -9,9 +9,9 @@ such as HTTP `503`, `503`, then `200`. Each admitted attempt receives a sequence
 position before waiting. A reset starts that sequence again in a new generation.
 Existing `/sleep` and `/simulate` routes keep their stateless behavior.
 
-Current source extends steps with optional `fixture` and `fault` fields. See
+From **`v0.1.1-alpha.4`**, steps support optional `fixture` and `fault` fields. See
 [response fixtures and transport faults](response-fixtures.md) for their
-unreleased contract and limits; alpha.3 supports only the original JSON steps.
+contract and limits; alpha.3 supports only the original JSON steps.
 
 Runs are volatile, process-local state. Restarting SleepAPI loses every run and
 receipt. Run identifiers are server-generated identifiers, not secrets or

@@ -1,15 +1,17 @@
 # SleepAPI alpha readiness
 
-Assessment date: 2026-10-29 (Europe/Madrid). Published alpha version:
-**`0.1.1-alpha.3`**. The [GitHub prerelease record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3)
-is the authoritative publication status and completion evidence, including the
-released commit, final CI, and fresh tagged-source installation.
+Assessment date: 2026-10-29 (Europe/Madrid). Alpha release candidate:
+**`0.1.1-alpha.4`**. This candidate adds
+[response fixtures and transport faults](response-fixtures.md) to recovery runs.
+The implementation is merged; final candidate CI, tagging, fresh tagged-source
+installation, and publication are separate release gates.
 
-Current source adds [response fixtures and transport faults](response-fixtures.md)
-to the recovery runs shipped in alpha.3. These additions are unreleased. Reviewed
-CI is required before integration; a future version still needs final candidate
-CI and tagged-source verification before publication. The linked alpha.3 release
-record verifies that release's source only.
+The [alpha.4 GitHub prerelease record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+is the destination for authoritative publication and completion evidence,
+including the released commit, final CI, and installation results. This source
+document does not establish that the candidate is published. The previous
+[alpha.3 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3)
+remains available and verifies its own source only.
 
 ## Where the project stands
 
@@ -30,11 +32,11 @@ exit `2` even when HTTP work has drained.
 The [historical benchmark documentation](https://github.com/givtaj/sleepapi/pull/1)
 has also been reconciled and merged. It describes the retained evidence and rerun
 limits; it does not certify this candidate's throughput. Recovery sequences
-([#4](https://github.com/givtaj/sleepapi/issues/4)) are the addition in alpha.3. Exact response fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5))
-and transport faults ([#6](https://github.com/givtaj/sleepapi/issues/6)) are
-unreleased additions in current source; see the [API contract](response-fixtures.md).
-They require their own reviewed CI before integration and release. Alpha.3's
-release evidence below covers its original 58-test source only.
+([#4](https://github.com/givtaj/sleepapi/issues/4)) shipped in alpha.3. Exact response
+fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5)) and transport faults
+([#6](https://github.com/givtaj/sleepapi/issues/6)) are merged and included in the
+alpha.4 candidate; see the [API contract](response-fixtures.md). Alpha.3's
+historical release evidence below covers its original 58-test source only.
 
 ## Alpha scope
 
@@ -47,6 +49,13 @@ release evidence below covers its original 58-test source only.
   run, 32 retained receipts per run, and a fixed TTL of 1 ms to 1 hour (default
   five minutes). Attempts share simulation capacity; management does not consume
   it. State is process-local and disappears on restart.
+- Optional fixtures: exact decoded UTF-8 bodies up to 4,096 bytes, three allowed
+  content types, and up to five allowed headers with 256-byte ASCII values. The
+  complete run-creation request remains bounded by the existing 8 KiB limit.
+- HTTP/1.1 faults through the instrumented listener: connection drop before
+  headers or an exact fixture prefix followed by an incomplete response. Attempts
+  retain capacity through injection or cancellation; diagnostics remain separate
+  from the broken response and cannot restore cleared or evicted receipts.
 - No hosted-service, production capacity, prebuilt image/binary, provider delivery,
   background-job, authentication, or Windows verification claim.
 
@@ -78,20 +87,43 @@ workload on the recorded host. They are not service SLOs or maximum throughput
 measurements. CPU/RSS/thread counts remain descriptive until a fresh, controlled
 benchmark establishes comparable budgets.
 
+## Alpha.4 implementation baseline — 2026-10-29
+
+The merged fixture and transport-fault baseline,
+[`535301ac7c4d2adcc6a8d33a6f121c71d5247d96`](https://github.com/givtaj/sleepapi/commit/535301ac7c4d2adcc6a8d33a6f121c71d5247d96),
+passed [main CI run 40883400744](https://github.com/givtaj/sleepapi/actions/runs/40883400744):
+Linux Rust stable, Rust 1.94.0, native Linux AMD64 Docker, and native Linux ARM64
+Docker all succeeded. This baseline has 86 Rust tests and six Python regressions,
+plus alpha HTTP acceptance and fixture/fault-aware Docker smoke checks.
+
+Independent review of [implementation PR #12](https://github.com/givtaj/sleepapi/pull/12)
+covered fixtures, runs, waiting, transport, server integration, tests, and docs,
+with no actionable source findings. The review checked the flush handshake
+against the locked Hyper version and cancellation/late-completion handling for
+capacity and receipts; a pipelined truncation regression was added. This was not
+external client acceptance or a security audit.
+
+Automated coverage includes real TCP faults, exact response bytes, fault-body
+cancellation and capacity, and reset/deletion/expiry/receipt-eviction isolation.
+These results validate the implementation baseline. The later alpha.4
+version and documentation commit must pass all four CI jobs itself before an
+annotated release tag or publication. Fresh tagged-source installation remains a
+separate gate; record its result in the alpha.4 prerelease notes.
+
 ## Alpha.3 preparation evidence (historical)
 
 The merged implementation and documentation baseline,
 `e325cc94a6b0bb3ca0d4c153a88a79c8dc88ff50`, passed
 [all four CI jobs](https://github.com/givtaj/sleepapi/actions/runs/40708257954).
-That evidence covers recovery runs and the completed release review before this
-version and documentation update.
-The final candidate must pass the same jobs on its own commit before tagging.
+That evidence covered recovery runs and their completed release review before
+the alpha.3 version and documentation update. It does not validate alpha.4.
 
 The [alpha.1 local receipt](release-evidence/2026-10-26/README.md) remains a
-historical record. Current release CI, alpha smoke, and fresh-install results
-belong in the linked alpha.3 prerelease notes, with their actual commit and date.
+historical record. Alpha.3's final CI, alpha smoke, and fresh-install results
+belong to its [prerelease record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3),
+with their actual commit and date.
 
-## Recovery-run release review — 2026-10-28
+## Recovery-run release review — 2026-10-28 (historical)
 
 Reviewed the recovery-run change at
 [`d5c296fdf448631948c10f00d0dbea438fb26720`](https://github.com/givtaj/sleepapi/commit/d5c296fdf448631948c10f00d0dbea438fb26720)
@@ -109,31 +141,32 @@ and run management does not consume simulation-capacity slots.
 | HTTP headers and browser access | PASS locally: simulated 401/405/429/503 headers, configured CORS, and actual routing 405 Allow headers |
 | Distribution inventory | PASS: 80-file source package includes recovery source, tests, API documentation and Docker smoke; compiled build artifacts and desktop metadata are excluded |
 
-The local disconnect probes used the existing Rust 1.94.0 release build from
-issue #4 verification; its source files match the reviewed tree. These probes
-supplement the automated tests, which cancel router futures directly; they are
-not yet retained as wire-level regression tests. A cancellation receipt is not
-proof that blocking work stopped, and completion is not proof of client delivery.
+The local disconnect probes used the Rust 1.94.0 release build from
+issue #4 verification; its source files matched the reviewed tree. Those probes
+supplemented the router-future cancellation tests and were not retained as
+wire-level regressions in alpha.3. Alpha.4 adds separate automated transport-fault
+tests; it does not retroactively automate those historical probes. A cancellation
+receipt is not proof that blocking work stopped, and completion is not proof of client delivery.
 Client acceptance remains separate from this review.
 
 The review recommended **`v0.1.1-alpha.3`** as a source-plus-Dockerfile
-prerelease. This preparation follows that recommendation; the review itself
-did not publish a release. Its CI results do not validate the later preparation
-commit. Windows and production capacity remain unverified.
+prerelease. The review itself did not publish that release, and its CI results
+did not validate the later alpha.3 preparation commit. Windows and production
+capacity remain unverified.
 
-## Alpha.3 release completion sequence
+## Alpha.4 release completion sequence
 
 1. Review and merge the prepared candidate after its PR checks pass. Set the
    actual changelog release date and update publication wording before the final
    commit; then require all four `main` CI jobs green on that commit.
-2. Create immutable annotated tag `v0.1.1-alpha.3` at the tested commit. Follow
+2. Create immutable annotated tag `v0.1.1-alpha.4` at the tested commit. Follow
    [Releasing](RELEASING.md) to verify a fresh public tagged checkout and Docker
    build, HTTP/shutdown smoke, and the source archive.
 3. Publish the GitHub **prerelease**, recording the full commit, CI URL, smoke
    receipt, installation result, and platform limitations. Verify signed-out
    access before announcing it.
 
-The linked GitHub prerelease record captures the completed sequence without
-changing the immutable release commit to insert its own SHA. A source document
-alone does not prove publication or installation. Earlier releases remain
-available; this release has no hosted deployment.
+Record the completed sequence in the alpha.4 GitHub prerelease notes without
+changing the immutable release commit to insert its own SHA. Until those results
+exist, the implementation baseline is not final release evidence. Earlier
+releases remain available; this release has no hosted deployment.
