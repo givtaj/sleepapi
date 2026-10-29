@@ -1,0 +1,342 @@
+{
+  "window_seconds": 10,
+  "pilot": false,
+  "cells": [
+    {
+      "id": "load-thread-c16-r1",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 16,
+      "repetition": 1
+    },
+    {
+      "id": "load-tokio-c16-r1",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 16,
+      "repetition": 1
+    },
+    {
+      "id": "load-park-c16-r1",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 16,
+      "repetition": 1
+    },
+    {
+      "id": "load-tokio-c64-r1",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 64,
+      "repetition": 1
+    },
+    {
+      "id": "load-tokio-spawn-c16-r1",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 16,
+      "repetition": 1
+    },
+    {
+      "id": "load-park-c1-r1",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "load-tokio-c1-r1",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "load-thread-c1-r1",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "load-tokio-spawn-c64-r1",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 64,
+      "repetition": 1
+    },
+    {
+      "id": "load-park-c64-r1",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 64,
+      "repetition": 1
+    },
+    {
+      "id": "load-tokio-spawn-c1-r1",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "load-thread-c64-r1",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 64,
+      "repetition": 1
+    },
+    {
+      "id": "lifecycle-tokio-r1",
+      "mode": "lifecycle",
+      "method": "tokio",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "lifecycle-tokio-spawn-r1",
+      "mode": "lifecycle",
+      "method": "tokio-spawn",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "lifecycle-thread-r1",
+      "mode": "lifecycle",
+      "method": "thread",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "lifecycle-park-r1",
+      "mode": "lifecycle",
+      "method": "park",
+      "concurrency": 1,
+      "repetition": 1
+    },
+    {
+      "id": "load-park-c64-r2",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 64,
+      "repetition": 2
+    },
+    {
+      "id": "load-thread-c16-r2",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 16,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-c64-r2",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 64,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-spawn-c64-r2",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 64,
+      "repetition": 2
+    },
+    {
+      "id": "load-park-c16-r2",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 16,
+      "repetition": 2
+    },
+    {
+      "id": "load-park-c1-r2",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "load-thread-c64-r2",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 64,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-c1-r2",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-c16-r2",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 16,
+      "repetition": 2
+    },
+    {
+      "id": "load-thread-c1-r2",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-spawn-c1-r2",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-spawn-c16-r2",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 16,
+      "repetition": 2
+    },
+    {
+      "id": "lifecycle-tokio-r2",
+      "mode": "lifecycle",
+      "method": "tokio",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "lifecycle-tokio-spawn-r2",
+      "mode": "lifecycle",
+      "method": "tokio-spawn",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "lifecycle-thread-r2",
+      "mode": "lifecycle",
+      "method": "thread",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "lifecycle-park-r2",
+      "mode": "lifecycle",
+      "method": "park",
+      "concurrency": 1,
+      "repetition": 2
+    },
+    {
+      "id": "load-tokio-spawn-c16-r3",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 16,
+      "repetition": 3
+    },
+    {
+      "id": "load-thread-c64-r3",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 64,
+      "repetition": 3
+    },
+    {
+      "id": "load-thread-c16-r3",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 16,
+      "repetition": 3
+    },
+    {
+      "id": "load-thread-c1-r3",
+      "mode": "load",
+      "method": "thread",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "load-tokio-c1-r3",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "load-tokio-spawn-c64-r3",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 64,
+      "repetition": 3
+    },
+    {
+      "id": "load-park-c64-r3",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 64,
+      "repetition": 3
+    },
+    {
+      "id": "load-tokio-c64-r3",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 64,
+      "repetition": 3
+    },
+    {
+      "id": "load-park-c1-r3",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "load-tokio-c16-r3",
+      "mode": "load",
+      "method": "tokio",
+      "concurrency": 16,
+      "repetition": 3
+    },
+    {
+      "id": "load-tokio-spawn-c1-r3",
+      "mode": "load",
+      "method": "tokio-spawn",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "load-park-c16-r3",
+      "mode": "load",
+      "method": "park",
+      "concurrency": 16,
+      "repetition": 3
+    },
+    {
+      "id": "lifecycle-tokio-r3",
+      "mode": "lifecycle",
+      "method": "tokio",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "lifecycle-tokio-spawn-r3",
+      "mode": "lifecycle",
+      "method": "tokio-spawn",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "lifecycle-thread-r3",
+      "mode": "lifecycle",
+      "method": "thread",
+      "concurrency": 1,
+      "repetition": 3
+    },
+    {
+      "id": "lifecycle-park-r3",
+      "mode": "lifecycle",
+      "method": "park",
+      "concurrency": 1,
+      "repetition": 3
+    }
+  ]
+}
