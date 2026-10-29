@@ -187,7 +187,7 @@ def main():
                    ("OperatingSystem", "KernelVersion", "Architecture", "NCPU", "MemTotal", "ServerVersion")},
         "server_cpus": args.server_cpus, "client_cpus": args.client_cpus,
         "server_workers": 2, "request_logging": "disabled (sleepapi=warn)",
-        "scope": "Linux containers in Docker Desktop VM; no host-namespace or socket mounts",
+        "scope": "Linux containers; daemon environment recorded under docker; no host-namespace or socket mounts",
         "harness_sha256": {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in
                            (Path(__file__).resolve(), args.scripts / "benchmark-worker.py",
                             args.scripts / "benchmark-resources.py")},

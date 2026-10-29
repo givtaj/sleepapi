@@ -168,6 +168,8 @@ source/build provenance before using the offline verifier.
 The executed orchestrator is frozen under `evidence/harness/`. The working
 `scripts/benchmark-linux.py` additionally hardens failure cleanup: an error
 cleaning one owned container no longer skips the remaining containers or the
-receipt. This post-run change affects failure handling only and has a mocked
-regression; it is not substituted for the measured harness. No server source or
-runtime behavior changed for this benchmark.
+receipt. It also uses host-neutral scope metadata for future runs on Linux
+daemons outside Docker Desktop. These post-run changes affect failure handling
+and metadata only, with a mocked cleanup regression; they are not substituted
+for the measured harness. No server source or runtime behavior changed for
+this benchmark.
