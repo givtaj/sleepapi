@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Exact bounded UTF-8 response fixtures on recovery-run steps, with a content-type
+  and header allowlist. Simulation diagnostics remain in separate run receipts.
+- Explicit HTTP/1.1 connection-drop and truncated-response faults, with bounded
+  injection receipts, shared capacity, and existing run lifecycle guarantees.
+- Fixture contract and real TCP fault regressions, plus container smoke coverage.
+  See the [fixture and fault API](docs/response-fixtures.md).
+
 ## 0.1.1-alpha.3 — 2026-10-28
 
 ### Added

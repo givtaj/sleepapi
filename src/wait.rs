@@ -45,20 +45,20 @@ impl WaitMethod {
         self,
         duration: Duration,
         permit: OwnedSemaphorePermit,
-    ) -> Result<(), JoinError> {
+    ) -> Result<OwnedSemaphorePermit, JoinError> {
         match self {
             Self::TokioSleep => {
-                let _permit = permit;
                 tokio::time::sleep(duration).await;
+                Ok(permit)
             }
             Self::TokioSpawn => {
                 let task = tokio::spawn(async move {
-                    let _permit = permit;
                     tokio::time::sleep(duration).await;
+                    permit
                 });
                 // Dropping a JoinHandle alone detaches its task. Abort on handler cancellation.
                 let _abort = AbortOnDrop(task.abort_handle());
-                task.await?;
+                task.await
             }
             Self::ThreadSleep | Self::ThreadPark => {
                 wait_in_blocking_pool(
@@ -69,22 +69,21 @@ impl WaitMethod {
                     },
                     permit,
                 )
-                .await?;
+                .await
             }
         }
-        Ok(())
     }
 }
 
 async fn wait_in_blocking_pool(
     wait: impl FnOnce() + Send + 'static,
     permit: OwnedSemaphorePermit,
-) -> Result<(), JoinError> {
+) -> Result<OwnedSemaphorePermit, JoinError> {
     let task = tokio::task::spawn_blocking(move || {
         // Started blocking tasks cannot be aborted. Keep the capacity slot until done,
         // even if the requesting handler disappears before the work finishes.
-        let _permit = permit;
         wait();
+        permit
     });
     let _abort = AbortOnDrop(task.abort_handle());
     task.await

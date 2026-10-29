@@ -7,12 +7,12 @@ use std::{
 };
 
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{
-        Path, State,
+        ConnectInfo, Path, State,
         rejection::{JsonRejection, PathRejection},
     },
-    http::StatusCode,
+    http::{HeaderValue, StatusCode, Version, header},
     response::{IntoResponse, Response},
     routing::{get, post},
 };
@@ -23,6 +23,7 @@ use tokio::time::Instant;
 use crate::{
     AppState, WaitMethod, default_duration,
     error::{ApiError, ErrorDetails, validate_simulated_status, with_simulation_headers},
+    transport::{self, FaultConnection},
 };
 
 const MAX_RUNS: usize = 64;
@@ -48,7 +49,7 @@ struct Run {
     receipts: VecDeque<Receipt>,
 }
 
-#[derive(Clone, Copy, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct Step {
     status_code: u16,
@@ -56,6 +57,17 @@ struct Step {
     duration_ms: u64,
     #[serde(default)]
     method: WaitMethod,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fixture: Option<crate::fixtures::Fixture>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fault: Option<Fault>,
+}
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
+enum Fault {
+    ConnectionDrop {},
+    TruncatedResponse { after_bytes: usize },
 }
 
 #[derive(Deserialize)]
@@ -86,6 +98,12 @@ struct Receipt {
     requested_duration_ms: u64,
     outcome: Outcome,
     elapsed_ms: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    fault: Option<Fault>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    injection_stage: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    injected_body_bytes: Option<usize>,
 }
 
 #[derive(Clone, Copy, Serialize)]
@@ -95,6 +113,7 @@ enum Outcome {
     Completed,
     HandlerCancelled,
     WaitFailed,
+    FaultInjected,
 }
 
 #[derive(Serialize)]
@@ -204,6 +223,18 @@ async fn create(
     }
     for step in &request.sequence {
         validate_simulated_status(step.status_code)?;
+        if let Some(fixture) = &step.fixture {
+            fixture.validate()?;
+        }
+        if let Some(Fault::TruncatedResponse { after_bytes }) = step.fault {
+            let length = step.fixture.as_ref().map(|fixture| fixture.bytes().len());
+            if !length.is_some_and(|length| after_bytes > 0 && after_bytes < length) {
+                return Err(ApiError::new(
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    "truncated_response requires a fixture and 0 < after_bytes < its UTF-8 byte length",
+                ));
+            }
+        }
         if step.duration_ms > state.config.max_duration_ms {
             return Err(ApiError::new(
                 StatusCode::UNPROCESSABLE_ENTITY,
@@ -328,6 +359,14 @@ struct AttemptGuard {
 
 impl AttemptGuard {
     fn finish(&mut self, outcome: Outcome) {
+        self.complete(outcome, None);
+    }
+
+    fn inject(&mut self, stage: &'static str, bytes: usize) {
+        self.complete(Outcome::FaultInjected, Some((stage, bytes)));
+    }
+
+    fn complete(&mut self, outcome: Outcome, injection: Option<(&'static str, usize)>) {
         if self.finished {
             return;
         }
@@ -350,6 +389,10 @@ impl AttemptGuard {
         if let Some(receipt) = run.receipts.iter_mut().find(|r| r.attempt == self.attempt) {
             receipt.outcome = outcome;
             receipt.elapsed_ms = Some(now.duration_since(self.started).as_secs_f64() * 1000.0);
+            if let Some((stage, bytes)) = injection {
+                receipt.injection_stage = Some(stage);
+                receipt.injected_body_bytes = Some(bytes);
+            }
         }
     }
 }
@@ -363,6 +406,8 @@ impl Drop for AttemptGuard {
 async fn attempt(
     State(state): State<AppState>,
     path: Result<Path<String>, PathRejection>,
+    version: Version,
+    connection: Option<Extension<ConnectInfo<FaultConnection>>>,
     payload: Result<Json<GenerationRequest>, JsonRejection>,
 ) -> Result<Response, ApiError> {
     let id = path_id(path)?;
@@ -386,12 +431,18 @@ async fn attempt(
                 "run attempt budget exhausted; create a new run",
             ));
         }
-        let Some(step) = run.sequence.get(run.generation_attempts).copied() else {
+        let Some(step) = run.sequence.get(run.generation_attempts).cloned() else {
             return Err(ApiError::new(
                 StatusCode::CONFLICT,
                 "sequence exhausted; reset the run before retrying",
             ));
         };
+        if step.fault.is_some() && (version != Version::HTTP_11 || connection.is_none()) {
+            return Err(ApiError::new(
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "transport faults require HTTP/1.1 through SleepAPI's FaultListener",
+            ));
+        }
         run.attempts_started += 1;
         run.generation_attempts += 1;
         let attempt = run.generation_attempts;
@@ -407,6 +458,9 @@ async fn attempt(
             requested_duration_ms: step.duration_ms,
             outcome: Outcome::Pending,
             elapsed_ms: None,
+            fault: step.fault,
+            injection_stage: None,
+            injected_body_bytes: None,
         });
         let guard = AttemptGuard {
             store: state.runs.clone(),
@@ -418,22 +472,61 @@ async fn attempt(
         };
         (step, guard)
     };
-    if let Err(error) = step
+    let permit = match step
         .method
         .wait(Duration::from_millis(step.duration_ms), permit)
         .await
     {
-        guard.finish(Outcome::WaitFailed);
-        tracing::error!(%error, "waiting task failed");
-        return Err(ApiError::new(
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "waiting task failed",
-        ));
+        Ok(permit) => permit,
+        Err(error) => {
+            guard.finish(Outcome::WaitFailed);
+            tracing::error!(%error, "waiting task failed");
+            return Err(ApiError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "waiting task failed",
+            ));
+        }
+    };
+    let status = validate_simulated_status(step.status_code)?;
+    if let Some(fault) = step.fault {
+        let mut response = step.fixture.as_ref().map_or_else(
+            || (status, "").into_response(),
+            |fixture| fixture.response(status),
+        );
+        // The callback owns the guard and the original admission permit. If
+        // Hyper drops the body before injection, guard Drop records cancellation
+        // and capacity is released without claiming a fault was delivered.
+        *response.body_mut() = match fault {
+            Fault::ConnectionDrop {} => transport::connection_drop(move || {
+                guard.inject("before_headers", 0);
+                drop(permit);
+            }),
+            Fault::TruncatedResponse { after_bytes } => {
+                let bytes = step.fixture.as_ref().expect("validated fixture").bytes();
+                response
+                    .headers_mut()
+                    .insert(header::CONTENT_LENGTH, HeaderValue::from(bytes.len()));
+                let Extension(ConnectInfo(connection)) = connection.expect("validated transport");
+                transport::truncated_response(
+                    &connection,
+                    bytes.slice(..after_bytes),
+                    bytes.len() as u64,
+                    move || {
+                        guard.inject("after_body_prefix", after_bytes);
+                        drop(permit);
+                    },
+                )
+            }
+        };
+        return Ok(response);
     }
+    drop(permit);
     let elapsed_ms = guard.started.elapsed().as_secs_f64() * 1000.0;
     guard.finish(Outcome::Completed);
     // Status was validated before storing the sequence.
-    let status = validate_simulated_status(step.status_code)?;
+    if let Some(fixture) = &step.fixture {
+        return Ok(fixture.response(status));
+    }
     let mut result = json!({
         "operation": "run", "simulated": true, "run_id": id,
         "generation": guard.generation, "attempt": guard.attempt, "sequence_step": guard.attempt,

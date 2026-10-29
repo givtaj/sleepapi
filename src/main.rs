@@ -1,6 +1,9 @@
 use std::{io, thread, time::Duration};
 
-use sleepapi::{Config, router};
+use sleepapi::{
+    Config, router,
+    transport::{FaultConnection, FaultListener},
+};
 use tokio::{runtime::Builder, sync::oneshot};
 use tracing_appender::non_blocking::NonBlockingBuilder;
 use tracing_subscriber::EnvFilter;
@@ -88,11 +91,14 @@ fn serve(config: Config, shutdown_rx: oneshot::Receiver<()>) -> io::Result<()> {
             shutdown_grace_ms = config.shutdown_grace_ms,
             "sleepapi listening"
         );
-        axum::serve(listener, app)
-            .with_graceful_shutdown(async {
-                let _ = shutdown_rx.await;
-            })
-            .await
+        axum::serve(
+            FaultListener::new(listener),
+            app.into_make_service_with_connect_info::<FaultConnection>(),
+        )
+        .with_graceful_shutdown(async {
+            let _ = shutdown_rx.await;
+        })
+        .await
     });
     // A disconnected request may have left blocking work behind after serve
     // finishes. Wait for it here so exit 0 means every task drained; the separate

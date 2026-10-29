@@ -21,6 +21,11 @@ This alpha adds **recovery runs** for isolated, resettable response sequences
 such as `503, 503, 200`. See [recovery runs](docs/recovery-runs.md) for the API,
 bounded storage, generation guards, and cancellation semantics.
 
+Current source also includes **unreleased response fixtures and transport
+faults**: exact UTF-8 bodies with separate receipts, connection drops, and
+truncated responses. See the [fixture and fault API](docs/response-fixtures.md).
+These additions are not included in the alpha.3 tag below.
+
 ## Run with Docker
 
 The container targets are Linux `amd64` and `arm64`. Use Docker Engine on Linux or Docker

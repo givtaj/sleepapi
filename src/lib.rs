@@ -1,7 +1,9 @@
 mod config;
 mod error;
+mod fixtures;
 mod runs;
 mod scenario;
+pub mod transport;
 mod wait;
 
 use std::{
@@ -213,7 +215,7 @@ async fn run_delay(
         .map_err(|_| ApiError::capacity_exceeded())?;
 
     let started = tokio::time::Instant::now();
-    request
+    let permit = request
         .method
         .wait(Duration::from_millis(duration_ms), permit)
         .await
@@ -221,6 +223,7 @@ async fn run_delay(
             tracing::error!(%error, "waiting task failed");
             ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "waiting task failed")
         })?;
+    drop(permit);
     let elapsed_ms = started.elapsed().as_secs_f64() * 1000.0;
     tracing::info!(operation, method = ?request.method, duration_ms, elapsed_ms, status_code, "simulation complete");
 
