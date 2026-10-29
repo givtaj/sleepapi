@@ -72,7 +72,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Gate | Required threshold | Evidence |
 | --- | --- | --- |
 | Defects | Zero unresolved critical/high-severity defects in supported behavior: crashes, hangs, incorrect HTTP contracts, or isolation failures | Review of final diff and failure triage; this is not a claim of a security audit |
-| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current source has 86 tests covering existing behavior, fixtures, transport faults and lifecycle |
+| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; development source has 89 tests covering existing behavior, fixtures, transport faults, disconnects and lifecycle; released alpha.4 has 86 |
 | Wait and lifecycle correctness | No early response; capacity returns structured `429` when full and recovers; dropped async work releases capacity; started blocking work retains it; graceful exit `0`, deadline/second-signal exit `2` | Rust API/wait/process tests and Docker smoke; existing process tests use a 3-second observation timeout |
 | Recovery runs | Deterministic reservation order; rejected attempts consume no step; finite sequence exhaustion and stale generations reject; reset preserves lifetime budget and TTL; late completions cannot recreate cleared state | `tests/runs.rs` and recovery-inclusive Docker HTTP smoke |
 | Fixtures and faults | Exact fixture bytes and allowed headers; no-header drop; byte-exact truncated prefix with incomplete declared length; rejected inputs consume no state; fault bodies retain capacity; late injection cannot restore cleared receipts | `tests/fixtures.rs`, `tests/transport.rs`, `tests/fault_lifecycle.rs`, transport unit tests and Docker client checks |
@@ -80,12 +80,30 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Sampler shutdown | Both SIGINT and SIGTERM and a stop file finish within 1 second in the long-interval fixture; preserve samples and restore handlers on errors | Six Python regression tests; polling interval is at most 100 ms, excluding setup/I/O |
 | Local HTTP regression | 64 requests on each of 4 routes at concurrency 16 and 40-ms delay: 256 valid responses, zero unexpected statuses/timeouts/transport errors; per-route p95 client overhead ≤250 ms; every health probe ≤250 ms | `scripts/alpha-smoke.py`; two Tokio workers, loopback, two-second request timeout; nearest-rank p95 includes HTTP client/network overhead |
 | Admission recovery | For every method, prove capacity-one rejection during a 300-ms wait, health stays ≤250 ms while occupied, and a real simulation succeeds within 1,300 ms of the admitted attempt's launch | Separate process in alpha smoke; tests ordinary completion, while Rust tests cover cancellation semantics |
+| Retry-client example | Both three-attempt sequences recover and repeat after reset; exact fixture bytes and observed faults match; stale generations consume no step; receipts correlate; owned runs are deleted | `examples/retry-client.py --binary target/release/sleepapi` in stable CI; synthetic Python-client evidence, separate from external client acceptance |
 | Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown smoke | `ci.yml`, followed by an annotated tag on that same commit and fresh public tagged-source installation |
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
 measurements. CPU/RSS/thread counts remain descriptive until a fresh, controlled
 benchmark establishes comparable budgets.
+
+## Development coverage after alpha.4
+
+The [retry-client example](client-acceptance.md) and five Python guard tests add
+repeatable consumer observations without changing the server. The guard tests
+reject misleading success from malformed framing, unexpected connection errors,
+and incorrect fixture bytes. These additions are not part of the immutable
+alpha.4 tag, although the example can exercise that release.
+
+Three Unix TCP tests in `tests/disconnect.rs` retain the earlier manual
+disconnect scenarios: all four waiting methods, full socket close and reset,
+consumed sequence positions, capacity after cancellation, and reset/deletion
+before disconnect. They cover 24 cases using the production listener. Blocking
+cases prewarm the pool and allow 50 ms for worker startup before rechecking
+pending state; the barrier-based wait unit test separately proves the semantics
+of already-started blocking work. These tests do not promise immediate detection
+of every client disconnect. Windows remains unverified.
 
 ## Alpha.4 implementation baseline — 2026-10-29
 

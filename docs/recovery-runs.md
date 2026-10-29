@@ -74,12 +74,14 @@ done
 ```
 
 `POST /runs/{run_id}/attempts` accepts only the expected generation; the chosen
-step defines the response status, delay, and waiting method. Its response uses
-the simulation JSON contract with run, generation, attempt, and sequence
-correlation metadata. `attempt` and `sequence_step` are both one-based within the
-current generation; use `(run_id, generation, attempt)` to identify an attempt
-across resets. Provider failures are simulated responses, not errors in run
-management.
+step defines the response status, delay, and waiting method. Without a fixture
+or fault, its response uses the simulation JSON contract with run, generation,
+attempt, and sequence correlation metadata. A fixture replaces that body with
+exact bytes; a fault deliberately prevents a complete response. In either case,
+retrieve correlation metadata through the separate receipts endpoint. `attempt`
+and `sequence_step` are both one-based within the current generation; use
+`(run_id, generation, attempt)` to identify an attempt across resets. Provider
+failures are simulated responses, not errors in run management.
 
 The sequence is finite. A fourth attempt against the three-step example receives
 a structured `409` API error; it does not silently repeat the final success.
@@ -147,7 +149,9 @@ array. Each receipt contains `generation`, `attempt`, `sequence_step`,
 `selected_status_code`, `method`, `requested_duration_ms`, `outcome`, and
 `elapsed_ms`. Run ID comes from the enclosing object.
 
-Outcomes are `pending`, `completed`, `handler_cancelled`, or `wait_failed`.
+Outcomes are `pending`, `completed`, `handler_cancelled`, `wait_failed`, or
+`fault_injected`. Fault receipts also describe the injection stage and byte
+count; see the [fault diagnostics contract](response-fixtures.md#transport-faults).
 `elapsed_ms` is `null` while pending; afterwards it records server-side time
 since reservation, including scheduling. The selected status is the configured
 simulation response; it does not become a different status when a wait fails.
@@ -199,5 +203,7 @@ then run lookup and generation/budget checks. When every simulation slot is busy
 None of these rejections consumes a sequence position. API errors have
 `simulated: false`, distinct from a selected simulated `503` or other failure.
 
-Exact fixture bodies and transport faults are separate enhancements. Recovery
-runs currently return complete JSON simulation responses.
+From alpha.4, optional [fixtures and transport faults](response-fixtures.md)
+extend recovery steps while keeping diagnostics in separate bounded receipts.
+For a runnable client that retries failures and checks reset/replay, see the
+[client acceptance example](client-acceptance.md).

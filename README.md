@@ -27,6 +27,10 @@ with separate receipts, connection drops, and truncated responses. See the
 [fixture and fault API](docs/response-fixtures.md).
 These additions are available from alpha.4; earlier release tags are unchanged.
 
+Run the [retry-client example](docs/client-acceptance.md) to exercise recovery,
+exact fixtures, connection drops, truncation, and reset/replay from a consumer's
+perspective. It prints client observations and separate server receipts as JSON.
+
 ## Run with Docker
 
 The container targets are Linux `amd64` and `arm64`. Use Docker Engine on Linux or Docker
@@ -423,12 +427,19 @@ cargo test --locked
 python3 -B -m unittest discover -s scripts -p 'test_*.py' -v
 cargo build --release --locked
 python3 scripts/alpha-smoke.py --binary target/release/sleepapi
+python3 examples/retry-client.py --binary target/release/sleepapi
 ```
 
 The alpha smoke command launches and cleans up its own loopback processes. It
 checks response correctness, health responsiveness, and capacity recovery and
 prints a JSON receipt. The fixed workload and limits are local regression gates;
 they do not establish maximum throughput or production capacity.
+
+The retry-client example also launches and cleans up its own server with
+`--binary`. It checks bounded retries and reset/replay against the alpha.4 API
+contract; it can also target an existing loopback server with `--base-url`.
+See [client acceptance](docs/client-acceptance.md) for pinned-release instructions
+and the distinction between this example and external client acceptance.
 
 GitHub Actions runs only on Linux. It checks formatting, Clippy, tests, release
 builds, and source packaging on stable Rust, and tests the supported minimum Rust

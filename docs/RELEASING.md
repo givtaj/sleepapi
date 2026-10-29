@@ -51,7 +51,7 @@ Use this checklist for each release and include the final results in its notes:
 | Required check | Completion evidence |
 | --- | --- |
 | Release candidate committed and pushed | Full commit SHA and source link |
-| Linux / Rust stable | Successful CI job including formatting, lint, Rust/Python tests, build, alpha smoke, and packaging |
+| Linux / Rust stable | Successful CI job including formatting, lint, Rust/Python tests, build, alpha smoke, retry-client example, and packaging |
 | Linux / Rust 1.94.0 | Successful CI job including lint, tests, and build |
 | Docker / linux/amd64 | Successful native build and container smoke checks |
 | Docker / linux/arm64 | Successful native build and container smoke checks |

@@ -44,6 +44,9 @@ jobs:
       - name: Verify alpha acceptance thresholds
         if: matrix.toolchain == 'stable'
         run: python3 scripts/alpha-smoke.py --binary target/release/sleepapi
+      - name: Verify retry-client recovery and replay
+        if: matrix.toolchain == 'stable'
+        run: python3 examples/retry-client.py --binary target/release/sleepapi
       - name: Verify source package
         if: matrix.toolchain == 'stable'
         run: cargo +${{ matrix.toolchain }} package --locked

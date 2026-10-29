@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- A runnable Python retry client with bounded retries, exact fixture validation,
+  client-observed transport failures, separate receipts, and reset/replay checks.
+- Real TCP disconnect regressions for ordinary recovery attempts, covering
+  sequence consumption, cancellation/capacity, and reset/deletion cleanup.
+
+### Documentation
+
+- Correct recovery-run response and receipt descriptions for alpha.4 fixtures
+  and transport faults, and document consumer acceptance of the pinned release.
+
 ## 0.1.1-alpha.4 — 2026-10-29
 
 ### Added
