@@ -1,7 +1,8 @@
 # Response fixtures and transport faults
 
-These features are **unreleased** additions after `v0.1.1-alpha.3`. They extend
-[recovery runs](recovery-runs.md); earlier tags do not accept these fields.
+These features are included from **`v0.1.1-alpha.4`**. Publication and verification
+are recorded in the [prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
+They extend [recovery runs](recovery-runs.md); earlier tags do not accept these fields.
 
 ## Exact fixture responses
 

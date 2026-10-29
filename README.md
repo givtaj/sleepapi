@@ -4,27 +4,28 @@ An Axum + Tokio API for simulating slow HTTP responses. Choose how long a reques
 waits, how it waits, and which HTTP status comes back. Use it to exercise loading
 states, client timeouts, retries, and mock email or SMS integrations.
 
-Each request waits inside SleepAPI, then receives a JSON result and the chosen
-HTTP status. Email and SMS are labels on this delay engine; no provider is
-contacted and no background delivery job is created. The waiting implementations
-are real, while the provider outcomes are simulated.
+By default, each request waits inside SleepAPI, then receives a JSON result and
+the chosen HTTP status. Recovery runs can instead return exact fixture bodies or
+deliberately break the response. Email and SMS are labels on this delay engine;
+no provider is contacted and no background delivery job is created. The waiting
+implementations are real, while the provider outcomes are simulated.
 
-**v0.1.1-alpha.3** is an alpha source distribution with a Dockerfile.
+**v0.1.1-alpha.4** is an alpha source distribution with a Dockerfile.
 Publication status and verification are recorded in the
-[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3).
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
 See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
 [release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
 The earlier [v0.1.0 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0)
 remains available.
 
-This alpha adds **recovery runs** for isolated, resettable response sequences
+**Recovery runs** provide isolated, resettable response sequences
 such as `503, 503, 200`. See [recovery runs](docs/recovery-runs.md) for the API,
 bounded storage, generation guards, and cancellation semantics.
 
-Current source also includes **unreleased response fixtures and transport
-faults**: exact UTF-8 bodies with separate receipts, connection drops, and
-truncated responses. See the [fixture and fault API](docs/response-fixtures.md).
-These additions are not included in the alpha.3 tag below.
+This alpha adds **response fixtures and transport faults**: exact UTF-8 bodies
+with separate receipts, connection drops, and truncated responses. See the
+[fixture and fault API](docs/response-fixtures.md).
+These additions are available from alpha.4; earlier release tags are unchanged.
 
 ## Run with Docker
 
@@ -55,14 +56,14 @@ and Rust dependencies. The Rust compiler stays in the build stage, outside the
 runtime image.
 
 No registry image is provided: users build their own image from the source.
-To build this alpha, use the `v0.1.1-alpha.3` Git tag instead of cloning the
+To build this alpha, use the `v0.1.1-alpha.4` Git tag instead of cloning the
 moving default branch:
 
 ```sh
-git clone --branch v0.1.1-alpha.3 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.3
-cd sleepapi-v0.1.1-alpha.3
-docker build -t sleepapi:0.1.1-alpha.3 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.3
+git clone --branch v0.1.1-alpha.4 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.4
+cd sleepapi-v0.1.1-alpha.4
+docker build -t sleepapi:0.1.1-alpha.4 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.4
 ```
 
 Both examples build an image on your machine; neither pulls a prebuilt SleepAPI image.
