@@ -1,14 +1,15 @@
 # SleepAPI alpha readiness
 
-Assessment date: 2026-10-28 (Europe/Madrid). Alpha version:
+Assessment date: 2026-10-29 (Europe/Madrid). Published alpha version:
 **`0.1.1-alpha.3`**. The [GitHub prerelease record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3)
 is the authoritative publication status and completion evidence, including the
 released commit, final CI, and fresh tagged-source installation.
 
-This candidate adds [recovery runs](recovery-runs.md): isolated, finite response
-sequences with generation guards, reset, deletion, expiry, and bounded diagnostic
-receipts. Final candidate CI and tagged-source verification are required before
-publication; the linked release record captures their results.
+Current source adds [response fixtures and transport faults](response-fixtures.md)
+to the recovery runs shipped in alpha.3. These additions are unreleased. Reviewed
+CI is required before integration; a future version still needs final candidate
+CI and tagged-source verification before publication. The linked alpha.3 release
+record verifies that release's source only.
 
 ## Where the project stands
 
@@ -30,8 +31,10 @@ The [historical benchmark documentation](https://github.com/givtaj/sleepapi/pull
 has also been reconciled and merged. It describes the retained evidence and rerun
 limits; it does not certify this candidate's throughput. Recovery sequences
 ([#4](https://github.com/givtaj/sleepapi/issues/4)) are the addition in alpha.3. Exact response fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5))
-and transport faults ([#6](https://github.com/givtaj/sleepapi/issues/6)) remain
-future work.
+and transport faults ([#6](https://github.com/givtaj/sleepapi/issues/6)) are
+unreleased additions in current source; see the [API contract](response-fixtures.md).
+They require their own reviewed CI before integration and release. Alpha.3's
+release evidence below covers its original 58-test source only.
 
 ## Alpha scope
 
@@ -60,9 +63,10 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Gate | Required threshold | Evidence |
 | --- | --- | --- |
 | Defects | Zero unresolved critical/high-severity defects in supported behavior: crashes, hangs, incorrect HTTP contracts, or isolation failures | Review of final diff and failure triage; this is not a claim of a security audit |
-| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; 58 tests, including 16 recovery-run tests |
+| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current source has 86 tests covering existing behavior, fixtures, transport faults and lifecycle |
 | Wait and lifecycle correctness | No early response; capacity returns structured `429` when full and recovers; dropped async work releases capacity; started blocking work retains it; graceful exit `0`, deadline/second-signal exit `2` | Rust API/wait/process tests and Docker smoke; existing process tests use a 3-second observation timeout |
 | Recovery runs | Deterministic reservation order; rejected attempts consume no step; finite sequence exhaustion and stale generations reject; reset preserves lifetime budget and TTL; late completions cannot recreate cleared state | `tests/runs.rs` and recovery-inclusive Docker HTTP smoke |
+| Fixtures and faults | Exact fixture bytes and allowed headers; no-header drop; byte-exact truncated prefix with incomplete declared length; rejected inputs consume no state; fault bodies retain capacity; late injection cannot restore cleared receipts | `tests/fixtures.rs`, `tests/transport.rs`, `tests/fault_lifecycle.rs`, transport unit tests and Docker client checks |
 | Blocked stdout | 2,048 requests progress with stdout saturated; logger teardown and incomplete-body shutdown terminate within 1 second with 150-ms grace; second signal terminates within 1 second during a 10-second grace | Three deterministic subprocess regressions; observation limits are test guards, not general latency promises |
 | Sampler shutdown | Both SIGINT and SIGTERM and a stop file finish within 1 second in the long-interval fixture; preserve samples and restore handlers on errors | Six Python regression tests; polling interval is at most 100 ms, excluding setup/I/O |
 | Local HTTP regression | 64 requests on each of 4 routes at concurrency 16 and 40-ms delay: 256 valid responses, zero unexpected statuses/timeouts/transport errors; per-route p95 client overhead ≤250 ms; every health probe ≤250 ms | `scripts/alpha-smoke.py`; two Tokio workers, loopback, two-second request timeout; nearest-rank p95 includes HTTP client/network overhead |
@@ -74,7 +78,7 @@ workload on the recorded host. They are not service SLOs or maximum throughput
 measurements. CPU/RSS/thread counts remain descriptive until a fresh, controlled
 benchmark establishes comparable budgets.
 
-## Candidate evidence
+## Alpha.3 preparation evidence (historical)
 
 The merged implementation and documentation baseline,
 `e325cc94a6b0bb3ca0d4c153a88a79c8dc88ff50`, passed

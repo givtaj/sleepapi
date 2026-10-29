@@ -177,6 +177,80 @@ def check_incomplete_body(container, port):
     print("PASS: incomplete request exits 2 after its grace period, without Docker SIGKILL")
 
 
+def check_fixtures(port):
+    fixture = '{ "message": "ready — café", "ok": true }\n'
+    status, _, body = request(port, "POST", "/runs", {
+        "sequence": [{"status_code": 503, "duration_ms": 20, "fixture": {
+            "body": fixture, "content_type": "application/json",
+            "headers": {"retry-after": "3", "x-request-id": "fixture-check"},
+        }}],
+    })
+    require(status == 201, "fixture run creation failed")
+    run = json.loads(body)
+    path = "/runs/" + run["run_id"]
+    started = time.monotonic()
+    status, headers, body = request(port, "POST", path + "/attempts", {"generation": run["generation"]})
+    require(status == 503 and body == fixture.encode("utf-8"), "fixture bytes/status changed")
+    require(headers.get("content-type") == "application/json" and headers.get("retry-after") == "3"
+            and headers.get("x-request-id") == "fixture-check", "fixture headers changed")
+    require(time.monotonic() - started >= 0.02, "fixture returned before selected wait")
+    status, _, body = request(port, "GET", path + "/receipts")
+    receipt = json.loads(body)["receipts"][0]
+    require(status == 200 and receipt["outcome"] == "completed" and receipt["attempt"] == 1,
+            "fixture diagnostics missing from separate receipts")
+    status, _, _ = request(port, "DELETE", path)
+    require(status == 204, "fixture cleanup failed")
+    print("PASS: exact UTF-8 fixture bytes, headers, delay, separate receipts, and cleanup")
+
+
+def check_transport_faults(port):
+    status, _, body = request(port, "POST", "/runs", {"sequence": [
+        {"status_code": 503, "duration_ms": 0, "fault": {"type": "connection_drop"}},
+        {"status_code": 200, "duration_ms": 0,
+         "fixture": {"body": "aéxyz", "content_type": "text/plain"},
+         "fault": {"type": "truncated_response", "after_bytes": 2}},
+        {"status_code": 200, "duration_ms": 0, "fixture": {"body": "recovered"}},
+    ]})
+    require(status == 201, "fault run creation failed")
+    run = json.loads(body)
+    path = "/runs/" + run["run_id"]
+    for fault in ("connection_drop", "truncated_response"):
+        connection = http.client.HTTPConnection("127.0.0.1", port, timeout=2)
+        try:
+            connection.request("POST", path + "/attempts", json.dumps({"generation": run["generation"]}),
+                               {"Content-Type": "application/json"})
+            if fault == "connection_drop":
+                try:
+                    connection.getresponse()
+                except http.client.RemoteDisconnected:
+                    pass
+                else:
+                    raise AssertionError("connection-drop fault returned HTTP headers")
+            else:
+                response = connection.getresponse()
+                require(response.status == 200 and response.getheader("Content-Length") == "6",
+                        "truncation did not declare full UTF-8 length")
+                try:
+                    response.read()
+                except http.client.IncompleteRead as error:
+                    require(error.partial == "aéxyz".encode("utf-8")[:2], "truncated prefix differs")
+                else:
+                    raise AssertionError("truncation returned a complete body")
+        finally:
+            connection.close()
+    status, _, body = request(port, "POST", path + "/attempts", {"generation": run["generation"]})
+    require(status == 200 and body == b"recovered", "normal recovery after faults failed")
+    status, _, body = request(port, "GET", path + "/receipts")
+    receipts = json.loads(body)["receipts"]
+    require(status == 200 and [r["outcome"] for r in receipts] ==
+            ["fault_injected", "fault_injected", "completed"], "fault outcomes missing")
+    require([r["injection_stage"] for r in receipts[:2]] == ["before_headers", "after_body_prefix"]
+            and [r["injected_body_bytes"] for r in receipts[:2]] == [0, 2], "fault injection facts missing")
+    status, _, _ = request(port, "DELETE", path)
+    require(status == 204, "fault cleanup failed")
+    print("PASS: connection drop, byte-exact truncated response, recovery, receipts, and cleanup")
+
+
 def main():
     if len(sys.argv) != 2:
         raise SystemExit("Usage: python3 scripts/docker-smoke.py IMAGE")
@@ -185,6 +259,8 @@ def main():
         container, port = start(sys.argv[1], containers)
         check_http(port)
         check_recovery_run(port)
+        check_fixtures(port)
+        check_transport_faults(port)
         stop(container, 0)
         print("PASS: normal Docker stop exits 0")
         container, port = start(sys.argv[1], containers)
