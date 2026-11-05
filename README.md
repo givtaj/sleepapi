@@ -1,35 +1,123 @@
 # sleepapi
 
-An Axum + Tokio API for simulating slow HTTP responses. Choose how long a request
-waits, how it waits, and which HTTP status comes back. Use it to exercise loading
-states, client timeouts, retries, and mock email or SMS integrations.
+Test how your HTTP client handles slow responses, failures, and recovery with
+repeatable local scenarios. SleepAPI lets you:
 
-By default, each request waits inside SleepAPI, then receives a JSON result and
-the chosen HTTP status. Recovery runs can instead return exact fixture bodies or
-deliberately break the response. Email and SMS are labels on this delay engine;
-no provider is contacted and no background delivery job is created. The waiting
-implementations are real, while the provider outcomes are simulated.
+- Exercise loading states and timeouts with configurable response delays.
+- Test retries against a sequence such as `503 → 503 → 200`, then reset and replay it.
+- Return exact response bodies or simulate dropped connections and truncated responses.
 
-**v0.1.1-alpha.4** is an alpha source distribution with a Dockerfile.
-Publication status and verification are recorded in the
-[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
-See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
-[release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
-The earlier [v0.1.0 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0)
-remains available.
+SleepAPI is built with Rust, Axum, and Tokio. It runs locally with no external
+provider or hosted service. **v0.1.1-alpha.4** is distributed as source plus a
+Dockerfile; see the [release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
 
-**Recovery runs** provide isolated, resettable response sequences
-such as `503, 503, 200`. See [recovery runs](docs/recovery-runs.md) for the API,
-bounded storage, generation guards, and cancellation semantics.
+[Quickstart](#quickstart-two-failures-then-success) · [API reference](#http-contract) ·
+[Configuration](#configuration) · [Development](#develop)
 
-This alpha adds **response fixtures and transport faults**: exact UTF-8 bodies
-with separate receipts, connection drops, and truncated responses. See the
-[fixture and fault API](docs/response-fixtures.md).
-These additions are available from alpha.4; earlier release tags are unchanged.
+## Quickstart: two failures, then success
 
-Run the [retry-client example](docs/client-acceptance.md) to exercise recovery,
-exact fixtures, connection drops, truncation, and reset/replay from a consumer's
-perspective. It prints client observations and separate server receipts as JSON.
+This example creates an isolated response sequence, sends three requests, then
+resets the sequence and repeats it. Use a POSIX shell (macOS/Linux, WSL, or Git
+Bash) with `curl` and `jq` installed. The Docker startup also requires Git and
+Docker running in Linux-container mode.
+
+### 1. Start SleepAPI
+
+In one terminal, build and run the pinned alpha release:
+
+```sh
+git clone --branch v0.1.1-alpha.4 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.4
+cd sleepapi-v0.1.1-alpha.4
+docker build -t sleepapi:0.1.1-alpha.4 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.4
+```
+
+This builds from source; no prebuilt registry image is provided. Wait for
+`sleepapi listening` before continuing. If you already have this repository and
+Rust 1.94 or newer, you can [run with Rust](#run-with-rust) instead.
+
+### 2. Get two failures followed by success
+
+Run the remaining steps in a second terminal, keeping the same shell open so
+the variables and function remain available. Create a run and save its returned
+ID and generation:
+
+```sh
+BASE_URL=http://127.0.0.1:3000
+RUN=$(curl -fsS "$BASE_URL/runs" \
+  -H 'Content-Type: application/json' \
+  -d '{"sequence":[
+    {"status_code":503,"duration_ms":50},
+    {"status_code":503,"duration_ms":50},
+    {"status_code":200,"duration_ms":50}
+  ]}')
+RUN_ID=$(printf '%s' "$RUN" | jq -er '.run_id')
+GENERATION=$(printf '%s' "$RUN" | jq -er '.generation')
+
+try_sequence() {
+  for attempt in 1 2 3; do
+    curl -sS -o /dev/null -w "Attempt $attempt: HTTP %{http_code}\n" \
+      "$BASE_URL/runs/$RUN_ID/attempts" \
+      -H 'Content-Type: application/json' \
+      -d "{\"generation\":$GENERATION}"
+  done
+}
+try_sequence
+```
+
+Expected output:
+
+```text
+Attempt 1: HTTP 503
+Attempt 2: HTTP 503
+Attempt 3: HTTP 200
+```
+
+These are actual HTTP statuses. The loop sends each request; SleepAPI does not
+retry for you. The attempt requests deliberately omit curl's `--fail` flag
+because the `503` responses are expected.
+
+### 3. Reset and repeat
+
+Reset the run, save the **new generation** from the response, and call the same
+function again:
+
+```sh
+RESET=$(curl -fsS "$BASE_URL/runs/$RUN_ID/reset" \
+  -H 'Content-Type: application/json' \
+  -d "{\"generation\":$GENERATION}")
+GENERATION=$(printf '%s' "$RESET" | jq -er '.generation')
+try_sequence
+```
+
+You get the same `503`, `503`, `200` output again. Reset rewinds the sequence and
+clears its receipts; the new generation prevents old requests from consuming
+steps in the replay. A fourth attempt without resetting returns `409` because
+the sequence is exhausted. Runs expire after five minutes by default; reset
+does not extend that lifetime.
+
+### 4. Clean up
+
+Delete your run:
+
+```sh
+curl -fsS -X DELETE "$BASE_URL/runs/$RUN_ID"
+```
+
+If you used Docker above, stop the container:
+
+```sh
+docker stop --time 7 sleepapi
+```
+
+For the Rust startup, stop the server with Ctrl-C instead of `docker stop`.
+
+Recovery runs use SleepAPI's `POST /runs/{run_id}/attempts` endpoint and a
+`generation` JSON body. Connecting an existing client may require adapting its
+request path, method, and body. See the [recovery-run guide](docs/recovery-runs.md)
+for the full contract, [fixtures and transport faults](docs/response-fixtures.md)
+for custom responses, or the [Python retry-client example](docs/client-acceptance.md)
+for a client with a bounded retry policy and server receipts.
 
 ## Run with Docker
 
@@ -59,18 +147,9 @@ from a released version. Building requires network access to download base image
 and Rust dependencies. The Rust compiler stays in the build stage, outside the
 runtime image.
 
-No registry image is provided: users build their own image from the source.
-To build this alpha, use the `v0.1.1-alpha.4` Git tag instead of cloning the
-moving default branch:
-
-```sh
-git clone --branch v0.1.1-alpha.4 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.4
-cd sleepapi-v0.1.1-alpha.4
-docker build -t sleepapi:0.1.1-alpha.4 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.4
-```
-
-Both examples build an image on your machine; neither pulls a prebuilt SleepAPI image.
+For the pinned `v0.1.1-alpha.4` release, use the
+[quickstart commands](#1-start-sleepapi). Both paths build an image on your
+machine; neither pulls a prebuilt SleepAPI image.
 
 ### Configure and stop the container
 
@@ -145,32 +224,6 @@ Email and SMS are operation labels on the same delay engine. Nothing is sent;
 no recipient, credentials, or external provider is involved. The HTTP connection
 stays open until the delay completes, including when selecting `tokio_spawn` or
 a status such as `202`. This version has no background-job queue or polling API.
-
-## Waiting methods
-
-| Endpoint | `method` | What waits | Implementation |
-| --- | --- | --- | --- |
-| `POST /sleep/tokio` | `tokio_sleep` (default) | The request's async task | Await `tokio::time::sleep` directly |
-| `POST /sleep/tokio-spawn` | `tokio_spawn` | A separate async task; the handler awaits its result | `tokio::spawn` + timer + await the join handle |
-| `POST /sleep/thread` | `thread_sleep` | An OS thread in Tokio's blocking pool | `spawn_blocking` + `std::thread::sleep` |
-| `POST /sleep/park` | `thread_park` | An OS thread in Tokio's blocking pool | `spawn_blocking` + repeated `std::thread::park_timeout` |
-
-An async task is not an OS thread. A Tokio timer suspends the task while runtime
-workers can do other work. Thread sleeping and parking occupy a blocking-pool
-thread for the duration; they do not run on the async worker threads.
-`/sleep/tokio` awaits the timer inside the request task. `/sleep/tokio-spawn`
-creates a separate Tokio task to await the timer, then the request task awaits
-that task's join handle. Both keep the HTTP request open until the timer finishes;
-spawning adds task scheduling and joining without making the timer faster.
-
-The original inspiration was a thread that sleeps, stores a result, then calls
-`waker.wake()`. Here, Tokio's timer or join handle provides that wake-up mechanism.
-There is no hand-written `Future` or manual waker in this first version.
-
-Parking differs from sleeping because it can be interrupted by an unpark token
-or a spurious wake. The parking implementation checks elapsed time and parks
-again until the requested duration is complete. This is a timed parking experiment;
-there is no HTTP unpark endpoint. See the [Rust parking documentation](https://doc.rust-lang.org/std/thread/fn.park_timeout.html).
 
 ## Scenarios
 
@@ -418,6 +471,32 @@ log readers cannot block HTTP requests. Logging teardown shares the original
 shutdown grace period; forced exits do not wait for log output. Queued records
 and final shutdown messages are best effort and may be lost.
 
+## Waiting methods
+
+| Endpoint | `method` | What waits | Implementation |
+| --- | --- | --- | --- |
+| `POST /sleep/tokio` | `tokio_sleep` (default) | The request's async task | Await `tokio::time::sleep` directly |
+| `POST /sleep/tokio-spawn` | `tokio_spawn` | A separate async task; the handler awaits its result | `tokio::spawn` + timer + await the join handle |
+| `POST /sleep/thread` | `thread_sleep` | An OS thread in Tokio's blocking pool | `spawn_blocking` + `std::thread::sleep` |
+| `POST /sleep/park` | `thread_park` | An OS thread in Tokio's blocking pool | `spawn_blocking` + repeated `std::thread::park_timeout` |
+
+An async task is not an OS thread. A Tokio timer suspends the task while runtime
+workers can do other work. Thread sleeping and parking occupy a blocking-pool
+thread for the duration; they do not run on the async worker threads.
+`/sleep/tokio` awaits the timer inside the request task. `/sleep/tokio-spawn`
+creates a separate Tokio task to await the timer, then the request task awaits
+that task's join handle. Both keep the HTTP request open until the timer finishes;
+spawning adds task scheduling and joining without making the timer faster.
+
+The original inspiration was a thread that sleeps, stores a result, then calls
+`waker.wake()`. Here, Tokio's timer or join handle provides that wake-up mechanism.
+There is no hand-written `Future` or manual waker in this first version.
+
+Parking differs from sleeping because it can be interrupted by an unpark token
+or a spurious wake. The parking implementation checks elapsed time and parks
+again until the requested duration is complete. This is a timed parking experiment;
+there is no HTTP unpark endpoint. See the [Rust parking documentation](https://doc.rust-lang.org/std/thread/fn.park_timeout.html).
+
 ## Develop
 
 ```sh
@@ -486,6 +565,17 @@ The code is split into the HTTP contract (`src/lib.rs`), the four waiting
 implementations (`src/wait.rs`), environment configuration (`src/config.rs`),
 scenario presets (`src/scenario.rs`), error responses (`src/error.rs`),
 and server startup/shutdown (`src/main.rs`).
+
+## Release status
+
+**v0.1.1-alpha.4** is an alpha source distribution with a Dockerfile. It includes
+recovery runs, exact UTF-8 response fixtures, and HTTP/1.1 transport faults.
+Publication status and verification are recorded in the
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
+See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
+[release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
+Earlier release tags, including [v0.1.0](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0),
+remain available and unchanged.
 
 ## License
 
