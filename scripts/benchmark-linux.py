@@ -11,8 +11,13 @@ import hashlib
 import json
 from pathlib import Path
 import random
+import re
 import subprocess
 import time
+import uuid
+
+
+OWNER_LABEL = "sleepapi.benchmark-owner"
 
 
 def docker(*args, timeout=30):
@@ -45,6 +50,55 @@ def identity(details):
                    ("CpusetCpus", "Memory", "MemorySwap", "PidsLimit", "ReadonlyRootfs")},
         "pid_mode": config["PidMode"], "network_mode": config["NetworkMode"],
     }
+
+
+def recover_created(name, owner, receipt):
+    """Bounded discovery after an ambiguous create; a name alone proves nothing."""
+    receipt["recovery_errors"] = []
+    for attempt in range(3):
+        try:
+            details = json.loads(docker("inspect", name, timeout=2))[0]
+            reference = details["Id"]
+            labels = details["Config"].get("Labels") or {}
+            if (details["Name"] == "/" + name and labels.get(OWNER_LABEL) == owner
+                    and re.fullmatch(r"[0-9a-f]{64}", reference)):
+                receipt["status"] = "recovered"
+                return reference
+            receipt["status"] = "ownership_mismatch"
+            return None
+        except (OSError, subprocess.SubprocessError, ValueError, KeyError, IndexError, TypeError) as error:
+            receipt["recovery_errors"].append({"attempt": attempt + 1,
+                                               "error": type(error).__name__, "message": str(error)})
+        if attempt < 2:
+            time.sleep(.2)
+    # A daemon can remain unreachable or finish creation after our bounded
+    # discovery. Preserve the name/token for reconciliation; never claim success.
+    receipt["status"] = "unresolved"
+    return None
+
+
+def create_owned(created, directory, role, name, *arguments):
+    owner = uuid.uuid4().hex
+    receipt = {"name": name, "owner_label": OWNER_LABEL, "owner_token": owner,
+               "status": "planned", "id": None}
+    save(directory / f"{role}-creation-intent.json", receipt)
+    try:
+        reference = docker("create", "--name", name, "--label", f"{OWNER_LABEL}={owner}", *arguments)
+        if not re.fullmatch(r"[0-9a-f]{64}", reference):
+            raise ValueError("docker create did not return a full container ID")
+        created.append(reference)
+        receipt.update(status="created", id=reference)
+        return reference
+    except BaseException as error:
+        receipt["creation_error"] = {"error": type(error).__name__, "message": str(error)}
+        reference = recover_created(name, owner, receipt)
+        if reference is not None and reference not in created:
+            created.append(reference)
+        if reference is not None:
+            receipt["id"] = reference
+        raise
+    finally:
+        save(directory / f"{role}-creation.json", receipt)
 
 
 def cleanup_owned(created, directory):
@@ -97,6 +151,23 @@ def cleanup_owned(created, directory):
         raise RuntimeError("owned container cleanup failed; inspect cleanup.json")
 
 
+def binary_hash(image, output, run_id):
+    directory = output / "binary-probe"
+    directory.mkdir()
+    created = []
+    try:
+        reference = create_owned(created, directory, "probe", f"sleepapi-bench-{run_id}-binary",
+                                 "--label", f"sleepapi.benchmark={run_id}", "--network", "none",
+                                 "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+                                 "--entrypoint", "sha256sum", image, "/usr/local/bin/sleepapi")
+        digest = docker("start", "--attach", reference).split()[0]
+        if not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise ValueError("binary probe did not return a SHA-256 digest")
+        return digest
+    finally:
+        cleanup_owned(created, directory)
+
+
 def run_case(args, output, image, runner_image, cell, index):
     name = f"sleepapi-bench-{args.run_id}-{index:02d}"
     worker_name = name + "-worker"
@@ -107,18 +178,21 @@ def run_case(args, output, image, runner_image, cell, index):
     directory.chmod(0o777)
     created = []
     try:
-        server = docker("run", "-d", "--name", name, "--label", f"sleepapi.benchmark={args.run_id}",
+        server = create_owned(created, directory, "server", name,
+                        "--label", f"sleepapi.benchmark={args.run_id}",
                         "--network", "none", "--cpuset-cpus", args.server_cpus,
                         "--memory", "512m", "--memory-swap", "512m", "--pids-limit", "256",
                         "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
                         "-e", "SLEEPAPI_ADDR=127.0.0.1:3000", "-e", "TOKIO_WORKER_THREADS=2",
                         "-e", "SLEEPAPI_MAX_IN_FLIGHT=" + ("64" if cell["mode"] == "load" else "1"),
                         "-e", "SLEEPAPI_SHUTDOWN_GRACE_MS=5000", "-e", "RUST_LOG=sleepapi=warn", image)
-        created.append(server)
+        # Record ownership before start: start can fail after the daemon has
+        # already launched the process, but cleanup still has its immutable ID.
+        docker("start", server)
         server_info = inspect(server)
         assert server_info["State"]["Running"], "server exited during startup"
         save(directory / "server.json", identity(server_info))
-        worker = docker("create", "--name", worker_name,
+        worker = create_owned(created, directory, "worker", worker_name,
                         "--label", f"sleepapi.benchmark={args.run_id}",
                         "--network", f"container:{server}", "--pid", f"container:{server}",
                         "--cpuset-cpus", args.client_cpus, "--memory", "512m", "--memory-swap", "512m",
@@ -130,7 +204,6 @@ def run_case(args, output, image, runner_image, cell, index):
                         "--mode", cell["mode"], "--method", cell["method"],
                         "--output-dir", "/out/data", "--window-secs", str(args.window_secs),
                         "--concurrency", str(cell["concurrency"]), "--duration-ms", "100")
-        created.append(worker)
         with (directory / "worker.log").open("x") as log:
             process = subprocess.run(["docker", "start", "--attach", worker], stdout=log,
                                      stderr=subprocess.STDOUT, timeout=90)
@@ -181,8 +254,7 @@ def main():
         "image_source_revision": revision,
         "server_image": {key: image.get(key) for key in ("Id", "Architecture", "Os", "Created", "RepoDigests")},
         "runner_image": {key: runner_image.get(key) for key in ("Id", "Architecture", "Os", "Created", "RepoDigests")},
-        "binary_sha256": docker("run", "--rm", "--network", "none", "--entrypoint", "sha256sum",
-                                image["Id"], "/usr/local/bin/sleepapi").split()[0],
+        "binary_sha256": binary_hash(image["Id"], output, args.run_id),
         "docker": {key: info.get(key) for key in
                    ("OperatingSystem", "KernelVersion", "Architecture", "NCPU", "MemTotal", "ServerVersion")},
         "server_cpus": args.server_cpus, "client_cpus": args.client_cpus,

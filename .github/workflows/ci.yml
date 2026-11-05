@@ -72,3 +72,5 @@ jobs:
         run: docker build --platform ${{ matrix.platform }} --tag sleepapi:ci .
       - name: Verify container HTTP and shutdown
         run: python3 scripts/docker-smoke.py sleepapi:ci
+      - name: Verify benchmark container ownership and cleanup
+        run: python3 -B scripts/benchmark-ownership-smoke.py sleepapi:ci

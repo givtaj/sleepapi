@@ -169,7 +169,15 @@ The executed orchestrator is frozen under `evidence/harness/`. The working
 `scripts/benchmark-linux.py` additionally hardens failure cleanup: an error
 cleaning one owned container no longer skips the remaining containers or the
 receipt. It also uses host-neutral scope metadata for future runs on Linux
-daemons outside Docker Desktop. These post-run changes affect failure handling
-and metadata only, with a mocked cleanup regression; they are not substituted
-for the measured harness. No server source or runtime behavior changed for
-this benchmark.
+daemons outside Docker Desktop. The November 5 review additionally separates
+container creation from startup, records ownership before startup, and recovers
+ambiguous creation failures only when the full ID, name, and unique ownership
+label match. This applies to the binary-hash probe as well as server/worker
+containers. Discovery is bounded to three two-second inspections; an unreachable
+daemon or later creation is recorded as unresolved with the name and ownership
+token for reconciliation. A name collision never authorizes cleanup.
+
+These post-run changes affect failure handling and metadata only. Five additional
+mocked regressions cover creation, startup, collision, unresolved ownership, and
+binary-probe failure; all 23 Python tests pass. They are not substituted for the
+measured harness. No server source or runtime behavior changed for this benchmark.
