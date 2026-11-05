@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-10-29T18:50:51.225770+00:00",
+  "source_commit": "f686bad93ca9a337817c92f7b7ecf6becb2915ea",
+  "image_source_revision": "f686bad93ca9a337817c92f7b7ecf6becb2915ea",
+  "server_image": {
+    "Id": "sha256:5b0de913db7014106b8f1f32e049a5062f109b4ee9307d650454cf6c25e76f83",
+    "Architecture": "arm64",
+    "Os": "linux",
+    "Created": "2026-10-29T14:06:14.45774809Z",
+    "RepoDigests": [
+      "sleepapi@sha256:5b0de913db7014106b8f1f32e049a5062f109b4ee9307d650454cf6c25e76f83"
+    ]
+  },
+  "runner_image": {
+    "Id": "sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea",
+    "Architecture": "arm64",
+    "Os": "linux",
+    "Created": "2026-08-31T23:50:54.422594423Z",
+    "RepoDigests": [
+      "python@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea"
+    ]
+  },
+  "binary_sha256": "5a4508ec45b862ef2c97df80cd1a8baad24d1552b1ecbc962607dafd9db1643f",
+  "docker": {
+    "OperatingSystem": "Docker Desktop",
+    "KernelVersion": "7.0.14-linuxkit",
+    "Architecture": "aarch64",
+    "NCPU": 10,
+    "MemTotal": 8319504384,
+    "ServerVersion": "29.8.1"
+  },
+  "server_cpus": "2,3",
+  "client_cpus": "0,1",
+  "server_workers": 2,
+  "request_logging": "disabled (sleepapi=warn)",
+  "scope": "Linux containers in Docker Desktop VM; no host-namespace or socket mounts",
+  "harness_sha256": {
+    "benchmark-linux.py": "f701e2548eff0a39b34b006513a3c92ae6fdc46c6f32199c3dbc2b1fc0c53f2d",
+    "benchmark-worker.py": "cf592b9a2654e647f8e5d29169c9b999c372012ef20366a5884fc41aee5a436c",
+    "benchmark-resources.py": "ba686f58bc213530070d0020595b73b9310d94ce68c138cbc9e0ae574f203ee2"
+  }
+}

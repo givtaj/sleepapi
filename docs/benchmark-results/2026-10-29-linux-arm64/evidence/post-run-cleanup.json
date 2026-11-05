@@ -1,0 +1,15 @@
+{
+  "checked_at_utc": "2026-10-29T19:00:19.284316+00:00",
+  "command": [
+    "docker",
+    "ps",
+    "-a",
+    "--filter",
+    "label=sleepapi.benchmark=20261029-full",
+    "--format",
+    "{{.ID}} {{.Names}} {{.Status}}"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "owned_containers_remaining": 0
+}

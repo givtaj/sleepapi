@@ -1,0 +1,52 @@
+{
+  "source_commit": "f686bad93ca9a337817c92f7b7ecf6becb2915ea",
+  "source_export": [
+    "git",
+    "archive",
+    "f686bad93ca9a337817c92f7b7ecf6becb2915ea"
+  ],
+  "source_archive_sha256": "c947325673913e081857b50666e319a024779d1a61d1d48402c87af5692c9cf9",
+  "source_file_sha256": {
+    "Cargo.toml": "295329a2cea3f59ae05564a3e27738ba557c6478f70f93ad733956a136309327",
+    "Cargo.lock": "166c8c8a0d920f297111d5ccae98ecc677345976659e42bd1b2f856fdb23eecf",
+    "Dockerfile": "b4bfbcd40f972929cb12276c117d766a442aec7753f2b1ac962018403ed349a1",
+    ".dockerignore": "c246cd937397c775846773133fab2e290c6fe92f1ed533014a381f2b8b47da8d",
+    "src/config.rs": "ab214d915e765f20dc706912794928672b56c619ce749bea25ff5022669c42a5",
+    "src/error.rs": "a5d20c3940a32ecc34407823f3332a89ee9e4c3f46066185291ee8c1bdfef9b6",
+    "src/fixtures.rs": "9a2eac897b29fab115c85d2dd9341c797c37112938bd25cbbb4eac59c60638a7",
+    "src/lib.rs": "271e19d2a7c888be3d9246863360fbe5aad98bd3f83d1dfdb68850c98c6509fb",
+    "src/main.rs": "115840fba825904c45c7bfc1fbe7e393374d4a3d0b067851cfaebc2d36ff6f35",
+    "src/runs.rs": "822f687f98b375636aa1f224f40b8d898da84f2fdf026eaafc753e6f1260c704",
+    "src/scenario.rs": "a980e51e6584c2e130fdb5f02c7bc205da95d1b0fdd51779ae741fb2dfb7efe6",
+    "src/transport.rs": "fd1b9ca808a3ad0d8de0a3f15d8a8f74b6584aacd9ece33922530995388b9ce0",
+    "src/wait.rs": "ef96f8c7a748c6588d5bea63824583aa3df994435ea06f9551aafd3d1e8fcdeb"
+  },
+  "build_command": [
+    "docker",
+    "build",
+    "--platform",
+    "linux/arm64",
+    "--label",
+    "org.opencontainers.image.revision=f686bad93ca9a337817c92f7b7ecf6becb2915ea",
+    "--label",
+    "sleepapi.benchmark=2026-10-29",
+    "--tag",
+    "sleepapi:benchmark-f686bad-20261029",
+    "EXPORTED_SOURCE"
+  ],
+  "build_log_sha256": "0e06da7f55f90aec270eee5b530adc6ffbc3ef539e7aaaecde11ff53949a0973",
+  "build_toolchain": "rust:1.94.0-slim-bookworm (digest retained in build.log)",
+  "run_command": [
+    "python3",
+    "-B",
+    "harness/benchmark-linux.py",
+    "--image",
+    "sleepapi:benchmark-f686bad-20261029",
+    "--source-sha",
+    "f686bad93ca9a337817c92f7b7ecf6becb2915ea",
+    "--output-dir",
+    "NEW_OUTPUT_DIRECTORY",
+    "--run-id",
+    "20261029-full"
+  ]
+}

@@ -1,0 +1,1 @@
+{"passed": true, "mode": "lifecycle", "method": "tokio-spawn", "output_dir": "/out/data", "error": null}

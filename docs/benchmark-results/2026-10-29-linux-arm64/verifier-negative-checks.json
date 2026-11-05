@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "verifier_sha256": "b8e90fcb686f12c734ae6ab12aa76f1a9cf0f7ffbfc1522f6039ad63cb50078f",
+  "production_inputs_unchanged": true,
+  "note": "Raw request/counter corruptions also refresh the temporary compression digest, so rejection exercises independent arithmetic instead of only compression integrity. Both server identity copies are changed together for the capacity case.",
+  "checks": [
+    {
+      "check": "positive-control",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "passed": true,
+      "detected_error": null,
+      "alteration": "Byte-identical temporary copy of all production evidence.",
+      "outcome": "accepted"
+    },
+    {
+      "check": "altered-request-latency",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "passed": true,
+      "detected_error": "AssertionError: request latency: 3.286375 != 3.036375",
+      "alteration": "Add 0.25 ms to one retained request latency; refresh only the temporary compression receipt.",
+      "outcome": "rejected"
+    },
+    {
+      "check": "altered-cpu-counter",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "passed": true,
+      "detected_error": "AssertionError: raw CPU seconds: 0.0 != 0.01",
+      "alteration": "Add one server user CPU tick without changing recorded CPU seconds; refresh only the temporary compression receipt.",
+      "outcome": "rejected"
+    },
+    {
+      "check": "altered-capacity-configuration",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "passed": true,
+      "detected_error": "AssertionError: server environment.SLEEPAPI_MAX_IN_FLIGHT: '63' != '64'",
+      "alteration": "Change SLEEPAPI_MAX_IN_FLIGHT from 64 to 63 in both before/after identity copies, preserving their equality.",
+      "outcome": "rejected"
+    },
+    {
+      "check": "altered-frozen-harness",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "passed": true,
+      "detected_error": "AssertionError: harness hash mismatch: benchmark-worker.py",
+      "alteration": "Append a comment to the retained worker source without changing the recorded execution hash.",
+      "outcome": "rejected"
+    }
+  ]
+}
