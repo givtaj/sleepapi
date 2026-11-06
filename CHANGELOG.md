@@ -4,6 +4,9 @@
 
 ### Added
 
+- Versioned GHCR container publication for Linux AMD64 and ARM64, with native
+  build/smoke checks, source revision labels, and anonymous pull verification.
+- A prebuilt-image quickstart, with source builds retained as an alternative.
 - A runnable Python retry client with bounded retries, exact fixture validation,
   client-observed transport failures, separate receipts, and reset/replay checks.
 - Real TCP disconnect regressions for ordinary recovery attempts, covering

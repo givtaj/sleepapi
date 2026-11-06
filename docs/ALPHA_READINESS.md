@@ -1,5 +1,11 @@
 # SleepAPI alpha readiness
 
+Current distribution also includes versioned Linux AMD64/ARM64 container images.
+The [container publication checklist](RELEASING.md#publish-versioned-container-images)
+covers their source identity, native smoke checks, and anonymous pulls. The
+alpha.4 source-release assessment below records the original release scope;
+container publication is additional evidence, not a change to the source tag.
+
 Assessment date: 2026-10-29 (Europe/Madrid). Alpha release candidate:
 **`0.1.1-alpha.4`**. This candidate adds
 [response fixtures and transport faults](response-fixtures.md) to recovery runs.

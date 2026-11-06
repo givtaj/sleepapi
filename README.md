@@ -8,8 +8,9 @@ repeatable local scenarios. SleepAPI lets you:
 - Return exact response bodies or simulate dropped connections and truncated responses.
 
 SleepAPI is built with Rust, Axum, and Tokio. It runs locally with no external
-provider or hosted service. **v0.1.1-alpha.4** is distributed as source plus a
-Dockerfile; see the [release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
+provider or hosted service. **v0.1.1-alpha.4** is available as a versioned Docker
+image for Linux AMD64 and ARM64, as well as source plus a Dockerfile. See the
+[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
 
 [Quickstart](#quickstart-two-failures-then-success) · [API reference](#http-contract) ·
 [Configuration](#configuration) · [Development](#develop) · [Contributing](CONTRIBUTING.md)
@@ -18,23 +19,22 @@ Dockerfile; see the [release notes](https://github.com/givtaj/sleepapi/releases/
 
 This example creates an isolated response sequence, sends three requests, then
 resets the sequence and repeats it. Use a POSIX shell (macOS/Linux, WSL, or Git
-Bash) with `curl` and `jq` installed. The Docker startup also requires Git and
-Docker running in Linux-container mode.
+Bash) with `curl` and `jq` installed, and Docker running in Linux-container mode.
+The prebuilt image does not require Git or Rust on your machine.
 
 ### 1. Start SleepAPI
 
-In one terminal, build and run the pinned alpha release:
+In one terminal, pull and run the versioned alpha image. Docker selects the
+image for your machine's architecture:
 
 ```sh
-git clone --branch v0.1.1-alpha.4 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-v0.1.1-alpha.4
-cd sleepapi-v0.1.1-alpha.4
-docker build -t sleepapi:0.1.1-alpha.4 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.4
+docker pull ghcr.io/givtaj/sleepapi:0.1.1-alpha.4
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 ghcr.io/givtaj/sleepapi:0.1.1-alpha.4
 ```
 
-This builds from source; no prebuilt registry image is provided. Wait for
-`sleepapi listening` before continuing. If you already have this repository and
-Rust 1.94 or newer, you can [run with Rust](#run-with-rust) instead.
+No registry login is needed. Wait for `sleepapi listening` before continuing.
+If you prefer to compile locally, [build from source](#build-the-current-source)
+or [run with Rust](#run-with-rust).
 
 ### 2. Get two failures followed by success
 
@@ -128,6 +128,20 @@ host. Docker runs the API locally; it does not connect to a hosted SleepAPI serv
 CI covers both Linux architectures. Docker Desktop was also checked locally on
 macOS; Windows host integration and native Windows builds have not been tested.
 
+### Use a prebuilt image
+
+The [quickstart](#1-start-sleepapi) uses `ghcr.io/givtaj/sleepapi:0.1.1-alpha.4`.
+Each version tag contains Linux `amd64` and `arm64` images. The publication
+workflow builds and tests each architecture on a native runner, then checks
+anonymous pulls and HTTP/shutdown behavior on both downloaded images.
+
+Image versions match source release tags without the leading `v`. Publication
+refuses to replace an existing version; there is no `latest` alias. For an exact
+artifact pin, use `ghcr.io/givtaj/sleepapi@sha256:...` with the manifest digest
+recorded in the [Container images workflow](https://github.com/givtaj/sleepapi/actions/workflows/container-images.yml)
+summary and its `container-release` artifact. The image's
+`org.opencontainers.image.revision` label records the source commit.
+
 ### Build the current source
 
 Build locally for your machine's architecture:
@@ -147,16 +161,16 @@ from a released version. Building requires network access to download base image
 and Rust dependencies. The Rust compiler stays in the build stage, outside the
 runtime image.
 
-For the pinned `v0.1.1-alpha.4` release, use the
-[quickstart commands](#1-start-sleepapi). Both paths build an image on your
-machine; neither pulls a prebuilt SleepAPI image.
+To build the pinned release yourself, clone with
+`git clone --branch v0.1.1-alpha.4 --depth 1 https://github.com/givtaj/sleepapi.git`
+instead, then use the same local build commands above.
 
 ### Configure and stop the container
 
 Configure the container with environment variables, for example:
 
 ```sh
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 -e SLEEPAPI_CORS_ORIGINS=http://localhost:5173 sleepapi:dev
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 -e SLEEPAPI_CORS_ORIGINS=http://localhost:5173 ghcr.io/givtaj/sleepapi:0.1.1-alpha.4
 ```
 
 Stop it from another terminal with `docker stop --time 7 sleepapi`. The default
@@ -524,7 +538,8 @@ GitHub Actions runs only on Linux. It checks formatting, Clippy, tests, release
 builds, and source packaging on stable Rust, and tests the supported minimum Rust
 1.94.0. Separate native Linux `amd64` and `arm64` jobs build the Docker image and
 verify container HTTP behavior, CORS, and shutdown. CI builds images only for
-testing; it does not push them to a registry. See [Releasing](docs/RELEASING.md)
+testing; the separate Container images workflow publishes versioned release
+images after native smoke checks. See [Releasing](docs/RELEASING.md)
 for the source-release checklist. A configured workflow is not evidence that a
 release candidate has passed: check the run for the exact release commit.
 Process tests cover graceful drain, stalled request bodies, repeated signals,
@@ -568,7 +583,8 @@ and server startup/shutdown (`src/main.rs`).
 
 ## Release status
 
-**v0.1.1-alpha.4** is an alpha source distribution with a Dockerfile. It includes
+**v0.1.1-alpha.4** is an alpha release with source, a Dockerfile, and versioned
+prebuilt Linux AMD64/ARM64 images. It includes
 recovery runs, exact UTF-8 response fixtures, and HTTP/1.1 transport faults.
 Publication status and verification are recorded in the
 [GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
