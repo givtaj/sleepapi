@@ -12,7 +12,7 @@ provider or hosted service. **v0.1.1-alpha.4** is distributed as source plus a
 Dockerfile; see the [release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
 
 [Quickstart](#quickstart-two-failures-then-success) · [API reference](#http-contract) ·
-[Configuration](#configuration) · [Development](#develop)
+[Configuration](#configuration) · [Development](#develop) · [Contributing](CONTRIBUTING.md)
 
 ## Quickstart: two failures, then success
 
