@@ -3,13 +3,55 @@
 ## Distribution scope
 
 Ship a GitHub source release containing the Rust application, lockfile, Dockerfile,
-tests, and documentation. Users build their own image. Linux AMD64 and ARM64
+tests, and documentation, plus a versioned image at `ghcr.io/givtaj/sleepapi`.
+Users can pull the image or build it themselves. Linux AMD64 and ARM64
 containers run through Docker on Linux, macOS, and Windows with Linux-container
 support. A native Rust build requires Rust 1.94 or newer.
 
-This source-release track does not require a container registry, image-publishing
-workflow, native binary downloads, crates.io publication, or native macOS/Windows CI.
-Ordinary Linux CI builds and tests containers without publishing them.
+Ordinary Linux CI builds and tests containers without publishing them. The
+separate [Container images workflow](../.github/workflows/container-images.yml)
+publishes images for existing source releases. Native binary downloads,
+crates.io publication, and native macOS/Windows CI remain outside this track.
+
+## Publish versioned container images
+
+Publishing a GitHub release runs the Container images workflow when the tagged
+source includes that workflow. For an older release such as alpha.4, dispatch
+the workflow from `main` with its published tag:
+
+```sh
+gh workflow run container-images.yml --ref main -f tag=v0.1.1-alpha.4
+```
+
+The workflow resolves the tag to one commit and requires successful `main` CI
+on that source, including both Rust and both Docker jobs. It verifies the Cargo
+version, builds on native AMD64/ARM64 runners, and runs `docker-smoke.py` before
+pushing the exact tested images under unique staging tags. Only after both
+architectures pass does it create `ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` from
+their registry digests. It then pulls anonymously on fresh native runners,
+checks architecture/version/revision/digest, and reruns HTTP and shutdown smoke.
+Pull requests exercise the build/test path without registry writes.
+
+The workflow uses the repository's `GITHUB_TOKEN` with `packages: write` for
+publishing; no personal registry secret is required. On the **first publication**,
+GHCR creates a private package. Set the SleepAPI package visibility to **Public**
+in its GitHub package settings. Promotion intentionally fails until both staging
+images can be read anonymously. After changing visibility, rerun failed jobs;
+keep the successful build jobs and their digest artifacts.
+
+Version tags omit the source tag's leading `v`; no `latest` alias is published.
+The workflow serializes publications and refuses to replace an existing version.
+Authentication and network failures never count as proof that a tag is absent.
+An interrupted promotion can resume without writing the tag again only when the
+existing manifest references the exact two tested digests from that run.
+This is a workflow guard, not registry-enforced immutability: retain the recorded
+manifest digest for exact artifact pinning. A rebuilt image needs a new version.
+
+If post-publication verification fails, investigate and rerun only the failed
+verification jobs; do not overwrite the version. Save the workflow URL, source
+SHA, manifest/platform digests from `container-release.json`, and both anonymous
+verification results in the release notes. Staging tags use
+`build-<run-id>-<attempt>-<architecture>` and are not installation instructions.
 
 ## Release evidence
 
@@ -107,10 +149,9 @@ Use this checklist for each release and include the final results in its notes:
 
 5. **Publish a GitHub prerelease using the tested tag.** Use `v0.1.1-alpha.4` as
    the title, enable the prerelease flag, summarize the changes and limits, and link the
-   README's Docker instructions. Describe the deliverable as source plus a
-   Dockerfile. [GitHub provides source archives](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases);
-   no prebuilt binary or container asset is promised. Verify the release and
-   source links in a signed-out view.
+   README's Docker instructions. [GitHub provides source archives](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases).
+   Complete the container publication and anonymous verification above before
+   announcing a prebuilt image. Verify the release and source links in a signed-out view.
 
 6. **Record completion.** Put the released commit, successful CI run, release URL,
    and fresh-install result in the GitHub prerelease notes linked from the
@@ -150,7 +191,9 @@ GitHub prerelease notes and fill every field from actual results:
 - Annotated tag target equals the tested SHA: pending.
 - Fresh tagged-source Docker build and smoke, platform, date: pending.
 - Signed-out release and source-archive verification: pending.
-- Distribution: source plus Dockerfile; Windows remains unverified.
+- Container workflow URL, manifest/platform digests, source SHA: pending.
+- Anonymous AMD64/ARM64 pulls and smoke results: pending.
+- Distribution: source plus Dockerfile and versioned container; Windows remains unverified.
 
 A green PR run makes the candidate reviewable. After merging, require a green
 `main` run for the resulting commit before tagging. Any subsequent source,
