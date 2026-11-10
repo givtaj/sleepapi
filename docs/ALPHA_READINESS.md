@@ -1,25 +1,33 @@
 # SleepAPI alpha readiness
 
-Current distribution also includes versioned Linux AMD64/ARM64 container images.
-The [container publication checklist](RELEASING.md#publish-versioned-container-images)
-covers their source identity, native smoke checks, and anonymous pulls. The
-alpha.4 source-release assessment below records the original release scope;
-container publication is additional evidence, not a change to the source tag.
+Assessment date: 2026-11-10 (Europe/Madrid). Current candidate:
+**`0.1.1-alpha.5` — unreleased**. This candidate adds
+[read-only server metadata and a capability-check client](server-metadata.md),
+alongside the development coverage and distribution work since alpha.4.
 
-Assessment date: 2026-10-29 (Europe/Madrid). Alpha release candidate:
-**`0.1.1-alpha.4`**. This candidate adds
-[response fixtures and transport faults](response-fixtures.md) to recovery runs.
-The implementation is merged; final candidate CI, tagging, fresh tagged-source
-installation, and publication are separate release gates.
+The implementation baseline
+[`a833eecfe6b7268378a3c3ae17b59d62ede2b115`](https://github.com/givtaj/sleepapi/commit/a833eecfe6b7268378a3c3ae17b59d62ede2b115)
+passed [main CI run 42786430040](https://github.com/givtaj/sleepapi/actions/runs/42786430040),
+including 96 Rust tests, 45 Python tests, and both native Linux Docker jobs.
+This is implementation evidence before the alpha.5 version and documentation
+changes. Candidate-head review and CI must pass independently; record their
+results in the candidate PR. They must not be inferred from the earlier green baseline.
 
-The [alpha.4 GitHub prerelease record](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
-is the destination for authoritative publication and completion evidence,
-including the released commit, final CI, and installation results. This source
-document does not establish that the candidate is published. The previous
-[alpha.3 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.3)
-remains available and verifies its own source only.
+Preparation stops at a reviewed, unmerged PR with passing checks. Merging,
+tagging, fresh tagged-source installation, and publication remain separate
+steps in [Releasing](RELEASING.md). Publishing a GitHub release starts container
+publication automatically; no alpha.5 release or image is established by this
+readiness document.
 
-## Where the project stands
+The published [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+and `ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` remain available and are the current
+quickstart/fallback. Their `/metadata` route returns `404`; that does not mean
+their existing recovery or fixture features are unsupported. Container
+publication added artifacts without changing the immutable alpha.4 source tag.
+See the [container publication procedure](RELEASING.md#publish-versioned-container-images)
+for source identity, native smoke checks, and anonymous pulls.
+
+## Historical background before alpha.5
 
 The previous [v0.1.1-alpha.1 source release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.1)
 was published on 2026-10-26. It passed its original 39-test suite, but a later
@@ -40,14 +48,15 @@ has also been reconciled and merged. It describes the retained evidence and reru
 limits; it does not certify this candidate's throughput. Recovery sequences
 ([#4](https://github.com/givtaj/sleepapi/issues/4)) shipped in alpha.3. Exact response
 fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5)) and transport faults
-([#6](https://github.com/givtaj/sleepapi/issues/6)) are merged and included in the
-alpha.4 candidate; see the [API contract](response-fixtures.md). Alpha.3's
+([#6](https://github.com/givtaj/sleepapi/issues/6)) shipped in
+alpha.4; see the [API contract](response-fixtures.md). Alpha.3's
 historical release evidence below covers its original 58-test source only.
 
-## Alpha scope
+## Alpha.5 candidate scope
 
-- Local developer tool, source plus Dockerfile. Linux AMD64 and ARM64 are the
-  container targets; macOS native execution is a local verification environment.
+- Local developer tool, source plus Dockerfile and versioned container
+  distribution. Linux AMD64 and ARM64 are the container targets; macOS native
+  execution is a local verification environment. Alpha.5 artifacts are pending.
 - Existing HTTP behavior and defaults: four waiting implementations, seven
   scenarios, mock email/SMS labels, 30-second maximum requested wait, 64
   active-wait slots, 8 KiB request body, and five-second shutdown grace.
@@ -62,7 +71,11 @@ historical release evidence below covers its original 58-test source only.
   headers or an exact fixture prefix followed by an incomplete response. Attempts
   retain capacity through injection or cancellation; diagnostics remain separate
   from the broken response and cannot restore cleared or evicted receipts.
-- No hosted-service, production capacity, prebuilt image/binary, provider delivery,
+- Read-only metadata with schema/contract versions, explicit capabilities and
+  configured limits; transport-fault flags depend on the actual request protocol
+  and instrumented listener. The loopback client distinguishes supported,
+  unsupported, and unknown without claiming verified software identity.
+- No hosted-service, production capacity, prebuilt native binary, provider delivery,
   background-job, authentication, or Windows verification claim.
 
 The 64-slot default is an admission limit, not a load-tested capacity guarantee.
@@ -82,7 +95,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Gate | Required threshold | Evidence |
 | --- | --- | --- |
 | Defects | Zero unresolved critical/high-severity defects in supported behavior: crashes, hangs, incorrect HTTP contracts, or isolation failures | Review of final diff and failure triage; this is not a claim of a security audit |
-| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; development source has 89 tests covering existing behavior, fixtures, transport faults, disconnects and lifecycle; released alpha.4 has 86 |
+| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current suite has 96 Rust tests, with 45 Python tests in stable CI; published alpha.4 has 86 Rust tests |
 | Wait and lifecycle correctness | No early response; capacity returns structured `429` when full and recovers; dropped async work releases capacity; started blocking work retains it; graceful exit `0`, deadline/second-signal exit `2` | Rust API/wait/process tests and Docker smoke; existing process tests use a 3-second observation timeout |
 | Recovery runs | Deterministic reservation order; rejected attempts consume no step; finite sequence exhaustion and stale generations reject; reset preserves lifetime budget and TTL; late completions cannot recreate cleared state | `tests/runs.rs` and recovery-inclusive Docker HTTP smoke |
 | Fixtures and faults | Exact fixture bytes and allowed headers; no-header drop; byte-exact truncated prefix with incomplete declared length; rejected inputs consume no state; fault bodies retain capacity; late injection cannot restore cleared receipts | `tests/fixtures.rs`, `tests/transport.rs`, `tests/fault_lifecycle.rs`, transport unit tests and Docker client checks |
@@ -91,7 +104,8 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Local HTTP regression | 64 requests on each of 4 routes at concurrency 16 and 40-ms delay: 256 valid responses, zero unexpected statuses/timeouts/transport errors; per-route p95 client overhead ≤250 ms; every health probe ≤250 ms | `scripts/alpha-smoke.py`; two Tokio workers, loopback, two-second request timeout; nearest-rank p95 includes HTTP client/network overhead |
 | Admission recovery | For every method, prove capacity-one rejection during a 300-ms wait, health stays ≤250 ms while occupied, and a real simulation succeeds within 1,300 ms of the admitted attempt's launch | Separate process in alpha smoke; tests ordinary completion, while Rust tests cover cancellation semantics |
 | Retry-client example | Both three-attempt sequences recover and repeat after reset; exact fixture bytes and observed faults match; stale generations consume no step; receipts correlate; owned runs are deleted | `examples/retry-client.py --binary target/release/sleepapi` in stable CI; synthetic Python-client evidence, separate from external client acceptance |
-| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown smoke | `ci.yml`, followed by an annotated tag on that same commit and fresh public tagged-source installation |
+| Metadata and capability client | Bounded no-store response derived from enforced limits; read-only and responsive at full capacity; accurate HTTP/1.1/listener fault flags; strict boolean capabilities and supported/unsupported/unknown results; no verified-identity claim | Rust metadata regressions, Python capability-client tests, and `scripts/docker-smoke.py IMAGE --metadata` in both native Docker CI jobs; older alpha.4 must be checked without the flag |
+| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | Candidate PR checks first; after separate merge/publication decisions, exact-commit main CI, immutable tag, fresh public source install, and verified anonymous image pulls. Publication smoke currently omits `--metadata`, so check downloaded alpha.5 images with it separately |
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
@@ -100,6 +114,13 @@ descriptive baseline for their recorded setup; they do not introduce release
 budgets or production SLOs.
 
 ## Development coverage after alpha.4
+
+The current implementation baseline has 96 Rust and 45 Python tests. Metadata
+coverage checks declarations, configured limits, listener/protocol context,
+capacity independence, and unchanged run state. Capability-client tests include
+older-server `404`, unknown schema/contract, missing or malformed fields,
+additive metadata, and explicit false values. These checks are synthetic
+compatibility evidence; they do not authenticate the responding artifact.
 
 The [retry-client example](client-acceptance.md) and five Python guard tests add
 repeatable consumer observations without changing the server. The guard tests
@@ -116,7 +137,7 @@ pending state; the barrier-based wait unit test separately proves the semantics
 of already-started blocking work. These tests do not promise immediate detection
 of every client disconnect. Windows remains unverified.
 
-## Alpha.4 implementation baseline — 2026-10-29
+## Alpha.4 implementation baseline — 2026-10-29 (historical)
 
 The merged fixture and transport-fault baseline,
 [`535301ac7c4d2adcc6a8d33a6f121c71d5247d96`](https://github.com/givtaj/sleepapi/commit/535301ac7c4d2adcc6a8d33a6f121c71d5247d96),
@@ -134,10 +155,11 @@ external client acceptance or a security audit.
 
 Automated coverage includes real TCP faults, exact response bytes, fault-body
 cancellation and capacity, and reset/deletion/expiry/receipt-eviction isolation.
-These results validate the implementation baseline. The later alpha.4
-version and documentation commit must pass all four CI jobs itself before an
-annotated release tag or publication. Fresh tagged-source installation remains a
-separate gate; record its result in the alpha.4 prerelease notes.
+These results validated the implementation baseline. At that assessment, the
+later alpha.4 version and documentation commit still needed its own CI and
+fresh tagged-source installation before publication. The completed release
+record is in the [alpha.4 prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
+This historical baseline does not validate the alpha.5 candidate.
 
 ## Alpha.3 preparation evidence (historical)
 
@@ -145,7 +167,7 @@ The merged implementation and documentation baseline,
 `e325cc94a6b0bb3ca0d4c153a88a79c8dc88ff50`, passed
 [all four CI jobs](https://github.com/givtaj/sleepapi/actions/runs/40708257954).
 That evidence covered recovery runs and their completed release review before
-the alpha.3 version and documentation update. It does not validate alpha.4.
+the alpha.3 version and documentation update. It does not validate later candidates.
 
 The [alpha.1 local receipt](release-evidence/2026-10-26/README.md) remains a
 historical record. Alpha.3's final CI, alpha smoke, and fresh-install results
@@ -183,19 +205,11 @@ prerelease. The review itself did not publish that release, and its CI results
 did not validate the later alpha.3 preparation commit. Windows and production
 capacity remain unverified.
 
-## Alpha.4 release completion sequence
+## Current next step
 
-1. Review and merge the prepared candidate after its PR checks pass. Set the
-   actual changelog release date and update publication wording before the final
-   commit; then require all four `main` CI jobs green on that commit.
-2. Create immutable annotated tag `v0.1.1-alpha.4` at the tested commit. Follow
-   [Releasing](RELEASING.md) to verify a fresh public tagged checkout and Docker
-   build, HTTP/shutdown smoke, and the source archive.
-3. Publish the GitHub **prerelease**, recording the full commit, CI URL, smoke
-   receipt, installation result, and platform limitations. Verify signed-out
-   access before announcing it.
-
-Record the completed sequence in the alpha.4 GitHub prerelease notes without
-changing the immutable release commit to insert its own SHA. Until those results
-exist, the implementation baseline is not final release evidence. Earlier
-releases remain available; this release has no hosted deployment.
+Review the alpha.5 preparation PR and require passing CI on its exact head.
+Keep it unmerged until the maintainer decides to proceed. If release work is
+approved later, follow [Releasing](RELEASING.md#release-sequence) for the resulting
+main commit, new tag, fresh installation, and publication evidence. Do not retag
+alpha.4 or replace its image, and keep the published quickstart on alpha.4 until
+the new artifacts exist and are verified.

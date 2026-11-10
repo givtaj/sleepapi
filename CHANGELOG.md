@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.1.1-alpha.5 — Unreleased candidate
+
+This section describes the prepared source candidate, not a published release.
+The public quickstart still uses alpha.4; no alpha.5 tag, release, or registry
+image has been published.
 
 ### Added
 
@@ -8,18 +12,26 @@
   and configured limits, plus a loopback capability-check client with explicit
   supported, unsupported, and unknown results. This is an unreleased source
   addition; the published alpha.4 tag and image remain unchanged.
-- Versioned GHCR container publication for Linux AMD64 and ARM64, with native
-  build/smoke checks, source revision labels, and anonymous pull verification.
-- A prebuilt-image quickstart, with source builds retained as an alternative.
 - A runnable Python retry client with bounded retries, exact fixture validation,
   client-observed transport failures, separate receipts, and reset/replay checks.
 - Real TCP disconnect regressions for ordinary recovery attempts, covering
   sequence consumption, cancellation/capacity, and reset/deletion cleanup.
 
+### Distribution and onboarding
+
+- Include the versioned GHCR publication workflow in the source candidate, with
+  native AMD64/ARM64 build/smoke checks, source revision labels, and anonymous
+  pull verification. The already-published alpha.4 images were backfilled from
+  their unchanged source tag; this candidate does not replace those images.
+- A prebuilt-image quickstart, with source builds retained as an alternative.
+- A contribution guide and focused bug-report and feature-request templates.
+
 ### Documentation
 
 - Correct recovery-run response and receipt descriptions for alpha.4 fixtures
   and transport faults, and document consumer acceptance of the pinned release.
+- Add the reproducible Linux ARM64 benchmark and its retained verification
+  evidence; its measurements describe the recorded source and workload.
 
 ## 0.1.1-alpha.4 — 2026-10-29
 

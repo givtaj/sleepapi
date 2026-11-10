@@ -4,12 +4,14 @@
 starting a test. It returns `200` JSON with `Cache-Control: no-store`, without
 consuming simulation capacity, creating a run, or changing existing runs.
 
-This endpoint and its example client are **unreleased source additions**. The
+This endpoint and its example client are included in the **unreleased
+`0.1.1-alpha.5` source candidate**. The
 published `v0.1.1-alpha.4` source tag and
 `ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` image do not contain `/metadata`.
-Build the current checkout to try it. The package version remains
-`0.1.1-alpha.4` during development, so a version string alone cannot tell a
-client whether this endpoint or a particular feature is present.
+Build the candidate checkout to try it; its declared Cargo package version is
+`0.1.1-alpha.5`. No alpha.5 tag, release, or registry image is published yet.
+Use explicit capability discovery rather than inferring support from a version
+string, and verify artifact provenance separately.
 
 ## Try the current source
 

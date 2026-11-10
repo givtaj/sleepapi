@@ -376,10 +376,10 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | `DELETE /runs/{run_id}` | Remove a run and its retained state |
 
 The read-only [metadata endpoint and capability-check example](docs/server-metadata.md)
-are available in the current source checkout. They are not included in the
-published alpha.4 tag or image used by the quickstart; build this checkout to try
+are included in the **unreleased alpha.5 source candidate**. They are not included
+in the published alpha.4 tag or image used by the quickstart; build this checkout to try
 them. Check explicit capabilities rather than inferring support from the package
-version, which remains `0.1.1-alpha.4` during development.
+version; metadata is a declaration, not verified binary or image provenance.
 
 The stateless sleep and simulation POST endpoints accept `scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
 defaults. The four named `/sleep/...` endpoints fix the waiting method in the
@@ -589,6 +589,11 @@ scenario presets (`src/scenario.rs`), error responses (`src/error.rs`),
 and server startup/shutdown (`src/main.rs`).
 
 ## Release status
+
+The current source is the **unreleased `0.1.1-alpha.5` candidate**, adding
+versioned [server metadata and capability checks](docs/server-metadata.md).
+Candidate preparation does not create a public tag, release, or image. Build
+this checkout to try it; the public quickstart remains pinned to alpha.4.
 
 **v0.1.1-alpha.4** is an alpha release with source, a Dockerfile, and versioned
 prebuilt Linux AMD64/ARM64 images. It includes
