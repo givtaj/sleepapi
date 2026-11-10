@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "target_release": "v0.1.1-alpha.4",
+  "server_version_verified": false,
+  "observed_at": "2026-11-10T14:08:59.306530+00:00",
+  "scope": "synthetic retry-client example; not external client acceptance",
+  "passed": true,
+  "policy": {
+    "max_attempts": 3,
+    "request_timeout_seconds": 2,
+    "max_response_body_bytes": 65536,
+    "fault_backoff_seconds": 0.05
+  },
+  "cases": [
+    {
+      "name": "status_recovery",
+      "passed": true,
+      "generations": [
+        {
+          "generation": 1,
+          "client_attempts": [
+            {
+              "attempt": 1,
+              "kind": "response",
+              "http_status": 503,
+              "body_hex": "7b20227265616479223a2066616c73652c2022617474656d7074223a2031207d0a",
+              "elapsed_ms": 13.407,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 33,
+              "retry_delay_ms": 0
+            },
+            {
+              "attempt": 2,
+              "kind": "response",
+              "http_status": 503,
+              "body_hex": "7b20227265616479223a2066616c73652c2022617474656d7074223a2032207d0a",
+              "elapsed_ms": 13.018,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 33,
+              "retry_delay_ms": 0
+            },
+            {
+              "attempt": 3,
+              "kind": "response",
+              "http_status": 200,
+              "body_hex": "7b20227265616479223a20747275652c20226d657373616765223a2022636166c3a922207d0a",
+              "elapsed_ms": 13.398,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 38,
+              "consumer_ready": true
+            }
+          ],
+          "server_receipts": {
+            "generation": 1,
+            "receipts": [
+              {
+                "attempt": 1,
+                "elapsed_ms": 11.693666,
+                "generation": 1,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 503,
+                "sequence_step": 1
+              },
+              {
+                "attempt": 2,
+                "elapsed_ms": 11.359582999999999,
+                "generation": 1,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 503,
+                "sequence_step": 2
+              },
+              {
+                "attempt": 3,
+                "elapsed_ms": 11.541459,
+                "generation": 1,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 200,
+                "sequence_step": 3
+              }
+            ],
+            "run_id": "run-1"
+          }
+        },
+        {
+          "generation": 2,
+          "client_attempts": [
+            {
+              "attempt": 1,
+              "kind": "response",
+              "http_status": 503,
+              "body_hex": "7b20227265616479223a2066616c73652c2022617474656d7074223a2031207d0a",
+              "elapsed_ms": 13.105,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 33,
+              "retry_delay_ms": 0
+            },
+            {
+              "attempt": 2,
+              "kind": "response",
+              "http_status": 503,
+              "body_hex": "7b20227265616479223a2066616c73652c2022617474656d7074223a2032207d0a",
+              "elapsed_ms": 13.89,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 33,
+              "retry_delay_ms": 0
+            },
+            {
+              "attempt": 3,
+              "kind": "response",
+              "http_status": 200,
+              "body_hex": "7b20227265616479223a20747275652c20226d657373616765223a2022636166c3a922207d0a",
+              "elapsed_ms": 15.793,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 38,
+              "consumer_ready": true
+            }
+          ],
+          "server_receipts": {
+            "generation": 2,
+            "receipts": [
+              {
+                "attempt": 1,
+                "elapsed_ms": 11.660791999999999,
+                "generation": 2,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 503,
+                "sequence_step": 1
+              },
+              {
+                "attempt": 2,
+                "elapsed_ms": 11.176167000000001,
+                "generation": 2,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 503,
+                "sequence_step": 2
+              },
+              {
+                "attempt": 3,
+                "elapsed_ms": 13.911583,
+                "generation": 2,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 200,
+                "sequence_step": 3
+              }
+            ],
+            "run_id": "run-1"
+          }
+        }
+      ],
+      "cleanup": "deleted_and_absent",
+      "run_id": "run-1",
+      "reset_replay_passed": true
+    },
+    {
+      "name": "transport_recovery",
+      "passed": true,
+      "generations": [
+        {
+          "generation": 1,
+          "client_attempts": [
+            {
+              "attempt": 1,
+              "kind": "connection_drop",
+              "http_status": null,
+              "body_hex": "",
+              "elapsed_ms": 14.692,
+              "exception": "RemoteDisconnected",
+              "retry_delay_ms": 50
+            },
+            {
+              "attempt": 2,
+              "kind": "truncated_response",
+              "http_status": 200,
+              "body_hex": "7b20227265616479223a2074",
+              "elapsed_ms": 13.628,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 38,
+              "retry_delay_ms": 50
+            },
+            {
+              "attempt": 3,
+              "kind": "response",
+              "http_status": 200,
+              "body_hex": "7b20227265616479223a20747275652c20226d657373616765223a20227265636f766572656422207d0a",
+              "elapsed_ms": 13.205,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 42,
+              "consumer_ready": true
+            }
+          ],
+          "server_receipts": {
+            "generation": 1,
+            "receipts": [
+              {
+                "attempt": 1,
+                "elapsed_ms": 12.849499999999999,
+                "fault": {
+                  "type": "connection_drop"
+                },
+                "generation": 1,
+                "injected_body_bytes": 0,
+                "injection_stage": "before_headers",
+                "method": "tokio_sleep",
+                "outcome": "fault_injected",
+                "requested_duration_ms": 10,
+                "selected_status_code": 503,
+                "sequence_step": 1
+              },
+              {
+                "attempt": 2,
+                "elapsed_ms": 11.814833,
+                "fault": {
+                  "after_bytes": 12,
+                  "type": "truncated_response"
+                },
+                "generation": 1,
+                "injected_body_bytes": 12,
+                "injection_stage": "after_body_prefix",
+                "method": "tokio_sleep",
+                "outcome": "fault_injected",
+                "requested_duration_ms": 10,
+                "selected_status_code": 200,
+                "sequence_step": 2
+              },
+              {
+                "attempt": 3,
+                "elapsed_ms": 11.318625,
+                "generation": 1,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 200,
+                "sequence_step": 3
+              }
+            ],
+            "run_id": "run-2"
+          }
+        },
+        {
+          "generation": 2,
+          "client_attempts": [
+            {
+              "attempt": 1,
+              "kind": "connection_drop",
+              "http_status": null,
+              "body_hex": "",
+              "elapsed_ms": 13.178,
+              "exception": "RemoteDisconnected",
+              "retry_delay_ms": 50
+            },
+            {
+              "attempt": 2,
+              "kind": "truncated_response",
+              "http_status": 200,
+              "body_hex": "7b20227265616479223a2074",
+              "elapsed_ms": 15.644,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 38,
+              "retry_delay_ms": 50
+            },
+            {
+              "attempt": 3,
+              "kind": "response",
+              "http_status": 200,
+              "body_hex": "7b20227265616479223a20747275652c20226d657373616765223a20227265636f766572656422207d0a",
+              "elapsed_ms": 15.124,
+              "fixture_bytes_match": true,
+              "declared_body_bytes": 42,
+              "consumer_ready": true
+            }
+          ],
+          "server_receipts": {
+            "generation": 2,
+            "receipts": [
+              {
+                "attempt": 1,
+                "elapsed_ms": 11.686792,
+                "fault": {
+                  "type": "connection_drop"
+                },
+                "generation": 2,
+                "injected_body_bytes": 0,
+                "injection_stage": "before_headers",
+                "method": "tokio_sleep",
+                "outcome": "fault_injected",
+                "requested_duration_ms": 10,
+                "selected_status_code": 503,
+                "sequence_step": 1
+              },
+              {
+                "attempt": 2,
+                "elapsed_ms": 13.831459,
+                "fault": {
+                  "after_bytes": 12,
+                  "type": "truncated_response"
+                },
+                "generation": 2,
+                "injected_body_bytes": 12,
+                "injection_stage": "after_body_prefix",
+                "method": "tokio_sleep",
+                "outcome": "fault_injected",
+                "requested_duration_ms": 10,
+                "selected_status_code": 200,
+                "sequence_step": 2
+              },
+              {
+                "attempt": 3,
+                "elapsed_ms": 12.818917,
+                "generation": 2,
+                "method": "tokio_sleep",
+                "outcome": "completed",
+                "requested_duration_ms": 10,
+                "selected_status_code": 200,
+                "sequence_step": 3
+              }
+            ],
+            "run_id": "run-2"
+          }
+        }
+      ],
+      "cleanup": "deleted_and_absent",
+      "run_id": "run-2",
+      "reset_replay_passed": true
+    }
+  ]
+}

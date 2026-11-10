@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "scope": "Unpublished alpha.5 candidate; clean commit-addressed source installation, not tagged-release installation or customer acceptance",
+  "observed_at": "2026-11-10T14:09:00.061593+00:00",
+  "candidate": {
+    "version": "0.1.1-alpha.5",
+    "commit": "de5627693c1ac24372bf209110d9acd2c11d1585",
+    "tree": "04e0a15e12d5c5c4cb649af1b76556db74af97b3"
+  },
+  "source": {
+    "url": "https://codeload.github.com/givtaj/sleepapi/tar.gz/de5627693c1ac24372bf209110d9acd2c11d1585",
+    "anonymous_download": true,
+    "archive_sha256": "4cf8004cf9c74dc745d976da45ffbf4af7bdb86172a628173fd0336ee4cda1a6",
+    "all_tracked_files_matched": 551,
+    "target_directory_present_before_build": false,
+    "source_unchanged_after_checks": true
+  },
+  "environment": {
+    "host": "macOS 26.0.1 ARM64",
+    "docker_desktop": "4.93.0",
+    "docker_engine": "29.8.1",
+    "container_platform": "linux/arm64",
+    "platform_override": false,
+    "builder_rust": "1.94.0",
+    "python": "3.9.6"
+  },
+  "build": {
+    "command_template": "docker build --pull --no-cache --progress=plain --iidfile IMAGE_ID_FILE -t LOCAL_IMAGE .",
+    "command_template_note": "Task-owned output paths and local image tag normalized; original flags preserved.",
+    "exit_code": 0,
+    "application_build_layers_reused": false,
+    "dependencies_downloaded_afresh": true,
+    "base_layers_may_be_reused": true,
+    "builder_base": "rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62",
+    "runtime_base": "debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc"
+  },
+  "artifact": {
+    "image_id": "sha256:adbe14d99ed68cae7ab6d2bacb43e006590e1137866c16ead859f3385c97fd4a",
+    "binary_sha256": "e3c64c1435b02e13645b384d38b4d5ee584f9b5db802c24adb2aa987cb7e006c",
+    "non_root_user": "65532:65532",
+    "metadata_software": {
+      "name": "sleepapi",
+      "version": "0.1.1-alpha.5"
+    },
+    "metadata_is_self_declaration": true,
+    "source_build_image_binding_verified": true
+  },
+  "checks": {
+    "docker_smoke_with_metadata": "PASS",
+    "retry_status_recovery_and_reset_replay": "PASS",
+    "retry_transport_recovery_and_reset_replay": "PASS",
+    "normal_shutdown_exit_code": 0,
+    "incomplete_request_deadline_exit_code": 2,
+    "docker_sigkill_used_for_deadline": false,
+    "independent_receipt_review": "PASS"
+  },
+  "cleanup": {
+    "all_owned_runs_deleted_and_absent": true,
+    "remaining_candidate_containers": [],
+    "errors": []
+  },
+  "hosted_ci": {
+    "commit": "de5627693c1ac24372bf209110d9acd2c11d1585",
+    "url": "https://github.com/givtaj/sleepapi/actions/runs/42823594104",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Docker / linux/arm64",
+        "url": "https://github.com/givtaj/sleepapi/actions/runs/42823594104/job/129855021481",
+        "conclusion": "success"
+      },
+      {
+        "name": "Linux / Rust stable",
+        "url": "https://github.com/givtaj/sleepapi/actions/runs/42823594104/job/129855022069",
+        "conclusion": "success"
+      },
+      {
+        "name": "Docker / linux/amd64",
+        "url": "https://github.com/givtaj/sleepapi/actions/runs/42823594104/job/129855022229",
+        "conclusion": "success"
+      },
+      {
+        "name": "Linux / Rust 1.94.0",
+        "url": "https://github.com/givtaj/sleepapi/actions/runs/42823594104/job/129855022614",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "not_run": [
+    "Tagged alpha.5 source installation: no tag exists",
+    "Published alpha.5 release access",
+    "Fresh local AMD64 install: exact-commit hosted CI covers AMD64",
+    "Native macOS build in this verification",
+    "Windows host or native Windows",
+    "Updater/rollback",
+    "Customer acceptance"
+  ],
+  "publication": {
+    "tag_created": false,
+    "release_published": false,
+    "docker_image_published": false
+  },
+  "original_evidence_sha256": {
+    "source-manifest.json": "b722291d5bd5aa64b6bdebc1695cf7ed5d31f7ef63549d75681e707fb6b1ba66",
+    "build.log": "bb66e823b6659f1063ea3b93022c7ab8c708fa44fe83b15ba827c7ada7cdb035",
+    "build-receipt.json": "69f4e006d85edb3939b189f3e317f0126136ddb1e3e6d272ac85130f5d50288b",
+    "install-receipt.json": "bfe9a260b5e8ddae286c7d0de5487f6c4f353e570b00fa093b85620b90f1632e",
+    "image-inspect.json": "ecea4c5066cb5dc8a6c2e56a41963201bacf7077ba4cba947a4f5f696afd1aca",
+    "ci-verification.json": "594f32b2cd2f7b22a825634a636433fd87bc4f9aa1c1157e4375135c55266983",
+    "independent-review.json": "951427d502678fc78a2480fca43413fb41c21837050598488616e6dc979ee73e"
+  },
+  "passed": true
+}
