@@ -2,9 +2,10 @@
 """Exercise alpha.4 recovery with a bounded HTTP/1.1 retry client.
 
 Uses only Python 3.9+ standard-library modules. Run against a tagged local
-installation, or pass --binary to own a temporary loopback server. The API does
-not expose a version: target_release identifies this example's contract, not a
-verified server version. This is synthetic client evidence, not client sign-off.
+installation, or pass --binary to own a temporary loopback server. This example
+does not query metadata: target_release identifies its alpha.4-compatible
+contract, not a verified server version. This is synthetic client evidence, not
+client sign-off.
 """
 
 import argparse

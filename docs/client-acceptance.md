@@ -22,8 +22,11 @@ python3 examples/retry-client.py \
 Choose unused checkout and output paths. Native builds require Rust 1.94 or
 newer. `--binary` launches an owned server on an ephemeral loopback port, drains
 its logs, and stops it when the example finishes. The result records the binary's
-SHA-256. The API does not expose a server version, so the target release label
-identifies the intended contract, not a version detected over HTTP.
+SHA-256. The published alpha.4 server does not expose a version endpoint. The
+unreleased alpha.5 candidate adds [self-reported metadata](server-metadata.md),
+but this retry example intentionally remains compatible with older servers and
+does not query it. Its `target_release` label identifies the alpha.4-compatible
+contract being exercised; it does not detect or verify the running version.
 
 Alternatively, start the [tagged Docker build](../README.md#run-with-docker) and
 run the example from your current checkout:
