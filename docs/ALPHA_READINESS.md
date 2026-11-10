@@ -3,29 +3,31 @@
 Assessment date: 2026-11-10 (Europe/Madrid). Current candidate:
 **`0.1.1-alpha.5` — unreleased**. This candidate adds
 [read-only server metadata and a capability-check client](server-metadata.md),
-alongside the development coverage and distribution work since alpha.4.
+alongside development coverage since alpha.4. Distribution is source plus a
+Dockerfile; users build their own image with Docker's machine defaults.
 
 The implementation baseline
 [`a833eecfe6b7268378a3c3ae17b59d62ede2b115`](https://github.com/givtaj/sleepapi/commit/a833eecfe6b7268378a3c3ae17b59d62ede2b115)
 passed [main CI run 42786430040](https://github.com/givtaj/sleepapi/actions/runs/42786430040),
 including 96 Rust tests, 45 Python tests, and both native Linux Docker jobs.
-This is implementation evidence before the alpha.5 version and documentation
-changes. Candidate-head review and CI must pass independently; record their
+This historical evidence predates the alpha.5 version/documentation changes and
+removal of container-publication tooling. The current suite has 96 Rust and 37
+Python tests; eight publication-tool tests were removed with that tooling.
+Candidate-head review and CI must pass independently; record their
 results in the candidate PR. They must not be inferred from the earlier green baseline.
 
 Preparation stops at a reviewed, unmerged PR with passing checks. Merging,
 tagging, fresh tagged-source installation, and publication remain separate
-steps in [Releasing](RELEASING.md). Publishing a GitHub release starts container
-publication automatically; no alpha.5 release or image is established by this
-readiness document.
+steps in [Releasing](RELEASING.md). This candidate has no image-publication
+workflow; a future release from it publishes source and a Dockerfile. No alpha.5
+publication is established by this readiness document.
 
-The published [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
-and `ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` remain available and are the current
-quickstart/fallback. Their `/metadata` route returns `404`; that does not mean
-their existing recovery or fixture features are unsupported. Container
-publication added artifacts without changing the immutable alpha.4 source tag.
-See the [container publication procedure](RELEASING.md#publish-versioned-container-images)
-for source identity, native smoke checks, and anonymous pulls.
+The published [alpha.4 source release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+remains the quickstart/fallback for a local Docker build. Its `/metadata` route
+returns `404`; that does not mean its existing recovery or fixture features are
+unsupported. Historical alpha.4 image-publication evidence remains in its
+release record. This candidate does not alter old tags or delete existing
+registry artifacts.
 
 ## Historical background before alpha.5
 
@@ -54,9 +56,9 @@ historical release evidence below covers its original 58-test source only.
 
 ## Alpha.5 candidate scope
 
-- Local developer tool, source plus Dockerfile and versioned container
-  distribution. Linux AMD64 and ARM64 are the container targets; macOS native
-  execution is a local verification environment. Alpha.5 artifacts are pending.
+- Local developer tool, source plus Dockerfile. Users run `docker build` with
+  their machine's defaults. CI tests Linux AMD64 and ARM64; macOS native
+  execution is a local verification environment. Alpha.5 source publication is pending.
 - Existing HTTP behavior and defaults: four waiting implementations, seven
   scenarios, mock email/SMS labels, 30-second maximum requested wait, 64
   active-wait slots, 8 KiB request body, and five-second shutdown grace.
@@ -75,7 +77,7 @@ historical release evidence below covers its original 58-test source only.
   configured limits; transport-fault flags depend on the actual request protocol
   and instrumented listener. The loopback client distinguishes supported,
   unsupported, and unknown without claiming verified software identity.
-- No hosted-service, production capacity, prebuilt native binary, provider delivery,
+- No new prebuilt registry images, hosted-service, production capacity, native binary downloads, provider delivery,
   background-job, authentication, or Windows verification claim.
 
 The 64-slot default is an admission limit, not a load-tested capacity guarantee.
@@ -95,7 +97,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Gate | Required threshold | Evidence |
 | --- | --- | --- |
 | Defects | Zero unresolved critical/high-severity defects in supported behavior: crashes, hangs, incorrect HTTP contracts, or isolation failures | Review of final diff and failure triage; this is not a claim of a security audit |
-| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current suite has 96 Rust tests, with 45 Python tests in stable CI; published alpha.4 has 86 Rust tests |
+| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current suite has 96 Rust tests, with 37 Python tests in stable CI; published alpha.4 has 86 Rust tests |
 | Wait and lifecycle correctness | No early response; capacity returns structured `429` when full and recovers; dropped async work releases capacity; started blocking work retains it; graceful exit `0`, deadline/second-signal exit `2` | Rust API/wait/process tests and Docker smoke; existing process tests use a 3-second observation timeout |
 | Recovery runs | Deterministic reservation order; rejected attempts consume no step; finite sequence exhaustion and stale generations reject; reset preserves lifetime budget and TTL; late completions cannot recreate cleared state | `tests/runs.rs` and recovery-inclusive Docker HTTP smoke |
 | Fixtures and faults | Exact fixture bytes and allowed headers; no-header drop; byte-exact truncated prefix with incomplete declared length; rejected inputs consume no state; fault bodies retain capacity; late injection cannot restore cleared receipts | `tests/fixtures.rs`, `tests/transport.rs`, `tests/fault_lifecycle.rs`, transport unit tests and Docker client checks |
@@ -105,7 +107,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Admission recovery | For every method, prove capacity-one rejection during a 300-ms wait, health stays ≤250 ms while occupied, and a real simulation succeeds within 1,300 ms of the admitted attempt's launch | Separate process in alpha smoke; tests ordinary completion, while Rust tests cover cancellation semantics |
 | Retry-client example | Both three-attempt sequences recover and repeat after reset; exact fixture bytes and observed faults match; stale generations consume no step; receipts correlate; owned runs are deleted | `examples/retry-client.py --binary target/release/sleepapi` in stable CI; synthetic Python-client evidence, separate from external client acceptance |
 | Metadata and capability client | Bounded no-store response derived from enforced limits; read-only and responsive at full capacity; accurate HTTP/1.1/listener fault flags; strict boolean capabilities and supported/unsupported/unknown results; no verified-identity claim | Rust metadata regressions, Python capability-client tests, and `scripts/docker-smoke.py IMAGE --metadata` in both native Docker CI jobs; older alpha.4 must be checked without the flag |
-| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | Candidate PR checks first; after separate merge/publication decisions, exact-commit main CI, immutable tag, fresh public source install, and verified anonymous image pulls. Publication smoke currently omits `--metadata`, so check downloaded alpha.5 images with it separately |
+| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | Candidate PR checks first; after separate merge/publication decisions, exact-commit main CI, immutable tag, signed-out source access, and a fresh tagged-source Docker build with metadata smoke. No registry publication |
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
@@ -115,7 +117,7 @@ budgets or production SLOs.
 
 ## Development coverage after alpha.4
 
-The current implementation baseline has 96 Rust and 45 Python tests. Metadata
+The current candidate has 96 Rust and 37 Python tests. Metadata
 coverage checks declarations, configured limits, listener/protocol context,
 capacity independence, and unchanged run state. Capability-client tests include
 older-server `404`, unknown schema/contract, missing or malformed fields,
@@ -211,5 +213,5 @@ Review the alpha.5 preparation PR and require passing CI on its exact head.
 Keep it unmerged until the maintainer decides to proceed. If release work is
 approved later, follow [Releasing](RELEASING.md#release-sequence) for the resulting
 main commit, new tag, fresh installation, and publication evidence. Do not retag
-alpha.4 or replace its image, and keep the published quickstart on alpha.4 until
-the new artifacts exist and are verified.
+alpha.4, and keep the source-build quickstart pinned to alpha.4 until the new
+source release exists and its installation is verified.

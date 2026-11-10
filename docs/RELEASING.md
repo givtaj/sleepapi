@@ -2,81 +2,41 @@
 
 The current candidate is **`0.1.1-alpha.5`**, not yet released. Preparation stops
 at a reviewed pull request with passing checks on its exact head. Merging,
-tagging, and publication are separate maintainer decisions. In particular,
-publishing a GitHub release automatically starts the container publication
-workflow; it is not a source-only action.
+tagging, and publication are separate maintainer decisions. This candidate
+ships source and a Dockerfile; it removes container-image publication.
 
 The published [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
-and `ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` remain the installation fallback and
-README quickstart target. They do not include `/metadata`.
+remains the source-build fallback and README quickstart target. Its source
+does not include `/metadata`.
 
 ## Distribution scope
 
 Ship a GitHub source release containing the Rust application, lockfile, Dockerfile,
-tests, and documentation, plus a versioned image at `ghcr.io/givtaj/sleepapi`.
-Users can pull the image or build it themselves. Linux AMD64 and ARM64
-containers run through Docker on Linux, macOS, and Windows with Linux-container
-support. A native Rust build requires Rust 1.94 or newer.
+tests, and documentation. Users build their own image with `docker build` using
+their machine's Docker defaults; installation commands do not override the
+platform. Linux AMD64 and ARM64 containers are tested. Use Docker Engine on
+Linux or Docker Desktop in Linux-container mode on macOS and Windows. A native
+Rust build requires Rust 1.94 or newer.
 
-Ordinary Linux CI builds and tests containers without publishing them. The
-separate [Container images workflow](../.github/workflows/container-images.yml)
-publishes images for existing source releases. Native binary downloads,
+Linux CI builds and tests containers without publishing them. This candidate
+has no container-registry publication workflow: a future source release from
+this candidate does not publish an image. Prebuilt registry images, native binary downloads,
 crates.io publication, and native macOS/Windows CI remain outside this track.
 
-## Publish versioned container images
-
-After publication is approved, publishing a GitHub release runs the Container
-images workflow when the tagged source includes that workflow. A manual
-dispatch is available for an already published source tag whose image version
-has not been published. Set the intended version first:
-
-```sh
-SLEEPAPI_RELEASE_VERSION=0.1.1-alpha.5
-SLEEPAPI_RELEASE_TAG="v${SLEEPAPI_RELEASE_VERSION}"
-gh workflow run container-images.yml --ref main -f tag="$SLEEPAPI_RELEASE_TAG"
-```
-
-These are future publication instructions, not candidate-preparation steps.
-Do not dispatch a second publication for the existing alpha.4 image.
-
-The workflow resolves the tag to one commit and requires successful `main` CI
-on that source, including both Rust and both Docker jobs. It verifies the Cargo
-version, builds on native AMD64/ARM64 runners, and runs `docker-smoke.py` before
-pushing the exact tested images under unique staging tags. Only after both
-architectures pass does it create `ghcr.io/givtaj/sleepapi:<version>` from
-their registry digests. It then pulls anonymously on fresh native runners,
-checks architecture/version/revision/digest, and reruns HTTP and shutdown smoke.
-Pull requests exercise the build/test path without registry writes.
-
-The workflow uses the repository's `GITHUB_TOKEN` with `packages: write` for
-publishing; no personal registry secret is required. On the **first publication**,
-GHCR creates a private package. Set the SleepAPI package visibility to **Public**
-in its GitHub package settings. Promotion intentionally fails until both staging
-images can be read anonymously. After changing visibility, rerun failed jobs;
-keep the successful build jobs and their digest artifacts.
-
-Version tags omit the source tag's leading `v`; no `latest` alias is published.
-The workflow serializes publications and refuses to replace an existing version.
-Authentication and network failures never count as proof that a tag is absent.
-An interrupted promotion can resume without writing the tag again only when the
-existing manifest references the exact two tested digests from that run.
-This is a workflow guard, not registry-enforced immutability: retain the recorded
-manifest digest for exact artifact pinning. A rebuilt image needs a new version.
-
-If post-publication verification fails, investigate and rerun only the failed
-verification jobs; do not overwrite the version. Save the workflow URL, source
-SHA, manifest/platform digests from `container-release.json`, and both anonymous
-verification results in the release notes. Staging tags use
-`build-<run-id>-<attempt>-<architecture>` and are not installation instructions.
+Previously published alpha.4 source and image evidence remains historical.
+Removing the publication workflow here does not change old tags, their files,
+or existing registry artifacts. Do not republish an old tag to apply this policy.
 
 ## Release evidence
 
 The alpha.5 implementation baseline
 [`a833eecfe6b7268378a3c3ae17b59d62ede2b115`](https://github.com/givtaj/sleepapi/commit/a833eecfe6b7268378a3c3ae17b59d62ede2b115)
 passed [main CI run 42786430040](https://github.com/givtaj/sleepapi/actions/runs/42786430040).
-It includes 96 Rust and 45 Python tests. That run validates the implementation
-before the alpha.5 version and documentation changes; it does not validate this
-candidate's final head. Record candidate checks in its PR, then require a new
+That historical run included 96 Rust and 45 Python tests. The current candidate
+has 96 Rust and 37 Python tests after removing eight container-publication tests
+with the publication tooling. The baseline run predates these removals and the
+alpha.5 version/documentation changes; it does not validate this candidate's
+final head. Record candidate checks in its PR, then require a new
 `main` run on the resulting commit if a merge is later approved. Tagging, fresh
 tagged-source installation, and publication remain separate
 [alpha gates](ALPHA_READINESS.md).
@@ -108,16 +68,15 @@ also cover preset definitions, validation, concurrency, cancellation, and parkin
 through early wakes. These checks are functional verification, not a throughput
 benchmark or proof of production-scale capacity. For alpha.5, pass `--metadata`
 to also check metadata and the capability client. Omit that flag for alpha.4,
-whose `/metadata` route returns `404`. The container publication workflow's
-smoke calls currently omit the flag; record an additional metadata-enabled
-check against the downloaded alpha.5 artifact before announcing it.
+whose `/metadata` route returns `404`. Verify the image built from a fresh
+tagged-source checkout before announcing the source release.
 
 Use this checklist for each release and include the final results in its notes:
 
 | Required check | Completion evidence |
 | --- | --- |
 | Release candidate committed and pushed | Full commit SHA and source link |
-| Linux / Rust stable | Successful CI job including formatting, lint, 96 Rust/45 Python tests, build, alpha smoke, retry-client example, and packaging |
+| Linux / Rust stable | Successful CI job including formatting, lint, 96 Rust/37 Python tests, build, alpha smoke, retry-client example, and packaging |
 | Linux / Rust 1.94.0 | Successful CI job including lint, tests, and build |
 | Docker / linux/amd64 | Successful native build and container smoke checks, including `--metadata` for alpha.5 |
 | Docker / linux/arm64 | Successful native build and container smoke checks, including `--metadata` for alpha.5 |
@@ -130,7 +89,7 @@ Use this checklist for each release and include the final results in its notes:
 1. **Prepare and review one candidate.** Choose a new, unused version and match
    `Cargo.toml` and the root package in `Cargo.lock`. Keep its changelog entry
    marked unreleased until publication is scheduled. Update candidate scope and
-   readiness, while retaining the currently published image in the quickstart.
+   readiness, while retaining the currently published source tag in the quickstart.
    Open a PR and require review plus passing CI on its exact head. This is the
    stopping point for candidate preparation; it does not merge or publish.
 
@@ -161,15 +120,17 @@ Use this checklist for each release and include the final results in its notes:
 
 4. **Verify the published source path before announcing the release.** In a
    fresh directory, use the README's version-pinned clone and Docker commands,
-   substituting the chosen source tag and local image tag
-   `sleepapi:${SLEEPAPI_RELEASE_VERSION}`.
-   Confirm `GET /health` returns `{"status":"ok"}` and a POST simulation waits
-   and returns its documented JSON. Run the existing container checks against
-   that locally built image:
+   substituting the chosen source tag. Build the checkout using Docker's default
+   platform and a local image tag:
 
    ```sh
-   python3 scripts/docker-smoke.py "sleepapi:${SLEEPAPI_RELEASE_VERSION}" --metadata
+   docker build -t sleepapi:dev .
+   python3 scripts/docker-smoke.py sleepapi:dev --metadata
    ```
+
+   Confirm `GET /health` returns `{"status":"ok"}` and a POST simulation waits
+   and returns its documented JSON; the smoke script checks these behaviors and
+   metadata against the locally built image.
 
    This needs Docker and Python 3. The test creates and cleans up only its own
    temporary containers. Also check the GitHub source archive contains the
@@ -179,10 +140,9 @@ Use this checklist for each release and include the final results in its notes:
 5. **Publish the approved GitHub prerelease using the tested tag.** Use the tag as
    the title, enable the prerelease flag, summarize the changes and limits, and link the
    README's Docker instructions. [GitHub provides source archives](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases).
-   This triggers container publication automatically. Complete its native and
-   anonymous verification, plus metadata smoke on the downloaded alpha.5 images,
-   before announcing them or moving the quickstart to the new version. Verify
-   the release and source links in a signed-out view.
+   Publish source and the Dockerfile, with no registry image. After verifying
+   signed-out release/source access and the fresh source-build installation,
+   update the quickstart's pinned source tag to the new version.
 
 6. **Record completion.** Put the released commit, successful CI run, release URL,
    and fresh-install result in the GitHub prerelease notes linked from the
@@ -223,14 +183,12 @@ GitHub prerelease notes and fill every field from actual results:
 - Annotated tag target equals the tested SHA: pending.
 - Fresh tagged-source Docker build and smoke, platform, date: pending.
 - Signed-out release and source-archive verification: pending.
-- Container workflow URL, manifest/platform digests, source SHA: pending.
-- Anonymous AMD64/ARM64 pulls and smoke results: pending.
-- Metadata-enabled smoke and capability-client results on downloaded images: pending.
-- Distribution: source plus Dockerfile and versioned container; Windows remains unverified.
+- Metadata-enabled smoke and capability-client results on the locally built image: pending.
+- Distribution: source plus Dockerfile; Windows remains unverified.
 
 A green PR run makes the candidate reviewable. After merging, require a green
 `main` run for the resulting commit before tagging. Any subsequent source,
 version, workflow, or documentation edit creates a new candidate. A published
 release is immutable: corrections use a new version. If installation fails,
-stop publication and use the published `v0.1.1-alpha.4` source tag or
-`ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` image while preparing a new version.
+stop publication and build the published `v0.1.1-alpha.4` source tag locally
+while preparing a new version.

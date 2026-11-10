@@ -6,10 +6,10 @@ consuming simulation capacity, creating a run, or changing existing runs.
 
 This endpoint and its example client are included in the **unreleased
 `0.1.1-alpha.5` source candidate**. The
-published `v0.1.1-alpha.4` source tag and
-`ghcr.io/givtaj/sleepapi:0.1.1-alpha.4` image do not contain `/metadata`.
+published `v0.1.1-alpha.4` source tag does not contain `/metadata`.
 Build the candidate checkout to try it; its declared Cargo package version is
-`0.1.1-alpha.5`. No alpha.5 tag, release, or registry image is published yet.
+`0.1.1-alpha.5`. No alpha.5 tag or release is published yet. Distribution is
+source plus a Dockerfile for local builds; new registry images will not be published.
 Use explicit capability discovery rather than inferring support from a version
 string, and verify artifact provenance separately.
 

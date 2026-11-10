@@ -3,8 +3,8 @@
 ## 0.1.1-alpha.5 — Unreleased candidate
 
 This section describes the prepared source candidate, not a published release.
-The public quickstart still uses alpha.4; no alpha.5 tag, release, or registry
-image has been published.
+The public quickstart builds alpha.4 from source; no alpha.5 tag or release
+has been published.
 
 ### Added
 
@@ -19,11 +19,12 @@ image has been published.
 
 ### Distribution and onboarding
 
-- Include the versioned GHCR publication workflow in the source candidate, with
-  native AMD64/ARM64 build/smoke checks, source revision labels, and anonymous
-  pull verification. The already-published alpha.4 images were backfilled from
-  their unchanged source tag; this candidate does not replace those images.
-- A prebuilt-image quickstart, with source builds retained as an alternative.
+- Distribute source plus the Dockerfile. The quickstart builds the pinned source
+  locally with Docker's configured platform defaults; CI still tests native
+  Linux AMD64 and ARM64 images without publishing them.
+- Remove the registry-image publication workflow, its helper, and the eight
+  publication-only regression tests. Existing alpha.4 images and their release
+  evidence remain historical artifacts; new images will not be published.
 - A contribution guide and focused bug-report and feature-request templates.
 
 ### Documentation
