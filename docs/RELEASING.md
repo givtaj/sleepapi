@@ -1,9 +1,11 @@
 # Releasing SleepAPI
 
-The current candidate is **`0.1.1-alpha.5`**, not yet released. Preparation stops
-at a reviewed pull request with passing checks on its exact head. Merging,
-tagging, and publication are separate maintainer decisions. This candidate
-ships source and a Dockerfile; it removes container-image publication.
+The current candidate is **`0.1.1-alpha.5` — merged, not yet released**.
+[PR #20](https://github.com/givtaj/sleepapi/pull/20) merged on 10 November 2026,
+and all four main CI jobs passed on its merge commit. The maintainer authorized
+integration while keeping alpha.5 unreleased. Tagging and source publication
+remain separate, unapproved steps. Distribution is source plus a Dockerfile for
+local builds using Docker's defaults; Docker image publication is disabled.
 
 The published [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
 remains the source-build fallback and README quickstart target. Its source
@@ -29,17 +31,19 @@ or existing registry artifacts. Do not republish an old tag to apply this policy
 
 ## Release evidence
 
-The alpha.5 implementation baseline
-[`a833eecfe6b7268378a3c3ae17b59d62ede2b115`](https://github.com/givtaj/sleepapi/commit/a833eecfe6b7268378a3c3ae17b59d62ede2b115)
-passed [main CI run 42786430040](https://github.com/givtaj/sleepapi/actions/runs/42786430040).
-That historical run included 96 Rust and 45 Python tests. The current candidate
-has 96 Rust and 37 Python tests after removing eight container-publication tests
-with the publication tooling. The baseline run predates these removals and the
-alpha.5 version/documentation changes; it does not validate this candidate's
-final head. Record candidate checks in its PR, then require a new
-`main` run on the resulting commit if a merge is later approved. Tagging, fresh
-tagged-source installation, and publication remain separate
-[alpha gates](ALPHA_READINESS.md).
+The reviewed alpha.5 candidate
+`856e01e8165c1f71add9a1869a6b73fad8a816c0` passed
+[PR CI run 42798848230](https://github.com/givtaj/sleepapi/actions/runs/42798848230).
+PR #20 merged it as
+[`0646bfabe75e3cb29d48883e13057635c176a770`](https://github.com/givtaj/sleepapi/commit/0646bfabe75e3cb29d48883e13057635c176a770)
+with an identical tree.
+[Main CI run 42817521918](https://github.com/givtaj/sleepapi/actions/runs/42817521918)
+passed Rust stable, Rust 1.94.0 and both native Linux Docker jobs on that exact
+merge commit. This includes 96 Rust and 37 Python tests after removal of eight
+container-publication tests and their tooling. These results establish source
+integration, not a release. Tagging, fresh tagged-source installation and
+publication remain pending [alpha gates](ALPHA_READINESS.md). Later changes
+require validation on the final commit before any separately approved release.
 
 The historical verification record is in the [v0.1.0 GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0), published on 2026-09-30 (Europe/Madrid):
 each new release must likewise record the full released commit SHA, a successful
