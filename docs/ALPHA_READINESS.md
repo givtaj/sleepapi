@@ -6,21 +6,22 @@ Assessment date: 2026-11-10 (Europe/Madrid). Current candidate:
 alongside development coverage since alpha.4. Distribution is source plus a
 Dockerfile; users build their own image with Docker's machine defaults.
 
-The implementation baseline
-[`a833eecfe6b7268378a3c3ae17b59d62ede2b115`](https://github.com/givtaj/sleepapi/commit/a833eecfe6b7268378a3c3ae17b59d62ede2b115)
-passed [main CI run 42786430040](https://github.com/givtaj/sleepapi/actions/runs/42786430040),
-including 96 Rust tests, 45 Python tests, and both native Linux Docker jobs.
-This historical evidence predates the alpha.5 version/documentation changes and
-removal of container-publication tooling. The current suite has 96 Rust and 37
-Python tests; eight publication-tool tests were removed with that tooling.
-Candidate-head review and CI must pass independently; record their
-results in the candidate PR. They must not be inferred from the earlier green baseline.
+[PR #20](https://github.com/givtaj/sleepapi/pull/20) was reviewed and merged on
+10 November 2026 as
+[`0646bfabe75e3cb29d48883e13057635c176a770`](https://github.com/givtaj/sleepapi/commit/0646bfabe75e3cb29d48883e13057635c176a770).
+The merged tree matches the reviewed candidate
+`856e01e8165c1f71add9a1869a6b73fad8a816c0`.
+[Main CI run 42817521918](https://github.com/givtaj/sleepapi/actions/runs/42817521918)
+passed all four jobs on that merge: Rust stable, Rust 1.94.0, native Linux AMD64
+Docker and native Linux ARM64 Docker. The suite has 96 Rust and 37 Python tests;
+eight publication-tool tests were removed with the image-publication tooling.
 
-Preparation stops at a reviewed, unmerged PR with passing checks. Merging,
-tagging, fresh tagged-source installation, and publication remain separate
-steps in [Releasing](RELEASING.md). This candidate has no image-publication
-workflow; a future release from it publishes source and a Dockerfile. No alpha.5
-publication is established by this readiness document.
+Source integration and merged-main CI are complete. **Alpha.5 remains
+unreleased:** no alpha.5 tag, source release or Docker images were published.
+Tagging, fresh tagged-source installation and publication remain separate,
+unapproved steps in [Releasing](RELEASING.md). The Dockerfile is retained for
+local builds using Docker's defaults. There is no image-publication workflow;
+any future approved release distributes source and a Dockerfile.
 
 The published [alpha.4 source release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
 remains the quickstart/fallback for a local Docker build. Its `/metadata` route
@@ -107,7 +108,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Admission recovery | For every method, prove capacity-one rejection during a 300-ms wait, health stays ≤250 ms while occupied, and a real simulation succeeds within 1,300 ms of the admitted attempt's launch | Separate process in alpha smoke; tests ordinary completion, while Rust tests cover cancellation semantics |
 | Retry-client example | Both three-attempt sequences recover and repeat after reset; exact fixture bytes and observed faults match; stale generations consume no step; receipts correlate; owned runs are deleted | `examples/retry-client.py --binary target/release/sleepapi` in stable CI; synthetic Python-client evidence, separate from external client acceptance |
 | Metadata and capability client | Bounded no-store response derived from enforced limits; read-only and responsive at full capacity; accurate HTTP/1.1/listener fault flags; strict boolean capabilities and supported/unsupported/unknown results; no verified-identity claim | Rust metadata regressions, Python capability-client tests, and `scripts/docker-smoke.py IMAGE --metadata` in both native Docker CI jobs; older alpha.4 must be checked without the flag |
-| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | Candidate PR checks first; after separate merge/publication decisions, exact-commit main CI, immutable tag, signed-out source access, and a fresh tagged-source Docker build with metadata smoke. No registry publication |
+| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | PR #20 review and merged-main CI passed at `0646bfa`; an approved final release commit still requires its own exact-commit evidence, immutable tag, signed-out source access and fresh tagged-source Docker build with metadata smoke. Publication remains pending; no registry publication |
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
@@ -209,9 +210,11 @@ capacity remain unverified.
 
 ## Current next step
 
-Review the alpha.5 preparation PR and require passing CI on its exact head.
-Keep it unmerged until the maintainer decides to proceed. If release work is
-approved later, follow [Releasing](RELEASING.md#release-sequence) for the resulting
-main commit, new tag, fresh installation, and publication evidence. Do not retag
-alpha.4, and keep the source-build quickstart pinned to alpha.4 until the new
-source release exists and its installation is verified.
+PR #20 integration is complete; keep alpha.5 unreleased under the maintainer's
+current instruction. No release or Docker image publication is authorized.
+If source-release work is approved later, follow
+[Releasing](RELEASING.md#release-sequence) for the final commit, new tag, fresh
+installation and publication evidence. Any subsequent changes require checks
+on that final commit. Do not retag alpha.4, and keep the source-build quickstart
+pinned to alpha.4 until the new source release exists and its installation is
+verified.
