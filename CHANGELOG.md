@@ -4,6 +4,10 @@
 
 ### Added
 
+- A read-only `GET /metadata` endpoint reporting versioned capability metadata
+  and configured limits, plus a loopback capability-check client with explicit
+  supported, unsupported, and unknown results. This is an unreleased source
+  addition; the published alpha.4 tag and image remain unchanged.
 - Versioned GHCR container publication for Linux AMD64 and ARM64, with native
   build/smoke checks, source revision labels, and anonymous pull verification.
 - A prebuilt-image quickstart, with source builds retained as an alternative.

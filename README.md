@@ -358,6 +358,7 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | Endpoint | Behavior |
 | --- | --- |
 | `GET /health` | Immediate health response, independent of simulation capacity |
+| `GET /metadata` | Capabilities and configured limits; [unreleased source addition](docs/server-metadata.md) |
 | `GET /methods` | Methods, defaults, and configured limits |
 | `GET /scenarios` | Available presets, descriptions, default delays and statuses |
 | `POST /sleep/tokio` | Wait with a Tokio timer in the request task |
@@ -373,6 +374,12 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | `GET /runs/{run_id}/receipts` | Inspect the newest bounded attempt receipts |
 | `POST /runs/{run_id}/reset` | Advance generation, restart the sequence and clear receipts |
 | `DELETE /runs/{run_id}` | Remove a run and its retained state |
+
+The read-only [metadata endpoint and capability-check example](docs/server-metadata.md)
+are available in the current source checkout. They are not included in the
+published alpha.4 tag or image used by the quickstart; build this checkout to try
+them. Check explicit capabilities rather than inferring support from the package
+version, which remains `0.1.1-alpha.4` during development.
 
 The stateless sleep and simulation POST endpoints accept `scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
 defaults. The four named `/sleep/...` endpoints fix the waiting method in the
@@ -573,7 +580,7 @@ Run the container checks locally with Docker and Python 3:
 
 ```sh
 docker build -t sleepapi:ci .
-python3 scripts/docker-smoke.py sleepapi:ci
+python3 scripts/docker-smoke.py sleepapi:ci --metadata
 ```
 
 The code is split into the HTTP contract (`src/lib.rs`), the four waiting

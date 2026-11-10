@@ -16,6 +16,14 @@ use crate::error::{ApiError, with_simulation_headers};
 pub(crate) const MAX_FIXTURE_BODY_BYTES: usize = 4096;
 pub(crate) const MAX_FIXTURE_HEADERS: usize = 5;
 pub(crate) const MAX_FIXTURE_HEADER_VALUE_BYTES: usize = 256;
+pub(crate) const CONTENT_TYPES: [&str; 3] = ["application/json", "text/plain", "application/xml"];
+pub(crate) const HEADER_NAMES: [&str; 5] = [
+    "retry-after",
+    "www-authenticate",
+    "allow",
+    "cache-control",
+    "x-request-id",
+];
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -82,10 +90,7 @@ impl Fixture {
             .content_type
             .strip_suffix("; charset=utf-8")
             .unwrap_or(&self.content_type);
-        if !matches!(
-            media_type,
-            "application/json" | "text/plain" | "application/xml"
-        ) {
+        if !CONTENT_TYPES.contains(&media_type) {
             return Err(invalid(
                 "fixture content_type must be application/json, text/plain, or application/xml, optionally followed by ; charset=utf-8",
             ));
@@ -94,10 +99,7 @@ impl Fixture {
             return Err(invalid("fixture permits at most 5 headers"));
         }
         for (name, value) in &self.headers {
-            if !matches!(
-                name.as_str(),
-                "retry-after" | "www-authenticate" | "allow" | "cache-control" | "x-request-id"
-            ) {
+            if !HEADER_NAMES.contains(&name.as_str()) {
                 return Err(invalid(
                     "fixture header must be retry-after, www-authenticate, allow, cache-control, or x-request-id",
                 ));

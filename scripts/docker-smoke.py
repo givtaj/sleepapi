@@ -2,7 +2,9 @@
 """Check a locally built Linux image using Docker and Python's standard library."""
 
 import http.client
+import importlib.util
 import json
+from pathlib import Path
 import socket
 import subprocess
 import sys
@@ -108,6 +110,31 @@ def check_http(port):
     status, headers, _ = request(port, "GET", "/sleep/tokio")
     require(status == 405 and headers.get("allow") == "POST", "real 405 must advertise POST")
     print("PASS: health, seven scenarios, four timed failure routes, CORS, and 401/405 headers")
+
+
+def check_metadata(port):
+    status, headers, body = request(port, "GET", "/metadata")
+    require(status == 200 and headers.get("cache-control") == "no-store", "metadata response contract")
+    require(len(body) < 4096, "metadata must be bounded")
+    metadata = json.loads(body)
+    _, _, methods = request(port, "GET", "/methods")
+    for key, value in json.loads(methods)["limits"].items():
+        require(metadata["limits"][key] == value, "metadata configured limit differs: " + key)
+    _, _, runs = request(port, "GET", "/runs")
+    require(metadata["limits"]["runs"] == json.loads(runs)["limits"], "metadata run limits differ")
+    require(metadata["capabilities"]["connection_drop"] is True and
+            metadata["capabilities"]["truncated_response"] is True, "production listener fault capabilities")
+    # Exercise the documented read-only client against the actual container.
+    spec = importlib.util.spec_from_file_location(
+        "check_capability", Path(__file__).resolve().parents[1] / "examples/check-capability.py")
+    client = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(client)
+    for capability, expected in [("recovery_runs", "supported"), ("persistent_runs", "unsupported"),
+                                 ("future_capability", "unknown")]:
+        report = client.check_capability(f"http://127.0.0.1:{port}", capability)
+        require(report["status"] == expected and report["identity_verified"] is False,
+                "metadata client classification differs: " + capability)
+    print("PASS: bounded metadata, effective limits, fault capabilities, and read-only client")
 
 
 def stop(container, expected):
@@ -252,12 +279,14 @@ def check_transport_faults(port):
 
 
 def main():
-    if len(sys.argv) != 2:
-        raise SystemExit("Usage: python3 scripts/docker-smoke.py IMAGE")
+    if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--metadata"):
+        raise SystemExit("Usage: python3 scripts/docker-smoke.py IMAGE [--metadata]")
     containers = {}
     try:
         container, port = start(sys.argv[1], containers)
         check_http(port)
+        if len(sys.argv) == 3:
+            check_metadata(port)
         check_recovery_run(port)
         check_fixtures(port)
         check_transport_faults(port)

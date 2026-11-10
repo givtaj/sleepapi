@@ -1,6 +1,7 @@
 mod config;
 mod error;
 mod fixtures;
+mod metadata;
 mod runs;
 mod scenario;
 pub mod transport;
@@ -31,6 +32,8 @@ use error::{ApiError, ErrorDetails, validate_simulated_status, with_simulation_h
 use scenario::Scenario;
 pub use wait::WaitMethod;
 
+const MAX_REQUEST_BODY_BYTES: usize = 8 * 1024;
+
 #[derive(Clone)]
 struct AppState {
     config: Config,
@@ -48,6 +51,7 @@ pub fn router(config: Config) -> std::io::Result<Router> {
     };
     let app = Router::new()
         .route("/health", get(|| async { Json(json!({ "status": "ok" })) }))
+        .route("/metadata", get(metadata::get))
         .route("/methods", get(methods))
         .route("/scenarios", get(scenarios))
         .route("/sleep", post(sleep))
@@ -64,7 +68,7 @@ pub fn router(config: Config) -> std::io::Result<Router> {
                 "HTTP method not allowed for this route",
             )
         })
-        .layer(DefaultBodyLimit::max(8 * 1024))
+        .layer(DefaultBodyLimit::max(MAX_REQUEST_BODY_BYTES))
         .with_state(state);
     if cors_origins.is_empty() {
         return Ok(app);

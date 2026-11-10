@@ -75,6 +75,10 @@ impl Server {
             .env("SLEEPAPI_MAX_IN_FLIGHT", "1")
             .env("SLEEPAPI_SHUTDOWN_GRACE_MS", grace_ms.to_string())
             .env("SLEEPAPI_CORS_ORIGINS", "")
+            .env(
+                "SLEEPAPI_METADATA_TEST_SENTINEL",
+                "synthetic-secret-not-for-metadata",
+            )
             .env("TOKIO_WORKER_THREADS", "2")
             .env("RUST_LOG", "sleepapi=info")
             .stderr(Stdio::inherit());
@@ -299,6 +303,43 @@ fn response(mut stream: TcpStream) -> String {
     let mut response = String::new();
     stream.read_to_string(&mut response).unwrap();
     response
+}
+
+#[test]
+fn metadata_on_the_real_server_uses_configured_limits_and_transport() {
+    let mut server = Server::start(777);
+    for (version, faults) in [("HTTP/1.1", true), ("HTTP/1.0", false)] {
+        let mut stream = server.connect();
+        write!(
+            stream,
+            "GET /metadata {version}\r\nHost: localhost\r\nConnection: close\r\n\r\n"
+        )
+        .unwrap();
+        let wire = response(stream);
+        let (head, raw) = wire.split_once("\r\n\r\n").unwrap();
+        assert!(head.contains("200 OK"));
+        assert!(raw.len() < 4096);
+        for excluded in [
+            "synthetic-secret-not-for-metadata",
+            "SLEEPAPI_",
+            "127.0.0.1",
+            "shutdown_grace",
+            "cors",
+            "target/",
+            "/Users/",
+            "/home/",
+        ] {
+            assert!(!raw.contains(excluded), "unexpected metadata field/value");
+        }
+        let metadata: serde_json::Value = serde_json::from_str(raw).unwrap();
+        assert_eq!(metadata["limits"]["max_duration_ms"], 10_000);
+        assert_eq!(metadata["limits"]["max_in_flight"], 1);
+        assert_eq!(metadata["software"]["version"], env!("CARGO_PKG_VERSION"));
+        assert_eq!(metadata["capabilities"]["connection_drop"], faults);
+        assert_eq!(metadata["capabilities"]["truncated_response"], faults);
+    }
+    server.signal("TERM");
+    assert_eq!(server.wait(Duration::from_secs(3)).code(), Some(0));
 }
 
 #[test]

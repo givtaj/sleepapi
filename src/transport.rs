@@ -16,6 +16,7 @@ use std::{
 use axum::{
     body::{Body, Bytes},
     extract::connect_info::Connected,
+    http::Version,
     serve::{IncomingStream, Listener},
 };
 use http_body::{Body as HttpBody, Frame, SizeHint};
@@ -23,6 +24,12 @@ use tokio::{
     io::{AsyncRead, AsyncWrite, ReadBuf},
     net::{TcpListener, TcpStream},
 };
+
+pub(crate) const FAULT_HTTP_VERSION: Version = Version::HTTP_11;
+
+pub(crate) fn faults_supported(version: Version, has_connection: bool) -> bool {
+    version == FAULT_HTTP_VERSION && has_connection
+}
 
 /// Listener that preserves Axum's server and graceful-shutdown behavior while
 /// exposing successful socket flushes to deliberately truncated response bodies.

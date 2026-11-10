@@ -193,15 +193,19 @@ async fn limits(State(state): State<AppState>) -> Result<Json<Value>, ApiError> 
     };
     Ok(Json(json!({
         "active_runs": active_runs,
-        "limits": {
+        "limits": declared_limits(),
+    })))
+}
+
+pub(crate) fn declared_limits() -> Value {
+    json!({
             "max_runs": MAX_RUNS,
             "max_sequence_steps": MAX_SEQUENCE_STEPS,
             "max_attempts_per_run": MAX_ATTEMPTS_PER_RUN,
             "max_receipts_per_run": MAX_RECEIPTS_PER_RUN,
             "default_ttl_ms": DEFAULT_TTL_MS,
             "max_ttl_ms": MAX_TTL_MS,
-        },
-    })))
+    })
 }
 
 async fn create(
@@ -437,7 +441,7 @@ async fn attempt(
                 "sequence exhausted; reset the run before retrying",
             ));
         };
-        if step.fault.is_some() && (version != Version::HTTP_11 || connection.is_none()) {
+        if step.fault.is_some() && !transport::faults_supported(version, connection.is_some()) {
             return Err(ApiError::new(
                 StatusCode::UNPROCESSABLE_ENTITY,
                 "transport faults require HTTP/1.1 through SleepAPI's FaultListener",
