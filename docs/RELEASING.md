@@ -1,11 +1,11 @@
 # Releasing SleepAPI
 
 The current candidate is **`0.1.1-alpha.5` — merged, not yet released**.
-[PR #20](https://github.com/givtaj/sleepapi/pull/20) merged on 10 November 2026,
-and all four main CI jobs passed on its merge commit. The maintainer authorized
-integration while keeping alpha.5 unreleased. Tagging and source publication
-remain separate, unapproved steps. Distribution is source plus a Dockerfile for
-local builds using Docker's defaults; Docker image publication is disabled.
+The planned source-prerelease date is **10 November 2026 (Europe/Madrid)**.
+Release documentation and its review, CI and merge are authorized; tagging and
+source publication remain on hold. The date is a plan, not a publication record.
+Distribution is source plus a Dockerfile for local builds using Docker's
+defaults; Docker image publication is disabled.
 
 The published [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
 remains the source-build fallback and README quickstart target. Its source
@@ -44,6 +44,23 @@ container-publication tests and their tooling. These results establish source
 integration, not a release. Tagging, fresh tagged-source installation and
 publication remain pending [alpha gates](ALPHA_READINESS.md). Later changes
 require validation on the final commit before any separately approved release.
+
+[PR #21](https://github.com/givtaj/sleepapi/pull/21) subsequently reconciled the
+integration records as
+[`de5627693c1ac24372bf209110d9acd2c11d1585`](https://github.com/givtaj/sleepapi/commit/de5627693c1ac24372bf209110d9acd2c11d1585).
+All four jobs passed in its
+[main CI run 42823594104](https://github.com/givtaj/sleepapi/actions/runs/42823594104).
+The [10 November clean-source verification](release-evidence/2026-11-10-alpha5/README.md)
+downloaded that commit anonymously, matched all 551 source files, built with
+`--pull --no-cache` using Docker's default Linux ARM64 platform, and passed
+metadata, HTTP, recovery/replay, fixtures, transport faults and shutdown checks.
+This is candidate-installation evidence, not a tagged-release installation.
+
+The release-documentation merge needs its own green main CI on the resulting
+commit. Record that final SHA and CI URL in the PR completion evidence and,
+after publication is approved, the prerelease notes. Do not create another
+commit solely to insert its own SHA. If publication moves to a different date,
+update the planned date and revalidate the resulting commit before tagging.
 
 The historical verification record is in the [v0.1.0 GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0), published on 2026-09-30 (Europe/Madrid):
 each new release must likewise record the full released commit SHA, a successful

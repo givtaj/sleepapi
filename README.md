@@ -580,8 +580,12 @@ and server startup/shutdown (`src/main.rs`).
 
 The current source is the **unreleased `0.1.1-alpha.5` candidate**, adding
 versioned [server metadata and capability checks](docs/server-metadata.md).
-Candidate preparation does not create a public tag, release, or image. Build
-this checkout to try it; the public quickstart builds the pinned alpha.4 source.
+Its planned source-prerelease date is **10 November 2026 (Europe/Madrid)**;
+publication remains pending. [Clean-source installation passed](docs/release-evidence/2026-11-10-alpha5/README.md)
+on the recorded candidate. Final-commit CI and the future tagged-source checks
+remain release gates. Build this checkout to try it; the public quickstart
+continues to use alpha.4 until alpha.5 is published and verified. No new Docker
+images will be published.
 
 **v0.1.1-alpha.4** is an alpha source release with a Dockerfile. It includes
 recovery runs, exact UTF-8 response fixtures, and HTTP/1.1 transport faults.

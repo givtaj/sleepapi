@@ -10,6 +10,10 @@ published `v0.1.1-alpha.4` source tag does not contain `/metadata`.
 Build the candidate checkout to try it; its declared Cargo package version is
 `0.1.1-alpha.5`. No alpha.5 tag or release is published yet. Distribution is
 source plus a Dockerfile for local builds; new registry images will not be published.
+The planned source-prerelease date is **10 November 2026 (Europe/Madrid)**.
+The [clean-source verification](release-evidence/2026-11-10-alpha5/README.md)
+includes metadata and capability-client checks; it does not establish a public
+tagged-source installation.
 Use explicit capability discovery rather than inferring support from a version
 string, and verify artifact provenance separately.
 
