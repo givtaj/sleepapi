@@ -580,7 +580,7 @@ and server startup/shutdown (`src/main.rs`).
 
 The current source is the **unreleased `0.1.1-alpha.5` candidate**, adding
 versioned [server metadata and capability checks](docs/server-metadata.md).
-Its planned source-prerelease date is **10 November 2026 (Europe/Madrid)**;
+Its planned source-prerelease date is **11 November 2026 (Europe/Madrid)**;
 publication remains pending. [Clean-source installation passed](docs/release-evidence/2026-11-10-alpha5/README.md)
 on the recorded candidate. Final-commit CI and the future tagged-source checks
 remain release gates. Build this checkout to try it; the public quickstart
