@@ -5,7 +5,7 @@ Assessment date: 2026-11-10 (Europe/Madrid). Current candidate:
 [read-only server metadata and a capability-check client](server-metadata.md),
 alongside development coverage since alpha.4. Distribution is source plus a
 Dockerfile; users build their own image with Docker's machine defaults.
-The planned source-prerelease date is **10 November 2026 (Europe/Madrid)**;
+The planned source-prerelease date is **11 November 2026 (Europe/Madrid)**;
 publication remains on hold.
 
 [PR #20](https://github.com/givtaj/sleepapi/pull/20) was reviewed and merged on
@@ -223,7 +223,7 @@ capacity remain unverified.
 
 ## Current next step
 
-The planned source-prerelease date is 10 November 2026 (Europe/Madrid). Require
+The planned source-prerelease date is 11 November 2026 (Europe/Madrid). Require
 independent review and all four main CI jobs on the release-documentation merge,
 then retain that exact SHA and CI URL in the PR completion evidence. The clean
 candidate install above does not replace this final-commit gate.

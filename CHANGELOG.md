@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.1.1-alpha.5 — 2026-11-10 (planned)
+## 0.1.1-alpha.5 — 2026-11-11 (planned)
 
-The planned source-prerelease date is **10 November 2026 (Europe/Madrid)**.
+The planned source-prerelease date is **11 November 2026 (Europe/Madrid)**.
 Publication remains pending; this dated entry does not announce a release.
 The public quickstart builds alpha.4 from source until alpha.5 is published and
 its tagged-source installation is verified. No alpha.5 tag or release has been
