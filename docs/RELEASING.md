@@ -1,9 +1,11 @@
 # Releasing SleepAPI
 
 The current candidate is **`0.1.1-alpha.5` — merged, not yet released**.
-The planned source-prerelease date is **11 November 2026 (Europe/Madrid)**.
-Release documentation and its review, CI and merge are authorized; tagging and
-source publication remain on hold. The date is a plan, not a publication record.
+The planned source-prerelease date is **17 November 2026 (Europe/Madrid)**.
+Release documentation, review, CI, merge, tagging and source publication are
+authorized. Tagging requires green CI on the final main commit; publication
+requires fresh tagged-source installation and archive verification. These gates
+remain pending. The date is a plan, not a publication record.
 Distribution is source plus a Dockerfile for local builds using Docker's
 defaults; Docker image publication is disabled.
 

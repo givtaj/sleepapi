@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.1.1-alpha.5 — 2026-11-11 (planned)
+## 0.1.1-alpha.5 — 2026-11-17 (planned)
 
-The planned source-prerelease date is **11 November 2026 (Europe/Madrid)**.
+The planned source-prerelease date is **17 November 2026 (Europe/Madrid)**.
 Publication remains pending; this dated entry does not announce a release.
 The public quickstart builds alpha.4 from source until alpha.5 is published and
 its tagged-source installation is verified. No alpha.5 tag or release has been
@@ -10,7 +10,8 @@ published, and no Docker images will be published.
 
 The [clean-source verification](docs/release-evidence/2026-11-10-alpha5/README.md)
 passed on the recorded candidate. The final documentation commit still requires
-its own green main CI before any separately authorized tag or source release.
+its own green main CI before tagging. Source publication is authorized after
+fresh tagged-source installation and archive verification pass.
 
 ### Added
 

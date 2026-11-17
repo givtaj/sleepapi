@@ -1,12 +1,13 @@
 # SleepAPI alpha readiness
 
-Assessment date: 2026-11-10 (Europe/Madrid). Current candidate:
+Assessment date: 2026-11-17 (Europe/Madrid). Current candidate:
 **`0.1.1-alpha.5` — unreleased**. This candidate adds
 [read-only server metadata and a capability-check client](server-metadata.md),
 alongside development coverage since alpha.4. Distribution is source plus a
 Dockerfile; users build their own image with Docker's machine defaults.
-The planned source-prerelease date is **11 November 2026 (Europe/Madrid)**;
-publication remains on hold.
+The planned source-prerelease date is **17 November 2026 (Europe/Madrid)**.
+Source publication is authorized, subject to the final-commit CI and fresh
+tagged-source verification gates below; no release has been published yet.
 
 [PR #20](https://github.com/givtaj/sleepapi/pull/20) was reviewed and merged on
 10 November 2026 as
@@ -29,10 +30,11 @@ No runtime or packaging blocker was found in those scoped checks.
 
 Source integration and candidate-installation verification are complete.
 **Alpha.5 remains unreleased:** no alpha.5 tag, source release or Docker images
-were published. Release-documentation review, CI and merge are authorized;
-tagging, fresh tagged-source installation and publication remain later steps in
+were published. Release-documentation review, CI, merge, tagging, fresh
+tagged-source installation and source publication are authorized under
 [Releasing](RELEASING.md). The final documentation commit requires its own green
-main CI before any separately authorized publication. The Dockerfile is retained for
+main CI before tagging, followed by fresh tagged-source verification before
+publication. The Dockerfile is retained for
 local builds using Docker's defaults. There is no image-publication workflow;
 any future approved release distributes source and a Dockerfile.
 
@@ -223,14 +225,14 @@ capacity remain unverified.
 
 ## Current next step
 
-The planned source-prerelease date is 11 November 2026 (Europe/Madrid). Require
+The planned source-prerelease date is 17 November 2026 (Europe/Madrid). Require
 independent review and all four main CI jobs on the release-documentation merge,
 then retain that exact SHA and CI URL in the PR completion evidence. The clean
 candidate install above does not replace this final-commit gate.
 
-Keep alpha.5 unpublished until tagging and source publication are separately
-authorized. Follow [Releasing](RELEASING.md#release-sequence) for the new tag,
-fresh tagged-source installation and public-access checks. Any subsequent edit,
+Tagging and source publication are authorized after their verification gates.
+Follow [Releasing](RELEASING.md#release-sequence) for the new tag, fresh
+tagged-source installation and public-access checks. Any subsequent edit,
 including a changed planned release date, requires checks on its final commit.
 Do not retag alpha.4 or publish Docker images. Keep the source-build quickstart
 pinned to alpha.4 until the new source release exists and its installation is
