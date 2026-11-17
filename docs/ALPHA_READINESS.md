@@ -1,13 +1,18 @@
 # SleepAPI alpha readiness
 
-Assessment date: 2026-11-17 (Europe/Madrid). Current candidate:
-**`0.1.1-alpha.5` — unreleased**. This candidate adds
+Assessment date: 2026-11-17 (Europe/Madrid). Current source prerelease:
+**`0.1.1-alpha.5` — published**. This release adds
 [read-only server metadata and a capability-check client](server-metadata.md),
 alongside development coverage since alpha.4. Distribution is source plus a
 Dockerfile; users build their own image with Docker's machine defaults.
-The planned source-prerelease date is **17 November 2026 (Europe/Madrid)**.
-Source publication is authorized, subject to the final-commit CI and fresh
-tagged-source verification gates below; no release has been published yet.
+The source prerelease was published on **17 November 2026 (Europe/Madrid)**.
+Its immutable tag resolves to
+[`f10bd4c9551f4617f68e9ba7aa08385e178dff6a`](https://github.com/givtaj/sleepapi/commit/f10bd4c9551f4617f68e9ba7aa08385e178dff6a),
+with all four jobs passing in
+[main CI run 44051798111](https://github.com/givtaj/sleepapi/actions/runs/44051798111).
+[Fresh tagged-source installation and public access](release-evidence/2026-11-17-alpha5/README.md)
+passed; full release identity and platform limits are in the
+[prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5).
 
 [PR #20](https://github.com/givtaj/sleepapi/pull/20) was reviewed and merged on
 10 November 2026 as
@@ -28,21 +33,17 @@ also passed: anonymous commit-addressed source, all 551 files matched, a fresh
 Linux ARM64 build, metadata, HTTP/recovery/replay, fixtures, faults and shutdown.
 No runtime or packaging blocker was found in those scoped checks.
 
-Source integration and candidate-installation verification are complete.
-**Alpha.5 remains unreleased:** no alpha.5 tag, source release or Docker images
-were published. Release-documentation review, CI, merge, tagging, fresh
-tagged-source installation and source publication are authorized under
-[Releasing](RELEASING.md). The final documentation commit requires its own green
-main CI before tagging, followed by fresh tagged-source verification before
-publication. The Dockerfile is retained for
-local builds using Docker's defaults. There is no image-publication workflow;
-any future approved release distributes source and a Dockerfile.
+Source integration, exact-release-commit CI, fresh tagged-source installation
+and source publication are complete for alpha.5. The quickstart now uses the
+verified alpha.5 source tag. The Dockerfile is retained for local builds using
+Docker's defaults. No alpha.5 registry image was published, and there is no
+image-publication workflow. Future releases follow [Releasing](RELEASING.md).
 
-The published [alpha.4 source release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
-remains the quickstart/fallback for a local Docker build. Its `/metadata` route
+The earlier [alpha.4 source release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+remains available unchanged. Its `/metadata` route
 returns `404`; that does not mean its existing recovery or fixture features are
 unsupported. Historical alpha.4 image-publication evidence remains in its
-release record. This candidate does not alter old tags or delete existing
+release record. This release does not alter old tags or delete existing
 registry artifacts.
 
 ## Historical background before alpha.5
@@ -63,18 +64,19 @@ exit `2` even when HTTP work has drained.
 
 The [historical benchmark documentation](https://github.com/givtaj/sleepapi/pull/1)
 has also been reconciled and merged. It describes the retained evidence and rerun
-limits; it does not certify this candidate's throughput. Recovery sequences
+limits; it does not certify alpha.5 throughput. Recovery sequences
 ([#4](https://github.com/givtaj/sleepapi/issues/4)) shipped in alpha.3. Exact response
 fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5)) and transport faults
 ([#6](https://github.com/givtaj/sleepapi/issues/6)) shipped in
 alpha.4; see the [API contract](response-fixtures.md). Alpha.3's
 historical release evidence below covers its original 58-test source only.
 
-## Alpha.5 candidate scope
+## Alpha.5 release scope
 
 - Local developer tool, source plus Dockerfile. Users run `docker build` with
-  their machine's defaults. CI tests Linux AMD64 and ARM64; macOS native
-  execution is a local verification environment. Alpha.5 source publication is pending.
+  their machine's defaults. CI tests Linux AMD64 and ARM64. Fresh tagged-source
+  installation was checked with Docker Desktop on macOS ARM64; that check does
+  not establish native macOS or Windows support. Alpha.5 source is published.
 - Existing HTTP behavior and defaults: four waiting implementations, seven
   scenarios, mock email/SMS labels, 30-second maximum requested wait, 64
   active-wait slots, 8 KiB request body, and five-second shutdown grace.
@@ -123,7 +125,7 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Admission recovery | For every method, prove capacity-one rejection during a 300-ms wait, health stays ≤250 ms while occupied, and a real simulation succeeds within 1,300 ms of the admitted attempt's launch | Separate process in alpha smoke; tests ordinary completion, while Rust tests cover cancellation semantics |
 | Retry-client example | Both three-attempt sequences recover and repeat after reset; exact fixture bytes and observed faults match; stale generations consume no step; receipts correlate; owned runs are deleted | `examples/retry-client.py --binary target/release/sleepapi` in stable CI; synthetic Python-client evidence, separate from external client acceptance |
 | Metadata and capability client | Bounded no-store response derived from enforced limits; read-only and responsive at full capacity; accurate HTTP/1.1/listener fault flags; strict boolean capabilities and supported/unsupported/unknown results; no verified-identity claim | Rust metadata regressions, Python capability-client tests, and `scripts/docker-smoke.py IMAGE --metadata` in both native Docker CI jobs; older alpha.4 must be checked without the flag |
-| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | All four main CI jobs passed at `de56276`; its [clean-source Linux ARM64 installation](release-evidence/2026-11-10-alpha5/README.md) passed. The release-documentation commit still requires its own exact-commit CI, followed by an approved immutable tag, signed-out source access and fresh tagged-source Docker build with metadata smoke. Publication remains pending; no registry publication |
+| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | All four [main CI jobs](https://github.com/givtaj/sleepapi/actions/runs/44051798111) passed at released commit `f10bd4c`; the immutable tag, [fresh tagged-source Linux ARM64 installation and signed-out access](release-evidence/2026-11-17-alpha5/README.md) passed. The source prerelease is published; no registry publication |
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
@@ -133,7 +135,7 @@ budgets or production SLOs.
 
 ## Development coverage after alpha.4
 
-The current candidate has 96 Rust and 37 Python tests. Metadata
+The alpha.5 release has 96 Rust and 37 Python tests. Metadata
 coverage checks declarations, configured limits, listener/protocol context,
 capacity independence, and unchanged run state. Capability-client tests include
 older-server `404`, unknown schema/contract, missing or malformed fields,
@@ -177,7 +179,7 @@ These results validated the implementation baseline. At that assessment, the
 later alpha.4 version and documentation commit still needed its own CI and
 fresh tagged-source installation before publication. The completed release
 record is in the [alpha.4 prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
-This historical baseline does not validate the alpha.5 candidate.
+This historical baseline does not validate the alpha.5 release.
 
 ## Alpha.3 preparation evidence (historical)
 
@@ -225,15 +227,11 @@ capacity remain unverified.
 
 ## Current next step
 
-The planned source-prerelease date is 17 November 2026 (Europe/Madrid). Require
-independent review and all four main CI jobs on the release-documentation merge,
-then retain that exact SHA and CI URL in the PR completion evidence. The clean
-candidate install above does not replace this final-commit gate.
+Alpha.5 source publication is complete. Use the verified source-build quickstart
+and collect feedback within the documented platform limits. These synthetic
+checks do not establish customer acceptance or production capacity.
 
-Tagging and source publication are authorized after their verification gates.
-Follow [Releasing](RELEASING.md#release-sequence) for the new tag, fresh
-tagged-source installation and public-access checks. Any subsequent edit,
-including a changed planned release date, requires checks on its final commit.
-Do not retag alpha.4 or publish Docker images. Keep the source-build quickstart
-pinned to alpha.4 until the new source release exists and its installation is
-verified.
+Keep the alpha.5 tag and historical release evidence immutable. Later source
+fixes require a new version and the review, exact-commit CI, tagged-installation
+and public-access gates in [Releasing](RELEASING.md#release-sequence). Documentation
+updates on main do not change the released source. Do not publish Docker images.

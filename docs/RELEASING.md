@@ -1,17 +1,16 @@
 # Releasing SleepAPI
 
-The current candidate is **`0.1.1-alpha.5` — merged, not yet released**.
-The planned source-prerelease date is **17 November 2026 (Europe/Madrid)**.
-Release documentation, review, CI, merge, tagging and source publication are
-authorized. Tagging requires green CI on the final main commit; publication
-requires fresh tagged-source installation and archive verification. These gates
-remain pending. The date is a plan, not a publication record.
+The current source prerelease is **`0.1.1-alpha.5` — published on
+17 November 2026 (Europe/Madrid)**. Its
+[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5)
+record the immutable source commit, exact-commit CI, fresh tagged-source
+installation and public-access verification.
 Distribution is source plus a Dockerfile for local builds using Docker's
 defaults; Docker image publication is disabled.
 
-The published [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
-remains the source-build fallback and README quickstart target. Its source
-does not include `/metadata`.
+The README quickstart now builds the verified alpha.5 source tag. The earlier
+[alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+remains available unchanged; its source does not include `/metadata`.
 
 ## Distribution scope
 
@@ -22,9 +21,9 @@ platform. Linux AMD64 and ARM64 containers are tested. Use Docker Engine on
 Linux or Docker Desktop in Linux-container mode on macOS and Windows. A native
 Rust build requires Rust 1.94 or newer.
 
-Linux CI builds and tests containers without publishing them. This candidate
-has no container-registry publication workflow: a future source release from
-this candidate does not publish an image. Prebuilt registry images, native binary downloads,
+Linux CI builds and tests containers without publishing them. There is no
+container-registry publication workflow; source releases do not publish images.
+Prebuilt registry images, native binary downloads,
 crates.io publication, and native macOS/Windows CI remain outside this track.
 
 Previously published alpha.4 source and image evidence remains historical.
@@ -32,6 +31,19 @@ Removing the publication workflow here does not change old tags, their files,
 or existing registry artifacts. Do not republish an old tag to apply this policy.
 
 ## Release evidence
+
+The published `v0.1.1-alpha.5` annotated tag resolves to
+[`f10bd4c9551f4617f68e9ba7aa08385e178dff6a`](https://github.com/givtaj/sleepapi/commit/f10bd4c9551f4617f68e9ba7aa08385e178dff6a).
+All four jobs passed in
+[main CI run 44051798111](https://github.com/givtaj/sleepapi/actions/runs/44051798111)
+on that exact commit: Rust stable, Rust 1.94.0, native Linux AMD64 Docker and
+native Linux ARM64 Docker.
+[Fresh tagged-source verification](release-evidence/2026-11-17-alpha5/README.md)
+passed using Docker's default Linux ARM64 platform on macOS ARM64, including
+metadata, HTTP, fixtures, faults, retry/reset/replay and shutdown. The GitHub
+prerelease and tagged-source archives were verified without authentication.
+These results cover the released tag; later documentation commits do not change
+its source or inherit its exact-commit CI result.
 
 The reviewed alpha.5 candidate
 `856e01e8165c1f71add9a1869a6b73fad8a816c0` passed
@@ -42,10 +54,8 @@ with an identical tree.
 [Main CI run 42817521918](https://github.com/givtaj/sleepapi/actions/runs/42817521918)
 passed Rust stable, Rust 1.94.0 and both native Linux Docker jobs on that exact
 merge commit. This includes 96 Rust and 37 Python tests after removal of eight
-container-publication tests and their tooling. These results establish source
-integration, not a release. Tagging, fresh tagged-source installation and
-publication remain pending [alpha gates](ALPHA_READINESS.md). Later changes
-require validation on the final commit before any separately approved release.
+container-publication tests and their tooling. Those results established source
+integration; the final release and installation evidence is recorded above.
 
 [PR #21](https://github.com/givtaj/sleepapi/pull/21) subsequently reconciled the
 integration records as
@@ -58,11 +68,12 @@ downloaded that commit anonymously, matched all 551 source files, built with
 metadata, HTTP, recovery/replay, fixtures, transport faults and shutdown checks.
 This is candidate-installation evidence, not a tagged-release installation.
 
-The release-documentation merge needs its own green main CI on the resulting
-commit. Record that final SHA and CI URL in the PR completion evidence and,
-after publication is approved, the prerelease notes. Do not create another
-commit solely to insert its own SHA. If publication moves to a different date,
-update the planned date and revalidate the resulting commit before tagging.
+For each future release, the release-documentation merge needs its own green
+main CI on the resulting commit. Record that final SHA and CI URL in the PR
+completion evidence and, after publication is approved, the prerelease notes.
+Do not create another commit solely to insert its own SHA. If publication moves
+to a different date, update the planned date and revalidate the resulting commit
+before tagging.
 
 The historical verification record is in the [v0.1.0 GitHub release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0), published on 2026-09-30 (Europe/Madrid):
 each new release must likewise record the full released commit SHA, a successful
@@ -212,6 +223,7 @@ GitHub prerelease notes and fill every field from actual results:
 A green PR run makes the candidate reviewable. After merging, require a green
 `main` run for the resulting commit before tagging. Any subsequent source,
 version, workflow, or documentation edit creates a new candidate. A published
-release is immutable: corrections use a new version. If installation fails,
-stop publication and build the published `v0.1.1-alpha.4` source tag locally
-while preparing a new version.
+tag is immutable: source corrections use a new version. Later documentation
+updates on main do not change the released source. If installation fails,
+stop publication and build the previously verified source tag locally while
+preparing a new version.

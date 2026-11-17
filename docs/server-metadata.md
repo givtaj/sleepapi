@@ -4,16 +4,15 @@
 starting a test. It returns `200` JSON with `Cache-Control: no-store`, without
 consuming simulation capacity, creating a run, or changing existing runs.
 
-This endpoint and its example client are included in the **unreleased
-`0.1.1-alpha.5` source candidate**. The
-published `v0.1.1-alpha.4` source tag does not contain `/metadata`.
-Build the candidate checkout to try it; its declared Cargo package version is
-`0.1.1-alpha.5`. No alpha.5 tag or release is published yet. Distribution is
-source plus a Dockerfile for local builds; new registry images will not be published.
-The planned source-prerelease date is **17 November 2026 (Europe/Madrid)**.
-The [clean-source verification](release-evidence/2026-11-10-alpha5/README.md)
-includes metadata and capability-client checks; it does not establish a public
-tagged-source installation.
+This endpoint and its example client are included in the **published
+`0.1.1-alpha.5` source prerelease**, released on **17 November 2026 (Europe/Madrid)**.
+Use the [source-build quickstart](../README.md#quickstart-two-failures-then-success)
+to run it locally. The earlier `v0.1.1-alpha.4` source tag does not contain
+`/metadata`. Distribution is source plus a Dockerfile for local builds; registry
+images are not published.
+The [fresh tagged-source verification](release-evidence/2026-11-17-alpha5/README.md)
+includes metadata and capability-client checks, alongside signed-out source and
+release access. The declared Cargo package version is `0.1.1-alpha.5`.
 Use explicit capability discovery rather than inferring support from a version
 string, and verify artifact provenance separately.
 
