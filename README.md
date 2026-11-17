@@ -10,8 +10,8 @@ repeatable local scenarios. SleepAPI lets you:
 SleepAPI is built with Rust, Axum, and Tokio. It runs locally with no external
 provider or hosted service. SleepAPI ships **source plus a Dockerfile**; build
 the image locally using Docker's configured default platform. The quickstart
-uses the published **v0.1.1-alpha.4** source. See the
-[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
+uses the published **v0.1.1-alpha.5** source. See the
+[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5).
 
 [Quickstart](#quickstart-two-failures-then-success) · [API reference](#http-contract) ·
 [Configuration](#configuration) · [Development](#develop) · [Contributing](CONTRIBUTING.md)
@@ -30,10 +30,10 @@ server. The build uses your Docker platform defaults; no `--platform` override
 is required:
 
 ```sh
-git clone --branch v0.1.1-alpha.4 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-alpha4
-cd sleepapi-alpha4
-docker build -t sleepapi:0.1.1-alpha.4 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.4
+git clone --branch v0.1.1-alpha.5 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-alpha5
+cd sleepapi-alpha5
+docker build -t sleepapi:0.1.1-alpha.5 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.5
 ```
 
 The first build downloads base images and Rust dependencies. Wait for
@@ -347,7 +347,7 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | Endpoint | Behavior |
 | --- | --- |
 | `GET /health` | Immediate health response, independent of simulation capacity |
-| `GET /metadata` | Capabilities and configured limits; [unreleased source addition](docs/server-metadata.md) |
+| `GET /metadata` | Capabilities and configured limits; [available since alpha.5](docs/server-metadata.md) |
 | `GET /methods` | Methods, defaults, and configured limits |
 | `GET /scenarios` | Available presets, descriptions, default delays and statuses |
 | `POST /sleep/tokio` | Wait with a Tokio timer in the request task |
@@ -365,9 +365,9 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | `DELETE /runs/{run_id}` | Remove a run and its retained state |
 
 The read-only [metadata endpoint and capability-check example](docs/server-metadata.md)
-are included in the **unreleased alpha.5 source candidate**. They are not included
-in the published alpha.4 source used by the quickstart; build this checkout to
-try them. Check explicit capabilities rather than inferring support from the package
+are included in the **published alpha.5 source** used by the quickstart. The older
+alpha.4 source does not contain `/metadata`.
+Check explicit capabilities rather than inferring support from the package
 version; metadata is a declaration, not verified binary or image provenance.
 
 The stateless sleep and simulation POST endpoints accept `scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
@@ -578,22 +578,22 @@ and server startup/shutdown (`src/main.rs`).
 
 ## Release status
 
-The current source is the **unreleased `0.1.1-alpha.5` candidate**, adding
-versioned [server metadata and capability checks](docs/server-metadata.md).
-Its planned source-prerelease date is **17 November 2026 (Europe/Madrid)**;
-publication remains pending. [Clean-source installation passed](docs/release-evidence/2026-11-10-alpha5/README.md)
-on the recorded candidate. Final-commit CI and the future tagged-source checks
-remain release gates. Build this checkout to try it; the public quickstart
-continues to use alpha.4 until alpha.5 is published and verified. No new Docker
-images will be published.
+**v0.1.1-alpha.5** was published on **17 November 2026 (Europe/Madrid)** as
+source plus a Dockerfile. It adds versioned
+[server metadata and capability checks](docs/server-metadata.md) to recovery
+runs, exact UTF-8 response fixtures, and HTTP/1.1 transport faults.
+[Main CI](https://github.com/givtaj/sleepapi/actions/runs/44051798111) passed all
+four jobs on released commit `f10bd4c9551f4617f68e9ba7aa08385e178dff6a`.
+[Fresh tagged-source installation and public-access verification](docs/release-evidence/2026-11-17-alpha5/README.md)
+passed; the quickstart now builds that verified tag locally. No Docker images
+were published for alpha.5, and registry image publication remains disabled.
 
-**v0.1.1-alpha.4** is an alpha source release with a Dockerfile. It includes
-recovery runs, exact UTF-8 response fixtures, and HTTP/1.1 transport faults.
-Publication status and verification are recorded in the
-[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
+Publication status and platform limits are recorded in the
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5).
 See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
 [release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
-Earlier release tags, including [v0.1.0](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0),
+Earlier release tags, including [alpha.4](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+and [v0.1.0](https://github.com/givtaj/sleepapi/releases/tag/v0.1.0),
 remain available and unchanged.
 
 ## License
