@@ -49,7 +49,10 @@ Creation, inspection, and reset return the same summary fields:
 | `sequence` | Fully resolved steps, including default delay and method |
 | `retained_receipts` | Number of currently retained receipts |
 
-Save the returned `run_id` and `generation`. The examples below use `run-1` and
+Save the returned `run_id` and `generation`. Attempts and resets both take a JSON
+object with a named `generation` field, such as `{"generation":1}`. Current-source
+builds reject a positional array such as `[1]` with `422` before changing the run.
+The examples below use `run-1` and
 `1`; replace them with the values returned by your server.
 
 ```sh

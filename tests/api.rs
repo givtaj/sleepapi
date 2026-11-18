@@ -278,6 +278,43 @@ async fn configured_cors_covers_success_simulated_failures_and_api_rejections() 
 }
 
 #[tokio::test]
+async fn allowed_browser_origin_can_read_a_fixture_request_id() {
+    let app = cors_app();
+    let response = app
+        .clone()
+        .oneshot(post(
+            "/runs",
+            json!({"sequence": [{
+                "status_code": 503, "duration_ms": 0,
+                "fixture": {"body": "retry", "headers": {"X-Request-ID": "fixture-123"}}
+            }]}),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let run = json_body(response).await;
+    let id = run["run_id"].as_str().unwrap();
+    let origin = "http://localhost:5173";
+    let response = app
+        .oneshot(with_origin(
+            post(
+                &format!("/runs/{id}/attempts"),
+                json!({"generation": run["generation"]}),
+            ),
+            origin,
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    assert_eq!(
+        response.headers()[header::ACCESS_CONTROL_ALLOW_ORIGIN],
+        origin
+    );
+    assert_eq!(response.headers()["x-request-id"], "fixture-123");
+    assert_header_token(&response, "access-control-expose-headers", "X-Request-ID");
+}
+
+#[tokio::test]
 async fn configured_cors_does_not_allow_other_origins() {
     let app = cors_app();
     for origin in [
@@ -798,6 +835,7 @@ async fn malformed_json_invalid_schema_and_missing_content_type_return_json_erro
     let app = app();
     for (body, has_content_type, expected) in [
         ("{", true, StatusCode::BAD_REQUEST),
+        ("[0,", true, StatusCode::BAD_REQUEST),
         ("", true, StatusCode::BAD_REQUEST),
         ("{}", false, StatusCode::UNSUPPORTED_MEDIA_TYPE),
         ("null", true, StatusCode::UNPROCESSABLE_ENTITY),
@@ -807,6 +845,11 @@ async fn malformed_json_invalid_schema_and_missing_content_type_return_json_erro
             StatusCode::UNPROCESSABLE_ENTITY,
         ),
         (r#"{"duration":1}"#, true, StatusCode::UNPROCESSABLE_ENTITY),
+        (
+            r#"{"duration_ms":0,"duration_ms":0}"#,
+            true,
+            StatusCode::UNPROCESSABLE_ENTITY,
+        ),
         (
             r#"{"status_code":70000}"#,
             true,
@@ -819,6 +862,24 @@ async fn malformed_json_invalid_schema_and_missing_content_type_return_json_erro
             .await
             .unwrap();
         assert_eq!(response.status(), expected, "body: {body}");
+        assert_api_error(response).await;
+    }
+}
+
+#[tokio::test]
+async fn simulation_routes_reject_positional_arrays() {
+    let app = app();
+    for (path, payload) in [
+        ("/sleep/tokio", json!([0, 503, null])),
+        ("/sleep", json!([0, "tokio_sleep", 503, null])),
+        ("/simulate/email", json!([0, "tokio_sleep", 503, null])),
+    ] {
+        let response = app.clone().oneshot(post(path, payload)).await.unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::UNPROCESSABLE_ENTITY,
+            "{path}"
+        );
         assert_api_error(response).await;
     }
 }

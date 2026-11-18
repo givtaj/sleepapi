@@ -1,6 +1,7 @@
 mod config;
 mod error;
 mod fixtures;
+mod json_object;
 mod metadata;
 mod runs;
 mod scenario;
@@ -29,6 +30,7 @@ use tower_http::cors::CorsLayer;
 
 pub use config::Config;
 use error::{ApiError, ErrorDetails, validate_simulated_status, with_simulation_headers};
+use json_object::Object;
 use scenario::Scenario;
 pub use wait::WaitMethod;
 
@@ -78,7 +80,12 @@ pub fn router(config: Config) -> std::io::Result<Router> {
             .allow_origin(cors_origins)
             .allow_methods([Method::GET, Method::HEAD, Method::POST, Method::DELETE])
             .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
-            .expose_headers([header::RETRY_AFTER, header::WWW_AUTHENTICATE, header::ALLOW]),
+            .expose_headers([
+                header::RETRY_AFTER,
+                header::WWW_AUTHENTICATE,
+                header::ALLOW,
+                header::HeaderName::from_static("x-request-id"),
+            ]),
     ))
 }
 
@@ -103,8 +110,9 @@ struct SleepRequest {
 
 fn sleep_route(method: WaitMethod) -> MethodRouter<AppState> {
     post(
-        move |State(state): State<AppState>, payload: Result<Json<SleepRequest>, JsonRejection>| async move {
-            let Json(request) = payload.map_err(ApiError::from)?;
+        move |State(state): State<AppState>,
+              payload: Result<Json<Object<SleepRequest>>, JsonRejection>| async move {
+            let Json(Object(request)) = payload.map_err(ApiError::from)?;
             run_delay(
                 state,
                 "sleep",
@@ -163,16 +171,16 @@ async fn methods(State(state): State<AppState>) -> Json<Value> {
 
 async fn sleep(
     State(state): State<AppState>,
-    payload: Result<Json<DelayRequest>, JsonRejection>,
+    payload: Result<Json<Object<DelayRequest>>, JsonRejection>,
 ) -> Result<Response, ApiError> {
-    let Json(request) = payload.map_err(ApiError::from)?;
+    let Json(Object(request)) = payload.map_err(ApiError::from)?;
     run_delay(state, "sleep", request).await
 }
 
 async fn simulate(
     State(state): State<AppState>,
     operation: Result<Path<String>, PathRejection>,
-    payload: Result<Json<DelayRequest>, JsonRejection>,
+    payload: Result<Json<Object<DelayRequest>>, JsonRejection>,
 ) -> Result<Response, ApiError> {
     let Path(operation) =
         operation.map_err(|error| ApiError::new(error.status(), error.body_text()))?;
@@ -182,7 +190,7 @@ async fn simulate(
             "unknown simulation; use email or sms",
         ));
     }
-    let Json(request) = payload.map_err(ApiError::from)?;
+    let Json(Object(request)) = payload.map_err(ApiError::from)?;
     run_delay(state, &operation, request).await
 }
 

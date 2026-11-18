@@ -23,6 +23,7 @@ use tokio::time::Instant;
 use crate::{
     AppState, WaitMethod, default_duration,
     error::{ApiError, ErrorDetails, validate_simulated_status, with_simulation_headers},
+    json_object::{self, Object},
     transport::{self, FaultConnection},
 };
 
@@ -57,9 +58,17 @@ struct Step {
     duration_ms: u64,
     #[serde(default)]
     method: WaitMethod,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        deserialize_with = "json_object::optional",
+        skip_serializing_if = "Option::is_none"
+    )]
     fixture: Option<crate::fixtures::Fixture>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        deserialize_with = "json_object::optional",
+        skip_serializing_if = "Option::is_none"
+    )]
     fault: Option<Fault>,
 }
 
@@ -73,6 +82,7 @@ enum Fault {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct CreateRun {
+    #[serde(deserialize_with = "json_object::list")]
     sequence: Vec<Step>,
     #[serde(default = "default_ttl")]
     ttl_ms: u64,
@@ -210,9 +220,9 @@ pub(crate) fn declared_limits() -> Value {
 
 async fn create(
     State(state): State<AppState>,
-    payload: Result<Json<CreateRun>, JsonRejection>,
+    payload: Result<Json<Object<CreateRun>>, JsonRejection>,
 ) -> Result<Response, ApiError> {
-    let Json(request) = payload.map_err(ApiError::from)?;
+    let Json(Object(request)) = payload.map_err(ApiError::from)?;
     if request.sequence.is_empty() || request.sequence.len() > MAX_SEQUENCE_STEPS {
         return Err(ApiError::new(
             StatusCode::UNPROCESSABLE_ENTITY,
@@ -317,10 +327,10 @@ async fn receipts(
 async fn reset(
     State(state): State<AppState>,
     path: Result<Path<String>, PathRejection>,
-    payload: Result<Json<GenerationRequest>, JsonRejection>,
+    payload: Result<Json<Object<GenerationRequest>>, JsonRejection>,
 ) -> Result<Json<Summary>, ApiError> {
     let id = path_id(path)?;
-    let Json(request) = payload.map_err(ApiError::from)?;
+    let Json(Object(request)) = payload.map_err(ApiError::from)?;
     let summary = {
         let mut store = lock(&state.runs)?;
         let now = Instant::now();
@@ -412,10 +422,10 @@ async fn attempt(
     path: Result<Path<String>, PathRejection>,
     version: Version,
     connection: Option<Extension<ConnectInfo<FaultConnection>>>,
-    payload: Result<Json<GenerationRequest>, JsonRejection>,
+    payload: Result<Json<Object<GenerationRequest>>, JsonRejection>,
 ) -> Result<Response, ApiError> {
     let id = path_id(path)?;
-    let Json(request) = payload.map_err(ApiError::from)?;
+    let Json(Object(request)) = payload.map_err(ApiError::from)?;
     // Validation and global admission precede sequence consumption. A rejected
     // request consumes no step. This permit is released if reservation fails.
     let permit = state

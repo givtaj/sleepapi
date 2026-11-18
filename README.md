@@ -18,10 +18,16 @@ uses the published **v0.1.1-alpha.5** source. See the
 
 ## Quickstart: two failures, then success
 
-This example creates an isolated response sequence, sends three requests, then
-resets the sequence and repeats it. Use a POSIX shell (macOS/Linux, WSL, or Git
-Bash) with Git, `curl`, and `jq` installed, and Docker running in Linux-container
-mode. Rust is compiled inside Docker; no host Rust installation is needed.
+Each recovery attempt sends `POST /runs/{run_id}/attempts` with the run's current
+generation in a JSON object, such as `{"generation":1}`. To exercise an existing
+client's retry policy, its request builder must be able to send that method,
+path, and body. The [Python retry-client example](docs/client-acceptance.md)
+compares the responses the client received with the server's receipts.
+
+This example creates a run, sends three requests, then resets and replays the
+sequence. Use a POSIX shell (macOS/Linux, WSL, or Git Bash) with Git, `curl`,
+and `jq` installed, and Docker running in Linux-container mode. Docker compiles
+the Rust server during the build.
 
 ### 1. Start SleepAPI
 
@@ -116,12 +122,8 @@ docker stop --time 7 sleepapi
 
 For the Rust startup, stop the server with Ctrl-C instead of `docker stop`.
 
-Recovery runs use SleepAPI's `POST /runs/{run_id}/attempts` endpoint and a
-`generation` JSON body. Connecting an existing client may require adapting its
-request path, method, and body. See the [recovery-run guide](docs/recovery-runs.md)
-for the full contract, [fixtures and transport faults](docs/response-fixtures.md)
-for custom responses, or the [Python retry-client example](docs/client-acceptance.md)
-for a client with a bounded retry policy and server receipts.
+See the [recovery-run guide](docs/recovery-runs.md) for the full contract and
+[fixtures and transport faults](docs/response-fixtures.md) for custom responses.
 
 ## Run with Docker
 
@@ -370,7 +372,8 @@ alpha.4 source does not contain `/metadata`.
 Check explicit capabilities rather than inferring support from the package
 version; metadata is a declaration, not verified binary or image provenance.
 
-The stateless sleep and simulation POST endpoints accept `scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
+The stateless sleep and simulation POST endpoints accept a JSON object with
+`scenario`, `duration_ms`, and `status_code`. Send `{}` to use the
 defaults. The four named `/sleep/...` endpoints fix the waiting method in the
 route and reject a `method` field in the body, even if it matches the route.
 
@@ -428,7 +431,8 @@ Use a comma-separated list for multiple origins, such as
 optional port, with no trailing slash or path. Wildcards and credential-bearing
 URLs are rejected. An unset or empty list leaves cross-origin access disabled.
 This permits GET, HEAD, POST, and DELETE with `Content-Type` and `Authorization` headers,
-and exposes `Retry-After`, `WWW-Authenticate`, and `Allow` to JavaScript. Cookie
+and exposes `Retry-After`, `WWW-Authenticate`, and `Allow` to JavaScript. Builds
+from the current source also expose the fixture's `X-Request-ID` header. Cookie
 credentials are not enabled. CORS controls browser access; it is not authentication.
 
 ## Configuration

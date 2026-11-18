@@ -330,6 +330,31 @@ async fn invalid_and_stale_requests_do_not_consume_attempts_or_reset_state() {
 }
 
 #[tokio::test(start_paused = true)]
+async fn positional_generation_requests_leave_the_run_and_its_receipts_intact() {
+    let app = app();
+    let run = create(&app, zero_steps(&[200, 503])).await;
+    let id = run["run_id"].as_str().unwrap();
+    let first = app.clone().oneshot(attempt(id, 1)).await.unwrap();
+    assert_eq!(first.status(), StatusCode::OK);
+    let before = inspect(&app, id).await;
+    let first_receipt = receipts(&app, id).await;
+    assert_eq!(before["attempts_started"], 1);
+    assert_eq!(before["generation_attempts"], 1);
+    assert_eq!(first_receipt["receipts"][0]["outcome"], "completed");
+
+    for operation in ["attempts", "reset"] {
+        let path = format!("/runs/{id}/{operation}");
+        let response = app.clone().oneshot(post(&path, json!([1]))).await.unwrap();
+        api_error(response, StatusCode::UNPROCESSABLE_ENTITY).await;
+        assert_eq!(inspect(&app, id).await, before);
+        assert_eq!(receipts(&app, id).await, first_receipt);
+    }
+    let next = body(app.oneshot(attempt(id, 1)).await.unwrap()).await;
+    assert_eq!(next["status_code"], 503);
+    assert_eq!(next["attempt"], 2);
+}
+
+#[tokio::test(start_paused = true)]
 async fn run_attempts_share_capacity_with_stateless_simulations() {
     let app = router(Config {
         max_in_flight: 1,
@@ -668,6 +693,10 @@ async fn run_definitions_reject_invalid_sequences_fields_and_limits_without_allo
     })
     .unwrap();
     for invalid in [
+        json!([[{"status_code":200,"duration_ms":0}],300000]),
+        json!({"sequence":[[200,0]]}),
+        json!({"sequence":[{"status_code":200,"duration_ms":0,"fixture":["ok"]}]}),
+        json!({"sequence":[{"status_code":200,"duration_ms":0,"fault":["connection_drop"]}]}),
         json!({"sequence":[]}),
         zero_steps(&[200; 65]),
         json!({"sequence":[{"status_code":200,"duration_ms":101}]}),
