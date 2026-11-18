@@ -27,6 +27,19 @@ def metadata():
         "contract_version": 1,
         "software": {"name": "sleepapi", "version": "0.1.1-alpha.4"},
         "capabilities": {key: key != "persistent_runs" for key in CLIENT.CAPABILITIES},
+        "protocols": {"transport_faults": ["HTTP/1.1"]},
+        "wait_methods": ["tokio_sleep", "tokio_spawn", "thread_sleep", "thread_park"],
+        "scenarios": ["fast_success", "slow_provider", "delayed_failure", "client_timeout",
+                      "rate_limited", "invalid_request", "upstream_timeout"],
+        "limits": {
+            "max_duration_ms": 1000, "max_in_flight": 2, "max_request_body_bytes": 8192,
+            "runs": {"max_runs": 64, "max_sequence_steps": 64, "max_attempts_per_run": 1024,
+                     "max_receipts_per_run": 32, "default_ttl_ms": 300000, "max_ttl_ms": 3600000},
+            "fixtures": {"max_body_bytes": 4096, "max_headers": 5, "max_header_value_bytes": 256,
+                         "content_types": ["application/json", "text/plain", "application/xml"],
+                         "header_names": ["retry-after", "www-authenticate", "allow",
+                                          "cache-control", "x-request-id"]},
+        },
     }
 
 
@@ -136,6 +149,26 @@ class CheckCapabilityTests(unittest.TestCase):
             ("string capability", lambda d: d["capabilities"].update(recovery_runs="true")),
             ("null capability", lambda d: d["capabilities"].update(recovery_runs=None)),
             ("invalid added capability", lambda d: d["capabilities"].update(unrecognized="true")),
+            ("missing protocols", lambda d: d.pop("protocols")),
+            ("wrong protocol shape", lambda d: d.update(protocols=False)),
+            ("missing fault protocols", lambda d: d["protocols"].pop("transport_faults")),
+            ("wrong fault protocol type", lambda d: d["protocols"].update(transport_faults="HTTP/1.1")),
+            ("missing HTTP/1.1", lambda d: d["protocols"].update(transport_faults=["HTTP/2"])),
+            ("missing scenarios", lambda d: d.pop("scenarios")),
+            ("wrong scenario type", lambda d: d.update(scenarios=42)),
+            ("missing wait methods", lambda d: d.pop("wait_methods")),
+            ("wrong wait method type", lambda d: d.update(wait_methods=[None])),
+            ("missing limits", lambda d: d.pop("limits")),
+            ("wrong limits type", lambda d: d.update(limits="invalid")),
+            ("boolean limit", lambda d: d["limits"].update(max_in_flight=True)),
+            ("missing body limit", lambda d: d["limits"].pop("max_request_body_bytes")),
+            ("missing run limits", lambda d: d["limits"].pop("runs")),
+            ("missing receipt limit", lambda d: d["limits"]["runs"].pop("max_receipts_per_run")),
+            ("invalid TTL", lambda d: d["limits"]["runs"].update(max_ttl_ms=1)),
+            ("missing fixture limits", lambda d: d["limits"].pop("fixtures")),
+            ("invalid header limit", lambda d: d["limits"]["fixtures"].update(max_headers=-1)),
+            ("missing content types", lambda d: d["limits"]["fixtures"].pop("content_types")),
+            ("wrong header type", lambda d: d["limits"]["fixtures"].update(header_names=[""])),
         ]
         for name, change in changes:
             with self.subTest(case=name):
@@ -149,6 +182,9 @@ class CheckCapabilityTests(unittest.TestCase):
         value["new_metadata"] = SENTINEL
         value["software"]["extra"] = SENTINEL
         value["capabilities"]["future_capability"] = True
+        value["protocols"]["transport_faults"].append("HTTP/2")
+        value["scenarios"].append("future_scenario")
+        value["limits"]["runs"]["future_limit"] = {"value": 1}
         with server(json.dumps(value).encode()) as (base_url, requests):
             code, report = self.cli(base_url)
             self.assert_unknown(base_url, "future_capability")

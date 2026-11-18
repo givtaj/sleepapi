@@ -60,6 +60,30 @@ def reject_constant(_value):
     raise ValueError("invalid JSON constant")
 
 
+def valid_names(value):
+    return (isinstance(value, list) and len(value) > 0
+            and all(isinstance(name, str) and name for name in value))
+
+
+def positive_limits(value, fields):
+    return (isinstance(value, dict)
+            and all(type(value.get(field)) is int and value[field] > 0 for field in fields))
+
+
+def valid_limits(limits):
+    if not positive_limits(limits, ("max_duration_ms", "max_in_flight", "max_request_body_bytes")):
+        return False
+    runs = limits.get("runs")
+    if not positive_limits(runs, ("max_runs", "max_sequence_steps", "max_attempts_per_run",
+                                  "max_receipts_per_run", "default_ttl_ms", "max_ttl_ms")):
+        return False
+    fixtures = limits.get("fixtures")
+    return (runs["default_ttl_ms"] <= runs["max_ttl_ms"]
+            and positive_limits(fixtures, ("max_body_bytes", "max_headers", "max_header_value_bytes"))
+            and valid_names(fixtures.get("content_types"))
+            and valid_names(fixtures.get("header_names")))
+
+
 def valid_metadata(metadata):
     if not isinstance(metadata, dict):
         return False
@@ -79,8 +103,15 @@ def valid_metadata(metadata):
     if match[4] and any(part.isdigit() and len(part) > 1 and part[0] == "0"
                         for part in match[4].split(".")):
         return False
-    return (isinstance(capabilities, dict) and CAPABILITIES <= capabilities.keys()
-            and all(type(value) is bool for value in capabilities.values()))
+    if (not isinstance(capabilities, dict) or not CAPABILITIES <= capabilities.keys()
+            or not all(type(value) is bool for value in capabilities.values())):
+        return False
+    protocols = metadata.get("protocols")
+    return (isinstance(protocols, dict) and valid_names(protocols.get("transport_faults"))
+            and "HTTP/1.1" in protocols["transport_faults"]
+            and valid_names(metadata.get("wait_methods"))
+            and valid_names(metadata.get("scenarios"))
+            and valid_limits(metadata.get("limits")))
 
 
 def check_capability(base_url, capability="recovery_runs"):

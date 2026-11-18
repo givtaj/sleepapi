@@ -5,6 +5,7 @@ import http.client
 import importlib.util
 import json
 from pathlib import Path
+import re
 import socket
 import subprocess
 import sys
@@ -14,11 +15,12 @@ import uuid
 
 ORIGIN = "http://localhost:5173"
 SHUTDOWN_GRACE_MS = 500
+OWNER_LABEL = "sleepapi.smoke-owner"
 
 
-def docker(*args, timeout=20, check=True):
+def docker(*args, timeout=20):
     return subprocess.run(
-        ["docker", *args], capture_output=True, text=True, timeout=timeout, check=check
+        ["docker", *args], capture_output=True, text=True, errors="replace", timeout=timeout, check=True
     ).stdout.strip()
 
 
@@ -47,14 +49,17 @@ def request(port, method, path, payload=None, headers=None):
 
 def start(image, containers):
     name = "sleepapi-smoke-" + uuid.uuid4().hex
-    containers[name] = None  # Also recover our container if `docker run` times out.
+    owner = uuid.uuid4().hex
+    # The daemon can create the container even if the CLI never returns its ID.
+    containers[name] = (owner, None)
     container = docker(
-        "run", "--detach", "--pull=never", "--name", name,
+        "run", "--detach", "--pull=never", "--name", name, "--label", f"{OWNER_LABEL}={owner}",
         "--publish", "127.0.0.1::3000",
         "--env", "SLEEPAPI_CORS_ORIGINS=" + ORIGIN,
         "--env", f"SLEEPAPI_SHUTDOWN_GRACE_MS={SHUTDOWN_GRACE_MS}", image,
     )
-    containers[name] = container
+    require(re.fullmatch(r"[0-9a-f]{64}", container), "docker run did not return a full container ID")
+    containers[name] = (owner, container)
     details = inspect(container)
     user = details["Config"]["User"].split(":")[0]
     require(user not in ("", "0", "root"), "container must configure a non-root user")
@@ -278,10 +283,52 @@ def check_transport_faults(port):
     print("PASS: connection drop, byte-exact truncated response, recovery, receipts, and cleanup")
 
 
+def recover_container(name, owner):
+    for attempt in range(3):
+        try:
+            container = docker("ps", "--all", "--quiet", "--no-trunc",
+                               "--filter", f"name=^/{name}$", "--filter", f"label={OWNER_LABEL}={owner}",
+                               timeout=2)
+            if re.fullmatch(r"[0-9a-f]{64}", container):
+                return container
+            raise RuntimeError("could not confirm a container with the expected name and owner label")
+        except (OSError, subprocess.SubprocessError, RuntimeError):
+            if attempt == 2:
+                raise
+            time.sleep(0.2)
+
+
+def cleanup(containers, show_logs):
+    errors = []
+    for name, (owner, container) in containers.items():
+        if container is None:
+            try:
+                container = recover_container(name, owner)
+            except (OSError, subprocess.SubprocessError, RuntimeError) as error:
+                errors.append(f"{name} ({OWNER_LABEL}={owner}): unresolved ownership: {error}")
+                continue
+        if show_logs:
+            try:
+                print(docker("logs", "--tail", "30", container), file=sys.stderr)
+            except (OSError, subprocess.SubprocessError):
+                pass
+        try:
+            docker("rm", "--force", container)
+        except (OSError, subprocess.SubprocessError) as error:
+            errors.append(f"{name} ({container}): removal failed: {error}")
+        try:
+            if docker("ps", "--all", "--quiet", "--no-trunc", "--filter", f"id={container}"):
+                errors.append(f"{name} ({container}): still present after removal")
+        except (OSError, subprocess.SubprocessError) as error:
+            errors.append(f"{name} ({container}): could not confirm removal: {error}")
+    return errors
+
+
 def main():
     if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--metadata"):
         raise SystemExit("Usage: python3 scripts/docker-smoke.py IMAGE [--metadata]")
     containers = {}
+    passed = False
     try:
         container, port = start(sys.argv[1], containers)
         check_http(port)
@@ -294,21 +341,14 @@ def main():
         print("PASS: normal Docker stop exits 0")
         container, port = start(sys.argv[1], containers)
         check_incomplete_body(container, port)
-    except BaseException:
-        for name, container in containers.items():
-            try:
-                print(docker("logs", "--tail", "30", container or name, check=False), file=sys.stderr)
-            except (OSError, subprocess.SubprocessError):
-                pass
-        raise
+        passed = True
     finally:
-        for name, container in containers.items():
-            try:
-                container = container or docker("inspect", "--format", "{{.Id}}", name, check=False)
-                if container:
-                    docker("rm", "--force", container, check=False)
-            except (OSError, subprocess.SubprocessError) as error:
-                print(f"Could not clean up own smoke container {name}: {error}", file=sys.stderr)
+        errors = cleanup(containers, show_logs=not passed)
+        if errors:
+            message = "Smoke container cleanup failed:\n" + "\n".join(errors)
+            if passed:
+                raise RuntimeError(message)
+            print(message, file=sys.stderr)
 
 
 if __name__ == "__main__":
