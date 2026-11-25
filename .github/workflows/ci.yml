@@ -50,6 +50,13 @@ jobs:
       - name: Verify source package
         if: matrix.toolchain == 'stable'
         run: cargo +${{ matrix.toolchain }} package --locked
+      - name: Verify lost-reply recovery with the installed package
+        if: matrix.toolchain == 'stable'
+        run: |
+          version=$(cargo metadata --locked --no-deps --format-version 1 | jq -er '.packages[] | select(.name == "sleepapi") | .version')
+          package="target/package/sleepapi-$version"
+          cargo install --locked --path "$package" --root "$RUNNER_TEMP/sleepapi-install"
+          python3 -B "$package/scripts/verify-lost-reply.py" --installed-binary "$RUNNER_TEMP/sleepapi-install/bin/sleepapi"
 
   docker:
     name: Docker / ${{ matrix.platform }}

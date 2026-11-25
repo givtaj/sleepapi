@@ -66,7 +66,8 @@ async fn metadata_is_bounded_and_exposes_only_the_declared_schema() {
             "capabilities": {
                 "delays": true, "status_codes": true, "recovery_runs": true,
                 "run_reset": true, "run_receipts": true, "response_fixtures": true,
-                "connection_drop": false, "truncated_response": false, "persistent_runs": false,
+                "connection_drop": false, "truncated_response": false, "accept_then_drop": false,
+                "persistent_runs": false,
             },
             "protocols": {"transport_faults": ["HTTP/1.1"]},
             "wait_methods": ["tokio_sleep", "tokio_spawn", "thread_sleep", "thread_park"],
@@ -339,6 +340,7 @@ async fn fault_capabilities_follow_request_protocol_and_listener_context() {
         let metadata = body(app.clone().oneshot(request).await.unwrap()).await;
         assert_eq!(metadata["capabilities"]["connection_drop"], expected);
         assert_eq!(metadata["capabilities"]["truncated_response"], expected);
+        assert_eq!(metadata["capabilities"]["accept_then_drop"], expected);
         assert_eq!(
             metadata["protocols"]["transport_faults"],
             json!(["HTTP/1.1"])

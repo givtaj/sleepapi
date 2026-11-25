@@ -93,6 +93,11 @@ fn success_step() -> Value {
     json!({"status_code":200,"duration_ms":0})
 }
 
+fn accept_then_drop_step(method: &str) -> Value {
+    json!({"status_code":200,"duration_ms":0,"method":method,
+        "fault":{"type":"accept_then_drop"}})
+}
+
 async fn ordinary(app: &Router, status: StatusCode) {
     let response = app
         .clone()
@@ -125,21 +130,21 @@ fn assert_pending(receipt: &Value) {
     assert!(receipt["elapsed_ms"].is_null());
     assert!(receipt.get("injection_stage").is_none());
     assert!(receipt.get("injected_body_bytes").is_none());
+    assert!(receipt.get("provider_accepted").is_none());
 }
 
 #[tokio::test]
 async fn an_unpolled_fault_body_keeps_capacity_and_drop_records_cancellation() {
     for method in ["tokio_sleep", "tokio_spawn", "thread_sleep", "thread_park"] {
-        for truncate in [false, true] {
+        for (step, internal_status) in [
+            (fault_step(false, method), StatusCode::SERVICE_UNAVAILABLE),
+            (fault_step(true, method), StatusCode::SERVICE_UNAVAILABLE),
+            (accept_then_drop_step(method), StatusCode::OK),
+        ] {
             let app = app(1);
-            let id = create(
-                &app,
-                json!([fault_step(truncate, method), success_step()]),
-                300_000,
-            )
-            .await;
+            let id = create(&app, json!([step, success_step()]), 300_000).await;
             let response = app.clone().oneshot(attempt(&id, 1)).await.unwrap();
-            assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+            assert_eq!(response.status(), internal_status);
             let records = receipts(&app, &id).await;
             assert_pending(&records["receipts"][0]);
             ordinary(&app, StatusCode::TOO_MANY_REQUESTS).await;
@@ -156,6 +161,7 @@ async fn an_unpolled_fault_body_keeps_capacity_and_drop_records_cancellation() {
             assert_eq!(records["receipts"][0]["outcome"], "handler_cancelled");
             assert!(records["receipts"][0]["injection_stage"].is_null());
             assert!(records["receipts"][0]["injected_body_bytes"].is_null());
+            assert!(records["receipts"][0].get("provider_accepted").is_none());
             ordinary(&app, StatusCode::OK).await;
             let next = json_body(app.clone().oneshot(attempt(&id, 1)).await.unwrap()).await;
             assert_eq!(next["attempt"], 2);
@@ -184,6 +190,7 @@ async fn polling_connection_drop_records_injection_and_releases_capacity() {
     assert_eq!(receipt["fault"]["type"], "connection_drop");
     assert_eq!(receipt["injection_stage"], "before_headers");
     assert_eq!(receipt["injected_body_bytes"], 0);
+    assert_eq!(receipt["provider_accepted"], false);
     assert!(receipt["elapsed_ms"].is_number());
     ordinary(&app, StatusCode::OK).await;
     let next = json_body(app.oneshot(attempt(&id, 1)).await.unwrap()).await;
@@ -220,7 +227,7 @@ async fn a_prefix_waiting_for_flush_stays_pending_and_cancels_when_dropped() {
 async fn late_fault_injection_or_drop_cannot_modify_a_reset_generations_receipt() {
     for inject in [false, true] {
         let app = app(2);
-        let id = create(&app, json!([fault_step(false, "tokio_sleep")]), 300_000).await;
+        let id = create(&app, json!([accept_then_drop_step("tokio_sleep")]), 300_000).await;
         let old = app.clone().oneshot(attempt(&id, 1)).await.unwrap();
         let reset = app
             .clone()
@@ -246,6 +253,7 @@ async fn late_fault_injection_or_drop_cannot_modify_a_reset_generations_receipt(
         assert_eq!(after["receipts"].as_array().unwrap().len(), 1);
         assert_eq!(after["receipts"][0]["generation"], 2);
         assert_eq!(after["receipts"][0]["outcome"], "fault_injected");
+        assert_eq!(after["receipts"][0]["provider_accepted"], true);
     }
 }
 

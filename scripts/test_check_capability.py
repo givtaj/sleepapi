@@ -114,6 +114,19 @@ class CheckCapabilityTests(unittest.TestCase):
         self.assertEqual(report["status"], "unsupported")
         self.assertEqual(requests, [("GET", "/metadata")])
 
+    def test_optional_accept_then_drop_distinguishes_absent_and_explicit_values(self):
+        with server() as (base_url, requests):
+            self.assert_unknown(base_url, "accept_then_drop")
+        self.assertEqual(requests, [("GET", "/metadata")])
+        for enabled, expected in [(True, (0, "supported")), (False, (1, "unsupported"))]:
+            with self.subTest(enabled=enabled):
+                value = metadata()
+                value["capabilities"]["accept_then_drop"] = enabled
+                with server(json.dumps(value).encode()) as (base_url, requests):
+                    code, report = self.cli(base_url, "accept_then_drop")
+                self.assertEqual((code, report["status"]), expected)
+                self.assertEqual(requests, [("GET", "/metadata")])
+
     def test_old_404_auth_and_server_errors_are_unknown_without_body_leaks(self):
         for status in (404, 401, 403, 500):
             with self.subTest(status=status):

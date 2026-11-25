@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Add the opt-in `accept_then_drop` recovery fault. It records
+  `provider_accepted: true` before dropping the final HTTP response. An injected
+  `connection_drop` now records `provider_accepted: false`. Alpha.5 omits this
+  field, leaving acceptance unknown. Discover support through `GET /metadata`.
+  Clients using `Expect: 100-continue` may receive an interim `100 Continue`.
+
 ## 0.1.1-alpha.5 — 2026-11-17
 
 Published as a [GitHub source prerelease](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5)

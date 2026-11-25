@@ -92,6 +92,7 @@ that does not understand the schema must treat capability support as unknown.
 | `run_receipts` | `true`; bounded per-run diagnostic receipts |
 | `response_fixtures` | `true`; exact UTF-8 fixture bodies within the fixture limits |
 | `connection_drop` | `true` only when this metadata request uses HTTP/1.1 through the instrumented `FaultListener` |
+| `accept_then_drop` | Present in unreleased source after alpha.5 and `true` only through the same HTTP/1.1 listener. Records simulated acceptance before dropping the response. |
 | `truncated_response` | `true` only when this metadata request uses HTTP/1.1 through the instrumented `FaultListener` |
 | `persistent_runs` | `false`; runs and receipts are process-local and lost on restart |
 

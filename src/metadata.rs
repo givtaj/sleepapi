@@ -34,6 +34,7 @@ pub(crate) async fn get(
                 "run_receipts": true,
                 "response_fixtures": true,
                 "connection_drop": faults,
+                "accept_then_drop": faults,
                 "truncated_response": faults,
                 "persistent_runs": false,
             },

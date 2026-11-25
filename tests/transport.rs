@@ -207,8 +207,10 @@ async fn tcp_fault_sequence_recovers_and_reset_repeats_exact_wire_failures() {
             "after_body_prefix"
         );
         assert_eq!(receipt["receipts"][1]["injected_body_bytes"], 4);
+        assert!(receipt["receipts"][1].get("provider_accepted").is_none());
         assert_eq!(receipt["receipts"][2]["outcome"], "completed");
         assert!(receipt["receipts"][2].get("injection_stage").is_none());
+        assert!(receipt["receipts"][2].get("provider_accepted").is_none());
         assert_eq!(server.json("GET", "/health", None).await.0, 200);
         if generation == 1 {
             let (status, reset) = server
@@ -221,6 +223,48 @@ async fn tcp_fault_sequence_recovers_and_reset_repeats_exact_wire_failures() {
             assert_eq!(status, 200);
             assert_eq!(reset["generation"], 2);
         }
+    }
+}
+
+#[tokio::test]
+async fn tcp_zero_byte_drops_distinguish_provider_acceptance() {
+    let server = Server::start().await;
+    let id = server
+        .create(json!([
+            {"status_code":200,"duration_ms":0,"fault":{"type":"connection_drop"}},
+            {"status_code":200,"duration_ms":0,"fault":{"type":"accept_then_drop"}}
+        ]))
+        .await;
+
+    let outcomes = [("connection_drop", false), ("accept_then_drop", true)];
+    for (fault, _) in outcomes {
+        let response = server
+            .exchange(request(
+                "POST",
+                &format!("/runs/{id}/attempts"),
+                Some(json!({"generation":1})),
+                "HTTP/1.1",
+                true,
+            ))
+            .await;
+        assert!(response.is_empty(), "{fault} emitted HTTP response bytes");
+    }
+
+    let (status, result) = server
+        .json("GET", &format!("/runs/{id}/receipts"), None)
+        .await;
+    assert_eq!(status, 200);
+    let receipts = result["receipts"].as_array().unwrap();
+    assert_eq!(receipts.len(), outcomes.len());
+    for (index, (fault, accepted)) in outcomes.into_iter().enumerate() {
+        let receipt = &receipts[index];
+        assert_eq!(receipt["attempt"], index + 1);
+        assert_eq!(receipt["selected_status_code"], 200);
+        assert_eq!(receipt["fault"]["type"], fault);
+        assert_eq!(receipt["outcome"], "fault_injected");
+        assert_eq!(receipt["injection_stage"], "before_headers");
+        assert_eq!(receipt["injected_body_bytes"], 0);
+        assert_eq!(receipt["provider_accepted"], accepted);
     }
 }
 
@@ -253,7 +297,7 @@ async fn http_10_fault_rejection_does_not_consume_step() {
     let server = Server::start().await;
     let id = server
         .create(json!([
-            {"status_code":200,"duration_ms":0,"fault":{"type":"connection_drop"}}
+            {"status_code":200,"duration_ms":0,"fault":{"type":"accept_then_drop"}}
         ]))
         .await;
     let rejected = server
@@ -394,11 +438,18 @@ async fn invalid_fault_configuration_is_rejected_without_allocating_any_run() {
         json!({"fixture":{"body":"abc"},"fault":{"type":"truncated_response","after_bytes":1,"extra":true}}),
         json!({"fault":{"type":"connection_drop","after_bytes":0}}),
         json!({"fault":{"type":"connection_drop","extra":true}}),
+        json!({"fault":{"type":"accept_then_drop","after_bytes":0}}),
+        json!({"status_code":204,"fault":{"type":"accept_then_drop"}}),
+        json!({"status_code":302,"fault":{"type":"accept_then_drop"}}),
+        json!({"status_code":503,"fault":{"type":"accept_then_drop"}}),
         json!({"fault":{"type":"unknown_fault"}}),
         json!({"fault":{}}),
     ];
     for step in &mut invalid {
-        step["status_code"] = json!(200);
+        step.as_object_mut()
+            .unwrap()
+            .entry("status_code")
+            .or_insert(json!(200));
         step["duration_ms"] = json!(0);
         let response = app
             .clone()
