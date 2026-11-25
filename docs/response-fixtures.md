@@ -3,7 +3,8 @@
 Response fixtures, `connection_drop`, and `truncated_response` are included from
 **`v0.1.1-alpha.4`**. See the [prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
 and the [recovery run contract](recovery-runs.md). `accept_then_drop` is available
-in unreleased source after **`v0.1.1-alpha.5`**.
+in the **unreleased `0.1.1-alpha.6` candidate**. Final tagged-source installation
+and publication verification remain pending; the quickstart still uses alpha.5.
 
 ## Exact fixture responses
 

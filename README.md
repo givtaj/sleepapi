@@ -582,6 +582,14 @@ and server startup/shutdown (`src/main.rs`).
 
 ## Release status
 
+**0.1.1-alpha.6 is an unreleased candidate**, planned for **25 November 2026
+(Europe/Madrid)**. It combines request validation, capability-client, browser
+fixture-header, and Docker smoke cleanup fixes with the opt-in
+[`accept_then_drop` lost-final-reply fault](docs/response-fixtures.md#transport-faults).
+Final release-commit CI, fresh tagged-source Docker and native installation
+checks, and anonymous publication verification remain required. The quickstart
+stays pinned to the verified alpha.5 release until those gates pass.
+
 **v0.1.1-alpha.5** was published on **17 November 2026 (Europe/Madrid)** as
 source plus a Dockerfile. It adds versioned
 [server metadata and capability checks](docs/server-metadata.md) to recovery

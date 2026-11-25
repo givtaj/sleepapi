@@ -4,15 +4,22 @@
 starting a test. It returns `200` JSON with `Cache-Control: no-store`, without
 consuming simulation capacity, creating a run, or changing existing runs.
 
-This endpoint and its example client are included in the **published
+This endpoint and its example client were introduced in the **published
 `0.1.1-alpha.5` source prerelease**, released on **17 November 2026 (Europe/Madrid)**.
 Use the [source-build quickstart](../README.md#quickstart-two-failures-then-success)
 to run it locally. The earlier `v0.1.1-alpha.4` source tag does not contain
 `/metadata`. Distribution is source plus a Dockerfile for local builds; registry
 images are not published.
-The [fresh tagged-source verification](release-evidence/2026-11-17-alpha5/README.md)
+The historical [fresh tagged-source verification](release-evidence/2026-11-17-alpha5/README.md)
 includes metadata and capability-client checks, alongside signed-out source and
-release access. The declared Cargo package version is `0.1.1-alpha.5`.
+release access for alpha.5.
+
+The current source is the **unreleased `0.1.1-alpha.6` candidate**. It adds the
+`accept_then_drop` capability and strengthens the example client's validation
+of required protocols, wait methods, scenarios, and limits. Missing or malformed
+declarations produce `unknown`. Final release-commit CI and fresh tagged-source
+verification remain required; the quickstart stays pinned to alpha.5 until the
+new release is verified.
 Use explicit capability discovery rather than inferring support from a version
 string, and verify artifact provenance separately.
 
@@ -92,7 +99,7 @@ that does not understand the schema must treat capability support as unknown.
 | `run_receipts` | `true`; bounded per-run diagnostic receipts |
 | `response_fixtures` | `true`; exact UTF-8 fixture bodies within the fixture limits |
 | `connection_drop` | `true` only when this metadata request uses HTTP/1.1 through the instrumented `FaultListener` |
-| `accept_then_drop` | Present in unreleased source after alpha.5 and `true` only through the same HTTP/1.1 listener. Records simulated acceptance before dropping the response. |
+| `accept_then_drop` | Present in the unreleased alpha.6 candidate and `true` only through the same HTTP/1.1 listener. Records simulated acceptance before dropping the final response. |
 | `truncated_response` | `true` only when this metadata request uses HTTP/1.1 through the instrumented `FaultListener` |
 | `persistent_runs` | `false`; runs and receipts are process-local and lost on restart |
 
