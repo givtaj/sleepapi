@@ -117,7 +117,7 @@ curl -fsS -X DELETE "$BASE_URL/runs/$RUN_ID"
 If you used Docker above, stop the container:
 
 ```sh
-docker stop --time 7 sleepapi
+docker stop --timeout 7 sleepapi
 ```
 
 For the Rust startup, stop the server with Ctrl-C instead of `docker stop`.
@@ -164,7 +164,7 @@ After building `sleepapi:dev` above, configure it with environment variables:
 docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 -e SLEEPAPI_CORS_ORIGINS=http://localhost:5173 sleepapi:dev
 ```
 
-Stop it from another terminal with `docker stop --time 7 sleepapi`. The default
+Stop it from another terminal with `docker stop --timeout 7 sleepapi`. The default
 application grace period is five seconds; keep Docker's stop timeout longer than
 `SLEEPAPI_SHUTDOWN_GRACE_MS` when overriding that setting. Docker forwards SIGTERM
 to the binary running as PID 1.
