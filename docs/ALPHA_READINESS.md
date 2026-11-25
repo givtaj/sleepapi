@@ -1,6 +1,49 @@
 # SleepAPI alpha readiness
 
-Assessment date: 2026-11-17 (Europe/Madrid). Current source prerelease:
+Assessment date: **2026-11-25 (Europe/Madrid)**. Current candidate:
+**`0.1.1-alpha.6` — unreleased**, planned for **25 November 2026**.
+Distribution remains source plus a Dockerfile for local builds using Docker's
+defaults. Docker image publication remains disabled.
+
+## Alpha.6 candidate scope and pending gates
+
+This candidate combines the four fixes from
+[PR #26](https://github.com/givtaj/sleepapi/pull/26) with the lost-final-reply change
+from [PR #27](https://github.com/givtaj/sleepapi/pull/27):
+
+- Require JSON objects for request bodies, sequence steps, and nested fixture or
+  fault configurations; reject positional arrays before consuming run state.
+- Validate the capability client's required protocols, wait methods, scenarios,
+  and limits; malformed or missing declarations leave support unknown.
+- Make fixture `X-Request-ID` readable through CORS for allowed browser origins.
+- Fail Docker smoke checks when removal of an owned container is unconfirmed,
+  while preserving any original smoke failure.
+- Add opt-in `accept_then_drop` with supported 2xx statuses. Injected receipts
+  distinguish simulated acceptance (`true`) from `connection_drop` (`false`)
+  before the final response is dropped. Missing receipts remain unknown.
+
+PR #27 reports **100 Rust and 43 Python tests** for the combined source. Those
+results and the historical comparison do not validate the final version and
+documentation commit. Final review and all four exact-release-commit CI jobs
+remain required before tagging. Fresh tagged-source Docker installation, a
+native installed-binary check of both lost-reply restart controls, and anonymous
+release/source-archive access remain pending for alpha.6.
+
+The installed controls must keep the same SleepAPI process running while each
+synthetic worker restarts. A direct HTTP/1.1 request without `Expect: 100-continue`
+receives zero response bytes. A correlated `provider_accepted: false` receipt
+permits one retry, leaving two receipts; `true` suppresses a second send through
+three polls, leaving one receipt and the next success step unused. These are
+synthetic observations of process-local receipts, not real provider completion
+or general replay safety. Follow [the tagged-installation gate](RELEASING.md#verify-lost-replies-on-a-tagged-installation).
+
+The quickstart remains pinned to verified alpha.5 until alpha.6 publication and
+fresh installation are verified. Historical receipts below apply only to their
+recorded versions and commits.
+
+## Published alpha.5 baseline (historical)
+
+Assessment date: 2026-11-17 (Europe/Madrid).
 **`0.1.1-alpha.5` — published**. This release adds
 [read-only server metadata and a capability-check client](server-metadata.md),
 alongside development coverage since alpha.4. Distribution is source plus a
@@ -21,7 +64,7 @@ The merged tree matches the reviewed candidate
 `856e01e8165c1f71add9a1869a6b73fad8a816c0`.
 [Main CI run 42817521918](https://github.com/givtaj/sleepapi/actions/runs/42817521918)
 passed all four jobs on that merge: Rust stable, Rust 1.94.0, native Linux AMD64
-Docker and native Linux ARM64 Docker. The suite has 96 Rust and 37 Python tests;
+Docker and native Linux ARM64 Docker. That suite had 96 Rust and 37 Python tests;
 eight publication-tool tests were removed with the image-publication tooling.
 
 Documentation reconciliation in
@@ -71,7 +114,7 @@ fixtures ([#5](https://github.com/givtaj/sleepapi/issues/5)) and transport fault
 alpha.4; see the [API contract](response-fixtures.md). Alpha.3's
 historical release evidence below covers its original 58-test source only.
 
-## Alpha.5 release scope
+## Alpha.5 release scope (historical)
 
 - Local developer tool, source plus Dockerfile. Users run `docker build` with
   their machine's defaults. CI tests Linux AMD64 and ARM64. Fresh tagged-source
@@ -115,17 +158,18 @@ not green. Fixes create a new candidate; do not relax a threshold to pass a run.
 | Gate | Required threshold | Evidence |
 | --- | --- | --- |
 | Defects | Zero unresolved critical/high-severity defects in supported behavior: crashes, hangs, incorrect HTTP contracts, or isolation failures | Review of final diff and failure triage; this is not a claim of a security audit |
-| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; current suite has 96 Rust tests, with 37 Python tests in stable CI; published alpha.4 has 86 Rust tests |
+| Rust quality and contract | Formatting clean, zero Clippy warnings, all tests pass with zero ignored failures on stable and Rust 1.94.0; release builds succeed | Both Linux Rust CI jobs; PR #27 reports 100 Rust and 43 Python tests for this candidate; final release-commit results pending |
 | Wait and lifecycle correctness | No early response; capacity returns structured `429` when full and recovers; dropped async work releases capacity; started blocking work retains it; graceful exit `0`, deadline/second-signal exit `2` | Rust API/wait/process tests and Docker smoke; existing process tests use a 3-second observation timeout |
 | Recovery runs | Deterministic reservation order; rejected attempts consume no step; finite sequence exhaustion and stale generations reject; reset preserves lifetime budget and TTL; late completions cannot recreate cleared state | `tests/runs.rs` and recovery-inclusive Docker HTTP smoke |
 | Fixtures and faults | Exact fixture bytes and allowed headers; no-header drop; byte-exact truncated prefix with incomplete declared length; rejected inputs consume no state; fault bodies retain capacity; late injection cannot restore cleared receipts | `tests/fixtures.rs`, `tests/transport.rs`, `tests/fault_lifecycle.rs`, transport unit tests and Docker client checks |
+| Lost final replies | Fresh tagged native install; zero-byte final-reply loss, distinct worker PIDs, correlated run/generation/attempt receipts; plain drop retries once, accepted drop suppresses another send through three polls; owned runs and server cleaned up | `scripts/verify-lost-reply.py --installed-binary PATH`; both installed restart controls pending for alpha.6 |
 | Blocked stdout | 2,048 requests progress with stdout saturated; logger teardown and incomplete-body shutdown terminate within 1 second with 150-ms grace; second signal terminates within 1 second during a 10-second grace | Three deterministic subprocess regressions; observation limits are test guards, not general latency promises |
 | Sampler shutdown | Both SIGINT and SIGTERM and a stop file finish within 1 second in the long-interval fixture; preserve samples and restore handlers on errors | Six Python regression tests; polling interval is at most 100 ms, excluding setup/I/O |
 | Local HTTP regression | 64 requests on each of 4 routes at concurrency 16 and 40-ms delay: 256 valid responses, zero unexpected statuses/timeouts/transport errors; per-route p95 client overhead ≤250 ms; every health probe ≤250 ms | `scripts/alpha-smoke.py`; two Tokio workers, loopback, two-second request timeout; nearest-rank p95 includes HTTP client/network overhead |
 | Admission recovery | For every method, prove capacity-one rejection during a 300-ms wait, health stays ≤250 ms while occupied, and a real simulation succeeds within 1,300 ms of the admitted attempt's launch | Separate process in alpha smoke; tests ordinary completion, while Rust tests cover cancellation semantics |
 | Retry-client example | Both three-attempt sequences recover and repeat after reset; exact fixture bytes and observed faults match; stale generations consume no step; receipts correlate; owned runs are deleted | `examples/retry-client.py --binary target/release/sleepapi` in stable CI; synthetic Python-client evidence, separate from external client acceptance |
 | Metadata and capability client | Bounded no-store response derived from enforced limits; read-only and responsive at full capacity; accurate HTTP/1.1/listener fault flags; strict boolean capabilities and supported/unsupported/unknown results; no verified-identity claim | Rust metadata regressions, Python capability-client tests, and `scripts/docker-smoke.py IMAGE --metadata` in both native Docker CI jobs; older alpha.4 must be checked without the flag |
-| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke | All four [main CI jobs](https://github.com/givtaj/sleepapi/actions/runs/44051798111) passed at released commit `f10bd4c`; the immutable tag, [fresh tagged-source Linux ARM64 installation and signed-out access](release-evidence/2026-11-17-alpha5/README.md) passed. The source prerelease is published; no registry publication |
+| Distribution | All four CI jobs pass for the final release commit; clean package builds; both native Linux container architectures pass HTTP/CORS/non-root/shutdown and metadata smoke; fresh tagged installation and anonymous release/source access pass | Alpha.6 final-commit CI, tagged installation, and publication verification pending; [alpha.5 evidence](release-evidence/2026-11-17-alpha5/README.md) remains historical. No registry publication |
 
 The numeric latency limits are broad regression guards for the fixed smoke
 workload on the recorded host. They are not service SLOs or maximum throughput
@@ -133,7 +177,7 @@ measurements. The October 29 CPU/RSS/thread counts provide a reproducible,
 descriptive baseline for their recorded setup; they do not introduce release
 budgets or production SLOs.
 
-## Development coverage after alpha.4
+## Alpha.5 development coverage (historical)
 
 The alpha.5 release has 96 Rust and 37 Python tests. Metadata
 coverage checks declarations, configured limits, listener/protocol context,
@@ -227,11 +271,13 @@ capacity remain unverified.
 
 ## Current next step
 
-Alpha.5 source publication is complete. Use the verified source-build quickstart
-and collect feedback within the documented platform limits. These synthetic
-checks do not establish customer acceptance or production capacity.
+Review the alpha.6 candidate and require green CI on its exact final release
+commit, including both Rust toolchains and Docker architectures. Then tag that commit,
+verify a fresh tagged-source Docker build and native installation with both
+lost-reply restart controls, and publish the source prerelease. Verify anonymous
+release and archive access before updating the quickstart pin. Record actual
+results using [Releasing](RELEASING.md#release-sequence).
 
-Keep the alpha.5 tag and historical release evidence immutable. Later source
-fixes require a new version and the review, exact-commit CI, tagged-installation
-and public-access gates in [Releasing](RELEASING.md#release-sequence). Documentation
-updates on main do not change the released source. Do not publish Docker images.
+Keep earlier tags and historical release evidence immutable. These synthetic
+checks do not establish customer acceptance or production capacity. Do not
+publish Docker images.

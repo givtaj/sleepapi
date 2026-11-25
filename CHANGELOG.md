@@ -1,12 +1,36 @@
 # Changelog
 
-## Unreleased
+## 0.1.1-alpha.6 — unreleased candidate
+
+Planned source prerelease date: **25 November 2026 (Europe/Madrid)**.
+Publication is pending final review, exact-release-commit CI, fresh tagged-source
+Docker and native installation checks, and anonymous release/source access.
+Distribution remains source plus a Dockerfile; Docker image publication is disabled.
+
+### Fixed
+
+- Reject positional JSON arrays where request bodies, sequence steps, or nested
+  fixture/fault configurations require objects. Invalid input must not consume
+  an attempt or reset a run's generation; the `sequence` itself remains an array.
+- Validate required protocol, wait-method, scenario, and limit declarations in
+  the capability-check example. Missing or malformed declarations produce
+  `unknown` instead of reporting capability support.
+- Expose fixture `X-Request-ID` headers through CORS so allowed browser clients
+  can read them.
+- Fail Docker smoke verification when cleanup of its owned container cannot be
+  confirmed, including after an uncertain launch. Preserve the original smoke
+  failure and check container ownership before removal.
+
+### Added
 
 - Add the opt-in `accept_then_drop` recovery fault. It records
-  `provider_accepted: true` before dropping the final HTTP response. An injected
+  `provider_accepted: true` when injected, before dropping the final HTTP response,
+  and requires a supported 2xx status. An injected
   `connection_drop` now records `provider_accepted: false`. Alpha.5 omits this
   field, leaving acceptance unknown. Discover support through `GET /metadata`.
   Clients using `Expect: 100-continue` may receive an interim `100 Continue`.
+  Receipts describe simulated acceptance and remain bounded and process-local;
+  a missing receipt leaves acceptance unknown.
 
 ## 0.1.1-alpha.5 — 2026-11-17
 
