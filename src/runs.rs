@@ -76,6 +76,7 @@ struct Step {
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 enum Fault {
     ConnectionDrop {},
+    AcceptThenDrop {},
     TruncatedResponse { after_bytes: usize },
 }
 
@@ -110,6 +111,8 @@ struct Receipt {
     elapsed_ms: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     fault: Option<Fault>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    provider_accepted: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     injection_stage: Option<&'static str>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -236,7 +239,13 @@ async fn create(
         ));
     }
     for step in &request.sequence {
-        validate_simulated_status(step.status_code)?;
+        let status = validate_simulated_status(step.status_code)?;
+        if matches!(step.fault, Some(Fault::AcceptThenDrop {})) && !status.is_success() {
+            return Err(ApiError::new(
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "accept_then_drop requires a supported 2xx status_code",
+            ));
+        }
         if let Some(fixture) = &step.fixture {
             fixture.validate()?;
         }
@@ -401,12 +410,19 @@ impl AttemptGuard {
         // Never insert here: a reset, deletion, expiry, or retention eviction
         // must not be undone by an old request finishing or being dropped.
         if let Some(receipt) = run.receipts.iter_mut().find(|r| r.attempt == self.attempt) {
-            receipt.outcome = outcome;
-            receipt.elapsed_ms = Some(now.duration_since(self.started).as_secs_f64() * 1000.0);
             if let Some((stage, bytes)) = injection {
+                // Publish the simulated acceptance and response loss together
+                // before the body returns its intentional transport error.
+                receipt.provider_accepted = match receipt.fault {
+                    Some(Fault::AcceptThenDrop {}) => Some(true),
+                    Some(Fault::ConnectionDrop {}) => Some(false),
+                    _ => None,
+                };
                 receipt.injection_stage = Some(stage);
                 receipt.injected_body_bytes = Some(bytes);
             }
+            receipt.outcome = outcome;
+            receipt.elapsed_ms = Some(now.duration_since(self.started).as_secs_f64() * 1000.0);
         }
     }
 }
@@ -473,6 +489,7 @@ async fn attempt(
             outcome: Outcome::Pending,
             elapsed_ms: None,
             fault: step.fault,
+            provider_accepted: None,
             injection_stage: None,
             injected_body_bytes: None,
         });
@@ -511,10 +528,12 @@ async fn attempt(
         // Hyper drops the body before injection, guard Drop records cancellation
         // and capacity is released without claiming a fault was delivered.
         *response.body_mut() = match fault {
-            Fault::ConnectionDrop {} => transport::connection_drop(move || {
-                guard.inject("before_headers", 0);
-                drop(permit);
-            }),
+            Fault::ConnectionDrop {} | Fault::AcceptThenDrop {} => {
+                transport::connection_drop(move || {
+                    guard.inject("before_headers", 0);
+                    drop(permit);
+                })
+            }
             Fault::TruncatedResponse { after_bytes } => {
                 let bytes = step.fixture.as_ref().expect("validated fixture").bytes();
                 response

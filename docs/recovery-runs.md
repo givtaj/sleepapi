@@ -155,6 +155,8 @@ array. Each receipt contains `generation`, `attempt`, `sequence_step`,
 Outcomes are `pending`, `completed`, `handler_cancelled`, `wait_failed`, or
 `fault_injected`. Fault receipts also describe the injection stage and byte
 count; see the [fault diagnostics contract](response-fixtures.md#transport-faults).
+Current source adds `provider_accepted` to injected pre-header drop receipts
+for the [simulated acceptance scenario](response-fixtures.md#simulate-acceptance-with-a-lost-response).
 `elapsed_ms` is `null` while pending; afterwards it records server-side time
 since reservation, including scheduling. The selected status is the configured
 simulation response; it does not become a different status when a wait fails.

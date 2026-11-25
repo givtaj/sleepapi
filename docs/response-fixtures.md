@@ -1,8 +1,9 @@
 # Response fixtures and transport faults
 
-These features are included from **`v0.1.1-alpha.4`**. Publication and verification
-are recorded in the [prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4).
-They extend [recovery runs](recovery-runs.md); earlier tags do not accept these fields.
+Response fixtures, `connection_drop`, and `truncated_response` are included from
+**`v0.1.1-alpha.4`**. See the [prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
+and the [recovery run contract](recovery-runs.md). `accept_then_drop` is available
+in unreleased source after **`v0.1.1-alpha.5`**.
 
 ## Exact fixture responses
 
@@ -79,9 +80,9 @@ socket does not support faults.
 }
 ```
 
-- `connection_drop` aborts the connection before response headers. It does not
-  promise a particular operating-system FIN versus reset packet; the client
-  receives no HTTP response status.
+- `connection_drop` aborts the connection before the final response headers.
+  The operating system may signal EOF or reset. A request using
+  `Expect: 100-continue` can receive an interim `100 Continue`.
 - `truncated_response` requires a fixture and an `after_bytes` value greater than
   zero and smaller than the fixture's UTF-8 byte length. The server declares the
   full body length, writes exactly that prefix, then aborts before the remaining
@@ -105,3 +106,46 @@ client delivery. A body abandoned before injection records `handler_cancelled`.
 Always fetch receipts through a separate request; a deliberately broken response
 cannot reliably carry diagnostics. Storage and lifetime use the same bounded
 run/receipt limits above, and the process shutdown deadline still applies.
+
+### Simulate acceptance with a lost response
+
+Use `accept_then_drop` to test how a worker reconciles an ambiguous transport
+failure after simulated provider acceptance. It requires a supported `2xx`
+`status_code`. Discover support with `GET /metadata` and look for
+`capabilities.accept_then_drop: true` on the HTTP/1.1 path used by the worker.
+The capability check in this checkout accepts `--capability accept_then_drop`.
+Published alpha.5 omits this capability. Check the running server's metadata
+even when two builds declare the same package version.
+
+Send this configuration to `POST /runs` and call the attempts endpoint twice
+with the returned generation:
+
+```json
+{
+  "sequence": [
+    {"status_code":200,"duration_ms":0,"fault":{"type":"connection_drop"}},
+    {"status_code":200,"duration_ms":0,"fault":{"type":"accept_then_drop"}}
+  ]
+}
+```
+
+Both faults drop the final HTTP response. A direct HTTP/1.1 request without
+`Expect: 100-continue` receives zero response bytes. When the client requests
+it, an interim `100 Continue` may precede step selection.
+
+Both injected faults produce a receipt with `fault_injected`, `before_headers`,
+and `injected_body_bytes: 0`. On a build supporting `accept_then_drop`, the
+existing `connection_drop` fault explicitly records `provider_accepted: false`.
+The new fault records `provider_accepted: true` at injection, even when both
+steps select the same `200` status. Published alpha.5 omits the field on an
+injected `connection_drop`. An absent field or a missing receipt leaves
+acceptance unknown.
+
+Pending or cancelled attempts, ordinary responses, and truncations omit the
+field. The acceptance record exists only in the simulator. Read it from the
+same SleepAPI process while the generation is current and the receipt is among
+the 32 most recent attempts. Reset, expiry, deletion, or a server restart can
+clear it.
+
+See the [synthetic worker comparison](release-evidence/2026-11-23-lost-reply/README.md)
+for raw byte counts, receipts, restart decisions, and commands to repeat the test.

@@ -20,6 +20,7 @@ CAPABILITIES = frozenset({
     "delays", "status_codes", "recovery_runs", "run_reset", "run_receipts",
     "response_fixtures", "connection_drop", "truncated_response", "persistent_runs",
 })
+OPTIONAL_CAPABILITIES = frozenset({"accept_then_drop"})
 EXIT_CODES = {"supported": 0, "unsupported": 1, "unknown": 2}
 VERSION = re.compile(
     r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
@@ -116,7 +117,7 @@ def valid_metadata(metadata):
 
 def check_capability(base_url, capability="recovery_runs"):
     report = {"status": "unknown", "identity_verified": False}
-    if capability not in CAPABILITIES:
+    if capability not in CAPABILITIES and capability not in OPTIONAL_CAPABILITIES:
         return report
     report["capability"] = capability
     connection = None
@@ -141,7 +142,7 @@ def check_capability(base_url, capability="recovery_runs"):
             return report
         metadata = json.loads(body.decode("utf-8"), object_pairs_hook=unique_object,
                               parse_constant=reject_constant)
-        if valid_metadata(metadata):
+        if valid_metadata(metadata) and capability in metadata["capabilities"]:
             report["status"] = "supported" if metadata["capabilities"][capability] else "unsupported"
             report["declared_software_version"] = metadata["software"]["version"]
     except (OSError, ValueError, http.client.HTTPException, RecursionError):

@@ -1,0 +1,94 @@
+{
+  "baseline": {
+    "tag": "v0.1.1-alpha.5",
+    "commit": "f10bd4c9551f4617f68e9ba7aa08385e178dff6a",
+    "tree": "89a53bf72eed09028525b5c24070aa903d8b4c40",
+    "annotated_tag_object": "c010a875f2d6c9a731dfa7fce0571ba4cbb7a4de",
+    "tag_github_verification": false,
+    "published_at": "2026-11-17T09:08:47Z",
+    "uploaded_assets": [],
+    "archive": {
+      "url": "https://github.com/givtaj/sleepapi/archive/refs/tags/v0.1.1-alpha.5.tar.gz",
+      "sha256": "65b9200f08127ba609c9ae2cbaa5a8c81aef0668c36509015c4420c03635e54f",
+      "files_with_matching_git_blob_bytes_and_executable_bits": 555,
+      "extra_archive_files": 0
+    },
+    "native_install": {
+      "command": "cargo install --offline --locked --path <extracted-source> --root <install-path> --target-dir <fresh-target>",
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+      "macos": "26.0.1",
+      "architecture": "arm64",
+      "dependency_cache_reused": true,
+      "exit_code": 0,
+      "package": "sleepapi v0.1.1-alpha.5",
+      "binary_sha256": "11cf05a7e0a5b79f17279af90bfc8853a93e2d9b988780c410eb8f9a266d055d",
+      "lockfile_sha256": "b7773540e896062ddc2a9093bdf31321264577ef627817121d89651f73a37b51"
+    },
+    "observed_at": "2026-11-23T17:21:14.495518+00:00"
+  },
+  "candidate": {
+    "commit": "788042f45d1bb1a2f21bd0fca1164088c1f7956f",
+    "tree": "778751a805e54d7c1036e06bc77d6ef3dff2eb77",
+    "base_commit": "71b4283905352628f5654631f640ea228049edb5",
+    "source": "Isolated extraction of git archive at the tested commit",
+    "source_tar_sha256": "7f262078acb1dabff67a062a4aebef49734aab7250bc11bfacef588101467469",
+    "cargo_lock_sha256": "b7773540e896062ddc2a9093bdf31321264577ef627817121d89651f73a37b51",
+    "command": "cargo build --release --locked --offline",
+    "target": "aarch64-apple-darwin",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+    "fresh_target_directory": true,
+    "dependency_cache_reused": true,
+    "binary_sha256": "be94ef691665917f48d620c9c2cfec2fcd4d511950d4a8aee3f3d109716d9d48"
+  },
+  "comparison": {
+    "report": "comparison.json",
+    "observed_at": "2026-11-23T17:28:20.791486+00:00",
+    "report_sha256": "1380ad11b50f444843496e2662c1f45f09d3e22d823542641e0cdf1e7defa122",
+    "harness": "scripts/verify-lost-reply.py",
+    "harness_sha256": "e2858124729866f1b2a92a32a918c0e8ef96b7baa593951854cfb1468187705e",
+    "shared_helper": "examples/retry-client.py",
+    "shared_helper_sha256": "69528a80e1e7b63967b0d421ffee8a179fc4d295c776e105678dc52d5c183aaa",
+    "python": "3.9.6",
+    "exit_code": 0,
+    "negative_control": {
+      "description": "Supplied the published binary in both roles",
+      "exit_code": 1,
+      "error": "AssertionError: candidate lacks accept_then_drop"
+    }
+  },
+  "candidate_checks": {
+    "cargo fmt --check": {
+      "exit_code": 0
+    },
+    "cargo clippy --offline --locked --all-targets -- -D warnings": {
+      "exit_code": 0
+    },
+    "cargo test --offline --locked": {
+      "exit_code": 0,
+      "passed": 100,
+      "failed": 0,
+      "ignored": 0
+    },
+    "python3 -B -m unittest discover -s scripts -p 'test_*.py' -v": {
+      "exit_code": 0,
+      "passed": 43
+    },
+    "scripts/alpha-smoke.py": {
+      "exit_code": 0,
+      "passed": true,
+      "source_manifest_sha256": "e97ff82623908a4adaf790fcc6b1822274fdd2a5e34260ef4e0067bae0c138de",
+      "workload_server_exit_code": 0,
+      "capacity_server_exit_code": 0
+    },
+    "examples/retry-client.py": {
+      "exit_code": 0,
+      "server_exit_code": 0,
+      "passed_cases": [
+        "status_recovery",
+        "transport_recovery"
+      ]
+    }
+  }
+}

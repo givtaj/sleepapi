@@ -116,6 +116,7 @@ Use this checklist for each release and include the final results in its notes:
 | Docker / linux/arm64 | Successful native build and container smoke checks, including `--metadata` for alpha.5 |
 | Tag matches the tested commit | Annotated tag resolves to the same full SHA |
 | Fresh public installation works | New tagged checkout, local Docker build, HTTP and shutdown checks |
+| Native lost-reply check for tags shipping `accept_then_drop` | Passing [installed-binary check](#verify-lost-replies-on-a-tagged-installation) with its tag, commit and JSON report |
 | Source release is publicly available | GitHub release and source archive URLs work without authentication |
 
 ## Release sequence
@@ -171,6 +172,10 @@ Use this checklist for each release and include the final results in its notes:
    Dockerfile, `Cargo.lock`, `src/`, and `LICENSE`; the build must not depend on
    an existing `target/` directory or local secrets.
 
+   For a release that includes `accept_then_drop`, also run the
+   [native installed-binary check](#verify-lost-replies-on-a-tagged-installation)
+   from this checkout.
+
 5. **Publish the approved GitHub prerelease using the tested tag.** Use the tag as
    the title, enable the prerelease flag, summarize the changes and limits, and link the
    README's Docker instructions. [GitHub provides source archives](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases).
@@ -183,6 +188,41 @@ Use this checklist for each release and include the final results in its notes:
    readiness record. This avoids changing the immutable release commit merely
    to insert its own SHA. Creating a release is a publication step; updating
    these documents alone does not perform it.
+
+## Verify lost replies on a tagged installation
+
+Run this check from the fresh tagged checkout in step 4, with
+`SLEEPAPI_RELEASE_TAG` set to the tag from step 3. It requires Rust 1.94 or
+newer and Python 3.9 or newer. The probe starts the installed binary on a
+loopback port and stops it when the check finishes.
+
+```sh
+(
+  set -e
+  : "${SLEEPAPI_RELEASE_TAG:?Set SLEEPAPI_RELEASE_TAG to the release tag}"
+  test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/${SLEEPAPI_RELEASE_TAG}^{commit}")"
+  verify_dir=$(mktemp -d)
+  echo "Tagged installation evidence in $verify_dir"
+  echo "$SLEEPAPI_RELEASE_TAG" > "$verify_dir/tag.txt"
+  git rev-parse HEAD > "$verify_dir/commit.txt"
+  cargo install --locked --path . --root "$verify_dir/install" --target-dir "$verify_dir/target"
+  python3 -B scripts/verify-lost-reply.py --installed-binary "$verify_dir/install/bin/sleepapi" \
+    > "$verify_dir/lost-reply.json"
+)
+```
+
+Keep the tag, commit and passing JSON report with the release evidence. The
+probe requires the installed server to advertise `accept_then_drop: true` via
+`GET /metadata`. In each case a synthetic worker sends one direct HTTP/1.1
+request without `Expect: 100-continue`, receives zero response bytes, and
+restarts. An injected `connection_drop` records `provider_accepted: false`.
+The restarted worker retries once and consumes the following success step.
+An injected `accept_then_drop` records `provider_accepted: true`. The
+restarted worker leaves the success step unused through all three polls.
+
+The [candidate comparison](release-evidence/2026-11-23-lost-reply/README.md)
+passed on macOS ARM64 against published alpha.5. Each future tag containing
+this feature needs a fresh installation report for its own revision.
 
 ## Local checks when implementation changes
 
