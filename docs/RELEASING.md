@@ -1,21 +1,19 @@
 # Releasing SleepAPI
 
-The current candidate is **`0.1.1-alpha.6` — unreleased**, with source publication
-planned for **25 November 2026 (Europe/Madrid)**. It combines the four fixes from
-PR #26 and the lost-final-reply change from PR #27. Final release-commit CI, fresh
-tagged-source Docker and native installation checks, and anonymous release/source
-access remain required; see the [candidate scope](ALPHA_READINESS.md#alpha6-candidate-scope-and-pending-gates).
-
-The currently published source prerelease is **`0.1.1-alpha.5` — published on
-17 November 2026 (Europe/Madrid)**. Its
-[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5)
+The current source prerelease is **`0.1.1-alpha.6` — published on
+25 November 2026 (Europe/Madrid)**. It combines the four fixes from PR #26 and
+the lost-final-reply change from PR #27; see the
+[release scope](ALPHA_READINESS.md#alpha6-release-scope-and-verification).
+Its [release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.6)
 record the immutable source commit, exact-commit CI, fresh tagged-source
-installation and public-access verification.
+Docker and native installation, both lost-reply restart controls, and anonymous
+release/source-access verification.
 Distribution is source plus a Dockerfile for local builds using Docker's
 defaults; Docker image publication is disabled.
 
-The README quickstart keeps the verified alpha.5 source tag until alpha.6
-publication and fresh installation are verified. The earlier
+The README quickstart now builds the verified alpha.6 tag. The immutable tagged
+docs retain the preparation-time candidate wording and alpha.5 pin; this later
+completion record on main does not move that tag. The earlier
 [alpha.4 release](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
 remains available unchanged; its source does not include `/metadata`.
 
@@ -39,12 +37,18 @@ or existing registry artifacts. Do not republish an old tag to apply this policy
 
 ## Release evidence
 
-Alpha.6 release evidence is pending. PR #27 reports 100 Rust and 43 Python tests
-for the combined implementation; those results do not replace CI on the final
-version/documentation commit or installation from its exact tag. Retain new
-release receipts separately from the historical records below, including both
-native installed lost-reply controls. Existing alpha.5 receipts do not validate
-alpha.6.
+The published `v0.1.1-alpha.6` annotated tag resolves to
+[`0085226a91eb5f5a989de7377bb0e3e35a21d439`](https://github.com/givtaj/sleepapi/commit/0085226a91eb5f5a989de7377bb0e3e35a21d439).
+All four jobs passed in [main CI run 45592959784](https://github.com/givtaj/sleepapi/actions/runs/45592959784):
+100 Rust tests on each toolchain, 43 Python tests on stable, and native Linux
+AMD64/ARM64 Docker checks. [Fresh tagged-source verification](release-evidence/2026-11-25-alpha6/README.md)
+passed a default-platform Linux ARM64 Docker build and smoke, retry/reset/replay,
+and a native macOS ARM64 install with both lost-reply restart controls. Anonymous
+release/API/TAR/ZIP access and final release-note readback passed. All 565 tracked
+source files matched the released commit. No images or executable assets were
+published. Local AMD64, Windows, and customer acceptance were not run.
+
+The following alpha.5 records remain historical and are separate from alpha.6.
 
 The published `v0.1.1-alpha.5` annotated tag resolves to
 [`f10bd4c9551f4617f68e9ba7aa08385e178dff6a`](https://github.com/givtaj/sleepapi/commit/f10bd4c9551f4617f68e9ba7aa08385e178dff6a).
@@ -124,7 +128,7 @@ Use this checklist for each release and include the final results in its notes:
 | Required check | Completion evidence |
 | --- | --- |
 | Release candidate committed and pushed | Full commit SHA and source link |
-| Linux / Rust stable | Successful CI job including formatting, lint, all Rust/Python tests (100/43 reported for the alpha.6 implementation), build, alpha smoke, retry-client example, installed lost-reply controls, and packaging |
+| Linux / Rust stable | Successful CI job including formatting, lint, all Rust/Python tests (100/43 in the alpha.6 release), build, alpha smoke, retry-client example, installed lost-reply controls, and packaging |
 | Linux / Rust 1.94.0 | Successful CI job including lint, tests, and build |
 | Docker / linux/amd64 | Successful native build and container smoke checks, including `--metadata` for alpha.5 and later |
 | Docker / linux/arm64 | Successful native build and container smoke checks, including `--metadata` for alpha.5 and later |
@@ -242,7 +246,9 @@ leave acceptance unknown. This control verifies simulated acceptance, not
 completion by a real provider. Docker smoke does not replace this native gate.
 
 The [candidate comparison](release-evidence/2026-11-23-lost-reply/README.md)
-passed on macOS ARM64 against published alpha.5. Each future tag containing
+passed on macOS ARM64 against published alpha.5. The
+[alpha.6 tagged installation](release-evidence/2026-11-25-alpha6/README.md)
+subsequently passed both native installed controls. Each future tag containing
 this feature needs a fresh installation report for its own revision.
 
 ## Local checks when implementation changes

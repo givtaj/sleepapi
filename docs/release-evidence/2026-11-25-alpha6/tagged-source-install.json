@@ -1,0 +1,396 @@
+{
+  "artifact_sha256": {
+    "docker-build.log": "0b117540a0485a901ed378cb4f283559e8fa3d4e57be7e01dd2f618fa885f0b4",
+    "docker-smoke.log": "bd1298524d6c759483ff84e85e19b454996405c94c83b90d1f82fed5821be4d5",
+    "lost-reply.json": "a620ce049700fe24c5c58b59126e682b27b62cc09d70f52136785a5f7438f83d",
+    "native-install.log": "fb72e1f28d99ec9cbacffabf2b331655d9d260f316e09c786b6933ec83506893",
+    "release-ci.json": "3382e21938d0a62cb905ab2af37d0f005d2c4c1aeaa17a0bc7f6f9f731b56823",
+    "retry-client.json": "7280840035448b3e476425b9fdf6606c3817c11d97afba160b9ee4d4229a315c",
+    "source-manifest.json": "4e2d19ce33d6535df542520b98c755c3cc4ab4981b7b16c1e5447ddc0504c587"
+  },
+  "ci_test_counts": {
+    "python_tests_stable": 43,
+    "rust_tests_by_job": {
+      "Linux / Rust 1.94.0": 100,
+      "Linux / Rust stable": 100
+    },
+    "status": "PASS"
+  },
+  "distribution": "source plus Dockerfile; no Docker registry publication or uploaded executable assets",
+  "docker_build": {
+    "DOCKER_DEFAULT_PLATFORM": null,
+    "argv": [
+      "docker",
+      "build",
+      "--pull",
+      "--no-cache",
+      "--progress=plain",
+      "--iidfile",
+      "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/image-id.txt",
+      "-t",
+      "sleepapi:alpha6-verify-20261125-1apua2",
+      "."
+    ],
+    "cwd": "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source",
+    "docker_image_published": false,
+    "exit_code": 0,
+    "finished_at": "2026-11-25T10:18:11.738289+00:00",
+    "image_id": "sha256:1f13b993e8425b7aa7cde9c98186188247008c46e65d78434b15015113f970a9",
+    "log_sha256": "0b117540a0485a901ed378cb4f283559e8fa3d4e57be7e01dd2f618fa885f0b4",
+    "platform_override_in_command": false,
+    "source_commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "source_tree": "6c51af48cfa62b8b61ae46693d7ecbd222d083df",
+    "started_at": "2026-11-25T10:17:49.381888+00:00",
+    "status": "PASS"
+  },
+  "docker_install": {
+    "artifact_sha256": {
+      "container.log": "7a8a08e782ea0f9a63c7b0bb452d3dab5339c54e47a9abaade54d85ee5e7f9ae",
+      "docker-smoke.log": "bd1298524d6c759483ff84e85e19b454996405c94c83b90d1f82fed5821be4d5",
+      "retry-client.json": "7280840035448b3e476425b9fdf6606c3817c11d97afba160b9ee4d4229a315c",
+      "retry-client.log": "7280840035448b3e476425b9fdf6606c3817c11d97afba160b9ee4d4229a315c"
+    },
+    "checkout": "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source",
+    "cleanup_errors": [],
+    "container": {
+      "host_ip": "127.0.0.1",
+      "id": "d0848d780d02500333aad196ade95b57c3e9af010a634b805e959eb2cea93126",
+      "image_id": "sha256:1f13b993e8425b7aa7cde9c98186188247008c46e65d78434b15015113f970a9",
+      "port": 61477
+    },
+    "container_logs": {
+      "argv": [
+        "docker",
+        "logs",
+        "d0848d780d02500333aad196ade95b57c3e9af010a634b805e959eb2cea93126"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-11-25T10:18:39.433165+00:00",
+      "log": "container.log",
+      "log_sha256": "7a8a08e782ea0f9a63c7b0bb452d3dab5339c54e47a9abaade54d85ee5e7f9ae",
+      "started_at": "2026-11-25T10:18:39.396703+00:00",
+      "timed_out": false
+    },
+    "container_name": "sleepapi-release-562cf93f0e56415d8770454b8433e70c",
+    "docker_image_published": false,
+    "docker_smoke": {
+      "argv": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "-B",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source/scripts/docker-smoke.py",
+        "sha256:1f13b993e8425b7aa7cde9c98186188247008c46e65d78434b15015113f970a9",
+        "--metadata"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-11-25T10:18:38.565407+00:00",
+      "log": "docker-smoke.log",
+      "log_sha256": "bd1298524d6c759483ff84e85e19b454996405c94c83b90d1f82fed5821be4d5",
+      "started_at": "2026-11-25T10:18:37.222728+00:00",
+      "timed_out": false
+    },
+    "expected_version": "0.1.1-alpha.6",
+    "finished_at": "2026-11-25T10:18:39.498869+00:00",
+    "format": "sleepapi-tagged-docker-install/1",
+    "image": {
+      "architecture": "arm64",
+      "configured_user": "65532:65532",
+      "id": "sha256:1f13b993e8425b7aa7cde9c98186188247008c46e65d78434b15015113f970a9",
+      "os": "linux"
+    },
+    "metadata": {
+      "capabilities": {
+        "accept_then_drop": true,
+        "connection_drop": true,
+        "delays": true,
+        "persistent_runs": false,
+        "recovery_runs": true,
+        "response_fixtures": true,
+        "run_receipts": true,
+        "run_reset": true,
+        "status_codes": true,
+        "truncated_response": true
+      },
+      "contract_version": 1,
+      "limits": {
+        "fixtures": {
+          "content_types": [
+            "application/json",
+            "text/plain",
+            "application/xml"
+          ],
+          "header_names": [
+            "retry-after",
+            "www-authenticate",
+            "allow",
+            "cache-control",
+            "x-request-id"
+          ],
+          "max_body_bytes": 4096,
+          "max_header_value_bytes": 256,
+          "max_headers": 5
+        },
+        "max_duration_ms": 30000,
+        "max_in_flight": 64,
+        "max_request_body_bytes": 8192,
+        "runs": {
+          "default_ttl_ms": 300000,
+          "max_attempts_per_run": 1024,
+          "max_receipts_per_run": 32,
+          "max_runs": 64,
+          "max_sequence_steps": 64,
+          "max_ttl_ms": 3600000
+        }
+      },
+      "protocols": {
+        "transport_faults": [
+          "HTTP/1.1"
+        ]
+      },
+      "scenarios": [
+        "fast_success",
+        "slow_provider",
+        "delayed_failure",
+        "client_timeout",
+        "rate_limited",
+        "invalid_request",
+        "upstream_timeout"
+      ],
+      "schema_version": 1,
+      "software": {
+        "name": "sleepapi",
+        "version": "0.1.1-alpha.6"
+      },
+      "wait_methods": [
+        "tokio_sleep",
+        "tokio_spawn",
+        "thread_sleep",
+        "thread_park"
+      ]
+    },
+    "owned_container_removed": true,
+    "requested_image": "sha256:1f13b993e8425b7aa7cde9c98186188247008c46e65d78434b15015113f970a9",
+    "retry_client": {
+      "argv": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "-B",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source/examples/retry-client.py",
+        "--base-url",
+        "http://127.0.0.1:61477",
+        "--output",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/docker-install/retry-client.json"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-11-25T10:18:39.207064+00:00",
+      "log": "retry-client.log",
+      "log_sha256": "7280840035448b3e476425b9fdf6606c3817c11d97afba160b9ee4d4229a315c",
+      "started_at": "2026-11-25T10:18:38.763238+00:00",
+      "timed_out": false
+    },
+    "runtime_binary_sha256": "9e18d40e7d62e8653627b18e18393e0cc870c3211a1d90e6f4bc29d9473a7f71",
+    "runtime_uid": 65532,
+    "script_sha256": {
+      "examples/retry-client.py": "69528a80e1e7b63967b0d421ffee8a179fc4d295c776e105678dc52d5c183aaa",
+      "scripts/docker-smoke.py": "74a813750bdbfffb2bb8efea4bc58f28f4087428d0d6f99051b87763cb73b35a"
+    },
+    "shutdown": {
+      "exit_code": 0,
+      "running": false
+    },
+    "smoke_cleanup": "verified_by_unchanged_smoke_script",
+    "source_commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "started_at": "2026-11-25T10:18:37.102736+00:00",
+    "status": "PASS"
+  },
+  "helper_sha256": {
+    "build-docker.py": "b3d13fd8e12db50e397bae39e7899e6aa70ab6ed187d8d9621cf40125c8b03c5",
+    "verify-install.py": "af6e94cebd21f01b97fab6da84dfd6002f98a3e87160a2ae22d1df698d514de8",
+    "verify-native.py": "ae6e20cb571a017133948a7b4b194447ad3c8ea855e08bd46d40cf2ece28121a",
+    "verify-source.py": "e3e50de695583e8e0e549a3fa3955f4ebfa79cb1583c505da302413a317b7b83"
+  },
+  "host": {
+    "architecture": "arm64",
+    "docker_engine": "29.8.1",
+    "macOS": "26.0.1"
+  },
+  "native_install": {
+    "artifact_sha256": {
+      "install.stderr.log": "fb72e1f28d99ec9cbacffabf2b331655d9d260f316e09c786b6933ec83506893",
+      "install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lost-reply.json": "a620ce049700fe24c5c58b59126e682b27b62cc09d70f52136785a5f7438f83d",
+      "lost-reply.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checkout": "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source",
+    "controls": [
+      {
+        "additional_sends": 1,
+        "cleanup": "deleted_and_absent",
+        "fault": "connection_drop",
+        "final_attempt_receipts": 2,
+        "initial_response_bytes": 0,
+        "name": "installed_plain_drop",
+        "polls": 3,
+        "provider_accepted": false,
+        "separate_worker_process": true,
+        "status": "PASS"
+      },
+      {
+        "additional_sends": 0,
+        "cleanup": "deleted_and_absent",
+        "fault": "accept_then_drop",
+        "final_attempt_receipts": 1,
+        "initial_response_bytes": 0,
+        "name": "installed_accept_then_drop",
+        "polls": 3,
+        "provider_accepted": true,
+        "separate_worker_process": true,
+        "status": "PASS"
+      }
+    ],
+    "environment": {
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+      "machine": "arm64",
+      "python": "3.9.6",
+      "release": "25.0.0",
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "rustc_verbose": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1",
+      "system": "Darwin"
+    },
+    "expected_commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "expected_version": "0.1.1-alpha.6",
+    "finished_at": "2026-11-25T10:18:10.106567+00:00",
+    "format": "sleepapi-tagged-native-install/1",
+    "install": {
+      "argv": [
+        "cargo",
+        "install",
+        "--locked",
+        "--path",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source",
+        "--root",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/native-install/install",
+        "--target-dir",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/native-install/target"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-11-25T10:18:09.182243+00:00",
+      "pid": 44310,
+      "started_at": "2026-11-25T10:17:48.692203+00:00",
+      "stderr": "install.stderr.log",
+      "stderr_sha256": "fb72e1f28d99ec9cbacffabf2b331655d9d260f316e09c786b6933ec83506893",
+      "stdout": "install.stdout.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timed_out": false,
+      "timeout_seconds": 1200
+    },
+    "installed_binary_sha256": "baea586e0c0657ac58f7b4d2b256c1af79960855d7f23836a0166cee57d6dc00",
+    "limitations": [
+      "Fresh install and target directories; Cargo registry/source caches may be reused.",
+      "Synthetic loopback worker controls, not customer or production acceptance.",
+      "Probe reports its owned run deletion and server exit; this wrapper validates that report."
+    ],
+    "probe": {
+      "argv": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "-B",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/tagged-source/scripts/verify-lost-reply.py",
+        "--installed-binary",
+        "/private/tmp/sleepapi-alpha6-release-20261125.1Apua2/native-install/install/bin/sleepapi"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-11-25T10:18:10.054140+00:00",
+      "pid": 45870,
+      "started_at": "2026-11-25T10:18:09.185498+00:00",
+      "stderr": "lost-reply.stderr.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "lost-reply.json",
+      "stdout_sha256": "a620ce049700fe24c5c58b59126e682b27b62cc09d70f52136785a5f7438f83d",
+      "timed_out": false,
+      "timeout_seconds": 120
+    },
+    "source_clean_after_checks": true,
+    "source_commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "source_input_sha256": {
+      "Cargo.lock": "fe080bc1cb15d047e9cea7c6ff474e0914e099cfaa40c153c6629759d21729e5",
+      "Cargo.toml": "4addbb50e6ba72b3de3cf834df6d1fcc1901e3498432b6da44d7cb17c7354a68",
+      "examples/retry-client.py": "69528a80e1e7b63967b0d421ffee8a179fc4d295c776e105678dc52d5c183aaa",
+      "scripts/verify-lost-reply.py": "596414e0465f8c823ba237f36d736de248a0f72689d94307f410321331ad5a65"
+    },
+    "source_tree": "6c51af48cfa62b8b61ae46693d7ecbd222d083df",
+    "started_at": "2026-11-25T10:17:48.586809+00:00",
+    "status": "PASS",
+    "tag": "v0.1.1-alpha.6",
+    "tag_object": "e66f91429a0c89d92d89ad0ba50062e981ee3096"
+  },
+  "postpublication_review": {
+    "final_notes_sha256": "3a7231a34328f1fbaed842d9087e82771b7aa1c5b772a8ad3c6f0ba7e3271568",
+    "reviewer": "alpha6_gate_review",
+    "scope": "anonymous release/API/HTML, final notes readback, fresh public TAR/ZIP contents, copied receipt integrity",
+    "status": "PASS"
+  },
+  "preparation_review": {
+    "base": "f978e653d1a9f6eaf20ebd2f6aec2f6e9c38201d",
+    "diff_sha256": "a9b761a4a8dbf9c50e8191598ccc492f738aae6b757509df698583863fe38fd7",
+    "findings": [],
+    "reviewer": "alpha6_gate_review",
+    "scope": "eight-file release preparation; source and installation helpers reviewed separately",
+    "status": "PASS"
+  },
+  "prepublication_review": {
+    "commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "release_notes_sha256": "2e3a749a6b65af41b6918f2f4510c680d85e94438d05c47096b71cf94e5495c1",
+    "remaining": "anonymous release page/API/archive checks after publication and completion docs",
+    "reviewer": "alpha6_gate_review",
+    "scope": "all four CI jobs, 565 source files and both archives, default ARM64 Docker installation and cleanup, fresh native installation and both lost-reply restart controls",
+    "status": "PASS",
+    "tag_object": "e66f91429a0c89d92d89ad0ba50062e981ee3096"
+  },
+  "prior_tags_unchanged": true,
+  "public_access": {
+    "anonymous": true,
+    "authorization_header_supplied": false,
+    "commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "curl_config_disabled": true,
+    "draft": false,
+    "final_notes_anonymous_readback": "PASS",
+    "final_release_notes_sha256": "3a7231a34328f1fbaed842d9087e82771b7aa1c5b772a8ad3c6f0ba7e3271568",
+    "http_status_chains": {
+      "public-release-api": [
+        "200"
+      ],
+      "public-release-page": [
+        "200"
+      ],
+      "public-source-tar": [
+        "302",
+        "200"
+      ],
+      "public-source-zip": [
+        "302",
+        "200"
+      ]
+    },
+    "observed_at": "2026-11-25T10:21:03.665027+00:00",
+    "prerelease": true,
+    "published_at": "2026-11-25T10:20:35Z",
+    "readback_note": "Initial immediate read returned prior cached release notes; cache-busted anonymous read matched final body.",
+    "release_notes_sha256": "2e3a749a6b65af41b6918f2f4510c680d85e94438d05c47096b71cf94e5495c1",
+    "release_url": "https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.6",
+    "source_files_matched": 565,
+    "status": "PASS",
+    "tag": "v0.1.1-alpha.6",
+    "tar_sha256": "d03d2e395faff6606a5e681549f35500dea10818a9fc09c9adc5fa5dfc6fc822",
+    "uploaded_assets": 0,
+    "zip_sha256": "c6ce902c3d1069c0e8cbf35314240cbfa6c8605d56ad1f338b4acf6d92025581"
+  },
+  "schema_version": 1,
+  "status": "PASS",
+  "tag_identity": {
+    "commit": "0085226a91eb5f5a989de7377bb0e3e35a21d439",
+    "main_ci": "https://github.com/givtaj/sleepapi/actions/runs/45592959784",
+    "remote_tag_refs": "e66f91429a0c89d92d89ad0ba50062e981ee3096\trefs/tags/v0.1.1-alpha.6\n0085226a91eb5f5a989de7377bb0e3e35a21d439\trefs/tags/v0.1.1-alpha.6^{}\n",
+    "status": "PASS",
+    "tag": "v0.1.1-alpha.6",
+    "tag_object": "e66f91429a0c89d92d89ad0ba50062e981ee3096",
+    "tree": "6c51af48cfa62b8b61ae46693d7ecbd222d083df"
+  }
+}

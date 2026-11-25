@@ -1,11 +1,17 @@
 # Changelog
 
-## 0.1.1-alpha.6 — unreleased candidate
+## 0.1.1-alpha.6 — 2026-11-25
 
-Planned source prerelease date: **25 November 2026 (Europe/Madrid)**.
-Publication is pending final review, exact-release-commit CI, fresh tagged-source
-Docker and native installation checks, and anonymous release/source access.
-Distribution remains source plus a Dockerfile; Docker image publication is disabled.
+Published as a [GitHub source prerelease](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.6)
+on **25 November 2026 (Europe/Madrid)** at commit
+`0085226a91eb5f5a989de7377bb0e3e35a21d439`.
+[All four exact-commit CI jobs](https://github.com/givtaj/sleepapi/actions/runs/45592959784)
+and [fresh tagged-source installation and public-access checks](docs/release-evidence/2026-11-25-alpha6/README.md)
+passed, including both native installed lost-reply restart controls.
+Distribution remains source plus a Dockerfile; no Docker images or executable
+assets were published. The quickstart now uses alpha.6. The immutable tag retains
+preparation-time candidate wording and the alpha.5 pin; this completion record
+is a later documentation update on main.
 
 ### Fixed
 
@@ -39,7 +45,7 @@ on **17 November 2026 (Europe/Madrid)** at commit
 `f10bd4c9551f4617f68e9ba7aa08385e178dff6a`.
 [All four main CI jobs](https://github.com/givtaj/sleepapi/actions/runs/44051798111)
 and [fresh tagged-source installation and public-access checks](docs/release-evidence/2026-11-17-alpha5/README.md)
-passed. The public quickstart now builds alpha.5 locally from its immutable
+passed. The public quickstart then used alpha.5 locally from its immutable
 source tag. No Docker images were published; registry publication remains disabled.
 
 The earlier [10 November candidate verification](docs/release-evidence/2026-11-10-alpha5/README.md)

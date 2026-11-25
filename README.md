@@ -10,8 +10,8 @@ repeatable local scenarios. SleepAPI lets you:
 SleepAPI is built with Rust, Axum, and Tokio. It runs locally with no external
 provider or hosted service. SleepAPI ships **source plus a Dockerfile**; build
 the image locally using Docker's configured default platform. The quickstart
-uses the published **v0.1.1-alpha.5** source. See the
-[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5).
+uses the published **v0.1.1-alpha.6** source. See the
+[release notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.6).
 
 [Quickstart](#quickstart-two-failures-then-success) · [API reference](#http-contract) ·
 [Configuration](#configuration) · [Development](#develop) · [Contributing](CONTRIBUTING.md)
@@ -36,10 +36,10 @@ server. The build uses your Docker platform defaults; no `--platform` override
 is required:
 
 ```sh
-git clone --branch v0.1.1-alpha.5 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-alpha5
-cd sleepapi-alpha5
-docker build -t sleepapi:0.1.1-alpha.5 .
-docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.5
+git clone --branch v0.1.1-alpha.6 --depth 1 https://github.com/givtaj/sleepapi.git sleepapi-alpha6
+cd sleepapi-alpha6
+docker build -t sleepapi:0.1.1-alpha.6 .
+docker run --rm --name sleepapi -p 127.0.0.1:3000:3000 sleepapi:0.1.1-alpha.6
 ```
 
 The first build downloads base images and Rust dependencies. Wait for
@@ -367,7 +367,7 @@ exhausting the shared capacity returns HTTP `429`, `Retry-After: 1`, and:
 | `DELETE /runs/{run_id}` | Remove a run and its retained state |
 
 The read-only [metadata endpoint and capability-check example](docs/server-metadata.md)
-are included in the **published alpha.5 source** used by the quickstart. The older
+are included in the **published alpha.6 source** used by the quickstart. The older
 alpha.4 source does not contain `/metadata`.
 Check explicit capabilities rather than inferring support from the package
 version; metadata is a declaration, not verified binary or image provenance.
@@ -582,13 +582,21 @@ and server startup/shutdown (`src/main.rs`).
 
 ## Release status
 
-**0.1.1-alpha.6 is an unreleased candidate**, planned for **25 November 2026
-(Europe/Madrid)**. It combines request validation, capability-client, browser
+**v0.1.1-alpha.6** was published on **25 November 2026 (Europe/Madrid)**.
+It combines request validation, capability-client, browser
 fixture-header, and Docker smoke cleanup fixes with the opt-in
 [`accept_then_drop` lost-final-reply fault](docs/response-fixtures.md#transport-faults).
-Final release-commit CI, fresh tagged-source Docker and native installation
-checks, and anonymous publication verification remain required. The quickstart
-stays pinned to the verified alpha.5 release until those gates pass.
+[All four main CI jobs](https://github.com/givtaj/sleepapi/actions/runs/45592959784)
+passed on released commit `0085226a91eb5f5a989de7377bb0e3e35a21d439`.
+[Fresh tagged-source verification](docs/release-evidence/2026-11-25-alpha6/README.md)
+passed for a default-platform Linux ARM64 Docker build, a native macOS ARM64
+install with both lost-reply restart controls, and anonymous release/archive
+access. The quickstart now builds that verified source tag locally. No Docker
+images or executable assets were published.
+
+The immutable alpha.6 tag retains the preparation-time candidate wording and
+alpha.5 quickstart pin. This completion record and updated quickstart are later
+documentation on main; they do not move the tag or change its source.
 
 **v0.1.1-alpha.5** was published on **17 November 2026 (Europe/Madrid)** as
 source plus a Dockerfile. It adds versioned
@@ -597,11 +605,11 @@ runs, exact UTF-8 response fixtures, and HTTP/1.1 transport faults.
 [Main CI](https://github.com/givtaj/sleepapi/actions/runs/44051798111) passed all
 four jobs on released commit `f10bd4c9551f4617f68e9ba7aa08385e178dff6a`.
 [Fresh tagged-source installation and public-access verification](docs/release-evidence/2026-11-17-alpha5/README.md)
-passed; the quickstart now builds that verified tag locally. No Docker images
+passed; the quickstart used that verified tag after its release. No Docker images
 were published for alpha.5, and registry image publication remains disabled.
 
 Publication status and platform limits are recorded in the
-[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.5).
+[GitHub prerelease notes](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.6).
 See the [changelog](CHANGELOG.md), [alpha gates](docs/ALPHA_READINESS.md), and
 [release checklist](docs/RELEASING.md) for scope and acceptance thresholds.
 Earlier release tags, including [alpha.4](https://github.com/givtaj/sleepapi/releases/tag/v0.1.1-alpha.4)
