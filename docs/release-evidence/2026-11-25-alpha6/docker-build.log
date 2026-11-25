@@ -1,0 +1,223 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile:
+#1 transferring dockerfile: 655B 0.0s done
+#1 DONE 0.2s
+
+#2 [internal] load metadata for docker.io/library/rust:1.94.0-slim-bookworm
+#2 DONE 1.5s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 1.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 113B done
+#4 DONE 0.0s
+
+#5 [build 1/5] FROM docker.io/library/rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62
+#5 resolve docker.io/library/rust:1.94.0-slim-bookworm@sha256:a86cada82e36ebd7a9bffed7548792c55a952fdb20718eea9278a936bcb76e62 0.0s done
+#5 DONE 0.0s
+
+#6 [build 2/5] WORKDIR /build
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 126.95kB 0.0s done
+#7 DONE 0.0s
+
+#8 [build 3/5] COPY Cargo.toml Cargo.lock README.md LICENSE ./
+#8 DONE 0.0s
+
+#9 [runtime 1/2] FROM docker.io/library/debian:bookworm-slim@sha256:e67eeead736ff7bbe258ef088bff683635c561b1fcfefad0806c1df4ab49ce0e
+#9 resolve docker.io/library/debian:bookworm-slim@sha256:e67eeead736ff7bbe258ef088bff683635c561b1fcfefad0806c1df4ab49ce0e 0.0s done
+#9 ...
+
+#10 [build 4/5] COPY src ./src
+#10 DONE 0.0s
+
+#9 [runtime 1/2] FROM docker.io/library/debian:bookworm-slim@sha256:e67eeead736ff7bbe258ef088bff683635c561b1fcfefad0806c1df4ab49ce0e
+#9 sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e 0B / 28.14MB 0.2s
+#9 sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e 9.44MB / 28.14MB 0.5s
+#9 sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e 17.83MB / 28.14MB 0.6s
+#9 sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e 19.92MB / 28.14MB 0.8s
+#9 sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e 28.14MB / 28.14MB 0.9s done
+#9 extracting sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e
+#9 extracting sha256:7f1aa0b5c351d0542b2066749ed47608e5873bcdd1fd14f4df6f0a05cac02f8e 2.5s done
+#9 DONE 3.5s
+
+#11 [build 5/5] RUN cargo build --release --locked --bin sleepapi
+#11 0.473     Updating crates.io index
+#11 1.212  Downloading crates ...
+#11 1.345   Downloaded bitflags v2.13.2
+#11 1.359   Downloaded cfg-if v1.0.5
+#11 1.360   Downloaded atomic-waker v1.1.2
+#11 1.368   Downloaded tokio-macros v2.7.2
+#11 1.368   Downloaded percent-encoding v2.3.2
+#11 1.370   Downloaded serde_urlencoded v0.7.1
+#11 1.372   Downloaded tower-service v0.3.3
+#11 1.372   Downloaded time-core v0.1.9
+#11 1.374   Downloaded thread_local v1.1.10
+#11 1.374   Downloaded symlink v0.1.0
+#11 1.378   Downloaded errno v0.3.14
+#11 1.381   Downloaded form_urlencoded v1.2.2
+#11 1.381   Downloaded sync_wrapper v1.0.2
+#11 1.383   Downloaded num-conv v0.2.2
+#11 1.389   Downloaded http-body v1.1.0
+#11 1.391   Downloaded futures-core v0.3.34
+#11 1.394   Downloaded tower-layer v0.3.3
+#11 1.395   Downloaded powerfmt v0.2.1
+#11 1.399   Downloaded futures-task v0.3.34
+#11 1.403   Downloaded pin-project-lite v0.2.17
+#11 1.415   Downloaded zmij v1.0.23
+#11 1.416   Downloaded unicode-ident v1.0.26
+#11 1.419   Downloaded tracing-attributes v0.1.31
+#11 1.419   Downloaded time-macros v0.2.32
+#11 1.422   Downloaded once_cell v1.21.4
+#11 1.424   Downloaded sharded-slab v0.1.7
+#11 1.426   Downloaded socket2 v0.6.5
+#11 1.428   Downloaded smallvec v1.16.2
+#11 1.428   Downloaded ryu v1.0.23
+#11 1.431   Downloaded serde_derive v1.0.229
+#11 1.435   Downloaded serde_core v1.0.229
+#11 1.438   Downloaded matchit v0.8.4
+#11 1.440   Downloaded proc-macro2 v1.0.107
+#11 1.443   Downloaded tracing-core v0.1.36
+#11 1.454   Downloaded log v0.4.34
+#11 1.461   Downloaded crossbeam-channel v0.5.17
+#11 1.468   Downloaded tower v0.5.3
+#11 1.482   Downloaded hyper-util v0.1.21
+#11 1.492   Downloaded aho-corasick v1.1.5
+#11 1.495   Downloaded hyper v1.11.1
+#11 1.500   Downloaded tower-http v0.7.1
+#11 1.507   Downloaded tracing-subscriber v0.3.23
+#11 1.516   Downloaded serde_json v1.0.151
+#11 1.519   Downloaded futures-util v0.3.34
+#11 1.528   Downloaded axum v0.8.9
+#11 1.539   Downloaded time v0.3.55
+#11 1.551   Downloaded serde v1.0.229
+#11 1.553   Downloaded syn v3.0.6
+#11 1.561   Downloaded regex-syntax v0.8.11
+#11 1.569   Downloaded syn v2.0.119
+#11 1.576   Downloaded mio v1.2.3
+#11 1.585   Downloaded memchr v2.8.3
+#11 1.591   Downloaded http v1.5.0
+#11 1.592   Downloaded tracing v0.1.44
+#11 1.609   Downloaded bytes v1.12.1
+#11 1.610   Downloaded httparse v1.10.1
+#11 1.612   Downloaded futures-channel v0.3.34
+#11 1.613   Downloaded tracing-log v0.2.0
+#11 1.614   Downloaded thiserror v2.0.21
+#11 1.616   Downloaded crossbeam-utils v0.8.23
+#11 1.619   Downloaded axum-core v0.5.6
+#11 1.622   Downloaded tracing-appender v0.2.5
+#11 1.624   Downloaded thiserror-impl v2.0.21
+#11 1.625   Downloaded slab v0.4.12
+#11 1.626   Downloaded regex-automata v0.4.18
+#11 1.638   Downloaded signal-hook-registry v1.4.8
+#11 1.639   Downloaded serde_path_to_error v0.1.20
+#11 1.640   Downloaded quote v1.0.47
+#11 1.642   Downloaded nu-ansi-term v0.50.3
+#11 1.644   Downloaded http-body-util v0.1.5
+#11 1.645   Downloaded deranged v0.5.9
+#11 1.646   Downloaded mime v0.3.17
+#11 1.647   Downloaded matchers v0.2.0
+#11 1.647   Downloaded lazy_static v1.5.0
+#11 1.648   Downloaded itoa v1.0.18
+#11 1.651   Downloaded httpdate v1.0.3
+#11 1.651   Downloaded libc v0.2.189
+#11 1.693   Downloaded tokio v1.53.1
+#11 1.799    Compiling proc-macro2 v1.0.107
+#11 1.801    Compiling unicode-ident v1.0.26
+#11 1.801    Compiling quote v1.0.47
+#11 1.803    Compiling pin-project-lite v0.2.17
+#11 1.803    Compiling itoa v1.0.18
+#11 1.803    Compiling libc v0.2.189
+#11 1.803    Compiling bytes v1.12.1
+#11 1.803    Compiling futures-core v0.3.34
+#11 1.803    Compiling once_cell v1.21.4
+#11 1.803    Compiling serde_core v1.0.229
+#11 2.125    Compiling log v0.4.34
+#11 2.143    Compiling tower-service v0.3.3
+#11 2.178    Compiling tracing-core v0.1.36
+#11 2.195    Compiling httparse v1.10.1
+#11 2.215    Compiling smallvec v1.16.2
+#11 2.256    Compiling serde v1.0.229
+#11 2.375    Compiling percent-encoding v2.3.2
+#11 2.438    Compiling zmij v1.0.23
+#11 2.482    Compiling crossbeam-utils v0.8.23
+#11 2.591    Compiling tower-layer v0.3.3
+#11 2.619    Compiling regex-syntax v0.8.11
+#11 2.698    Compiling http v1.5.0
+#11 2.762    Compiling futures-channel v0.3.34
+#11 2.877    Compiling sync_wrapper v1.0.2
+#11 3.065    Compiling slab v0.4.12
+#11 3.176    Compiling syn v3.0.6
+#11 3.231    Compiling syn v2.0.119
+#11 3.234    Compiling thiserror v2.0.21
+#11 3.259    Compiling serde_json v1.0.151
+#11 3.263    Compiling atomic-waker v1.1.2
+#11 3.365    Compiling httpdate v1.0.3
+#11 3.450    Compiling futures-task v0.3.34
+#11 3.507    Compiling errno v0.3.14
+#11 3.513    Compiling socket2 v0.6.5
+#11 3.562    Compiling mio v1.2.3
+#11 3.585    Compiling cfg-if v1.0.5
+#11 3.665    Compiling signal-hook-registry v1.4.8
+#11 3.665    Compiling http-body v1.1.0
+#11 3.697    Compiling lazy_static v1.5.0
+#11 3.808    Compiling sharded-slab v0.1.7
+#11 3.841    Compiling regex-automata v0.4.18
+#11 4.429    Compiling http-body-util v0.1.5
+#11 4.556    Compiling thread_local v1.1.10
+#11 4.818    Compiling futures-util v0.3.34
+#11 5.029    Compiling tracing-log v0.2.0
+#11 5.164    Compiling form_urlencoded v1.2.2
+#11 5.509    Compiling mime v0.3.17
+#11 5.565    Compiling nu-ansi-term v0.50.3
+#11 5.569    Compiling num-conv v0.2.2
+#11 5.629    Compiling deranged v0.5.9
+#11 5.711    Compiling memchr v2.8.3
+#11 5.715    Compiling time-core v0.1.9
+#11 5.936    Compiling ryu v1.0.23
+#11 6.236    Compiling powerfmt v0.2.1
+#11 6.378    Compiling crossbeam-channel v0.5.17
+#11 6.456    Compiling serde_path_to_error v0.1.20
+#11 6.898    Compiling matchers v0.2.0
+#11 6.912    Compiling time v0.3.55
+#11 7.021    Compiling symlink v0.1.0
+#11 7.045    Compiling bitflags v2.13.2
+#11 7.092    Compiling matchit v0.8.4
+#11 7.244    Compiling tower-http v0.7.1
+#11 7.542    Compiling tokio-macros v2.7.2
+#11 7.813    Compiling serde_derive v1.0.229
+#11 8.208    Compiling tokio v1.53.1
+#11 8.310    Compiling thiserror-impl v2.0.21
+#11 8.318    Compiling tracing-attributes v0.1.31
+#11 9.235    Compiling tracing v0.1.44
+#11 9.433    Compiling tracing-subscriber v0.3.23
+#11 9.515    Compiling axum-core v0.5.6
+#11 10.10    Compiling serde_urlencoded v0.7.1
+#11 10.24    Compiling tracing-appender v0.2.5
+#11 10.25    Compiling hyper v1.11.1
+#11 10.25    Compiling tower v0.5.3
+#11 11.07    Compiling hyper-util v0.1.21
+#11 11.47    Compiling axum v0.8.9
+#11 14.18    Compiling sleepapi v0.1.1-alpha.6 (/build)
+#11 16.66     Finished `release` profile [optimized] target(s) in 16.43s
+#11 DONE 16.8s
+
+#12 [runtime 2/2] COPY --from=build /build/target/release/sleepapi /usr/local/bin/sleepapi
+#12 DONE 0.0s
+
+#13 exporting to image
+#13 exporting layers 0.1s done
+#13 exporting manifest sha256:c7377b55d7a201fc96acad3b2533daea6fcbb397c9ade98b66ab4f0809ca48e4 done
+#13 exporting config sha256:978cd2fb477d3e593472b1602be2b096d87b7e39c49e6225ca32d9ab3ba83afd done
+#13 exporting attestation manifest sha256:1492b24b30c9bc7c720b6c90f16e5a5b6fcca0a22552effddfb84ea0df6dafe6 done
+#13 exporting manifest list sha256:1f13b993e8425b7aa7cde9c98186188247008c46e65d78434b15015113f970a9 done
+#13 naming to docker.io/library/sleepapi:alpha6-verify-20261125-1apua2 done
+#13 unpacking to docker.io/library/sleepapi:alpha6-verify-20261125-1apua2 0.0s done
+#13 DONE 0.1s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/famx89kf41dtyy5fw6iimn2cy

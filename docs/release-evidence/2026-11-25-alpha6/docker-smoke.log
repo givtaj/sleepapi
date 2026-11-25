@@ -1,0 +1,7 @@
+PASS: health, seven scenarios, four timed failure routes, CORS, and 401/405 headers
+PASS: bounded metadata, effective limits, fault capabilities, and read-only client
+PASS: recovery sequence, receipts, exhaustion, guarded reset, and deletion
+PASS: exact UTF-8 fixture bytes, headers, delay, separate receipts, and cleanup
+PASS: connection drop, byte-exact truncated response, recovery, receipts, and cleanup
+PASS: normal Docker stop exits 0
+PASS: incomplete request exits 2 after its grace period, without Docker SIGKILL

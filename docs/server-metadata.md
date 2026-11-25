@@ -14,12 +14,14 @@ The historical [fresh tagged-source verification](release-evidence/2026-11-17-al
 includes metadata and capability-client checks, alongside signed-out source and
 release access for alpha.5.
 
-The current source is the **unreleased `0.1.1-alpha.6` candidate**. It adds the
+The current source prerelease is **`0.1.1-alpha.6`, published on
+25 November 2026 (Europe/Madrid)**. It adds the
 `accept_then_drop` capability and strengthens the example client's validation
 of required protocols, wait methods, scenarios, and limits. Missing or malformed
-declarations produce `unknown`. Final release-commit CI and fresh tagged-source
-verification remain required; the quickstart stays pinned to alpha.5 until the
-new release is verified.
+declarations produce `unknown`. [Exact-commit CI and fresh tagged-source
+verification](release-evidence/2026-11-25-alpha6/README.md) passed, including
+metadata, both installed lost-reply controls, and anonymous release/archive
+access. The quickstart now uses the verified alpha.6 tag.
 Use explicit capability discovery rather than inferring support from a version
 string, and verify artifact provenance separately.
 
@@ -99,7 +101,7 @@ that does not understand the schema must treat capability support as unknown.
 | `run_receipts` | `true`; bounded per-run diagnostic receipts |
 | `response_fixtures` | `true`; exact UTF-8 fixture bodies within the fixture limits |
 | `connection_drop` | `true` only when this metadata request uses HTTP/1.1 through the instrumented `FaultListener` |
-| `accept_then_drop` | Present in the unreleased alpha.6 candidate and `true` only through the same HTTP/1.1 listener. Records simulated acceptance before dropping the final response. |
+| `accept_then_drop` | Available since alpha.6 and `true` only through the same HTTP/1.1 listener. Records simulated acceptance before dropping the final response. |
 | `truncated_response` | `true` only when this metadata request uses HTTP/1.1 through the instrumented `FaultListener` |
 | `persistent_runs` | `false`; runs and receipts are process-local and lost on restart |
 
