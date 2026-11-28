@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/sleepapi-rain-frog.png" width="192" alt="SleepAPI’s mascot, a sleepy orange desert rain frog">
+</p>
+
 # sleepapi
 
 Test how your HTTP client handles slow responses, failures, and recovery with
